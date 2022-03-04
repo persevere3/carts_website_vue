@@ -528,17 +528,14 @@ export default {
       xhr.send(formData);
       xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-          
-        }
+
+        } 
       }
     },
     initTimeAnalysis(){
-      let activePages = localStorage.getItem('activePages') || 0 ;
-
+      let activePages = localStorage.getItem('activePages');
       let lastTimeAnalysis = JSON.parse(localStorage.getItem('timeAnalysis'));
-
       let now = new Date().getTime();
-
       // 另開分頁
       if(activePages > 1){
         this.getUserIp_type = 1;
@@ -568,81 +565,25 @@ export default {
         android: navigator.userAgent.indexOf('Android') > -1 || navigator.userAgent.indexOf('Linux') > -1,
       }
 
-      function getOSAndBrowser() {
-        var os = navigator.platform;
-        var userAgent = navigator.userAgent;
-        var info = {};
-        var tempArray = "";
-        if (os.indexOf("Win") > -1) {
-            if (userAgent.indexOf("Windows NT 5.0") > -1) {
-                info.os = "Windows 2000";
-            } else if (userAgent.indexOf("Windows NT 5.1") > -1) {
-                info.os = "Windows XP";
-            } else if (userAgent.indexOf("Windows NT 5.2") > -1) {
-                info.os = "Windows 2003";
-            } else if (userAgent.indexOf("Windows NT 6.0") > -1) {
-                info.os = "Windows Vista";
-            } else if (userAgent.indexOf("Windows NT 6.1") > -1 || userAgent.indexOf("Windows 7") > -1) {
-                info.os = "Windows 7";
-            } else if (userAgent.indexOf("Windows NT 6.2") > -1 || userAgent.indexOf("Windows NT 6.3") > -1 || userAgent.indexOf("Windows 8") > -1) {
-                info.os = "Windows 8";
-            } else if (userAgent.indexOf("Windows NT 6.4") > -1 || userAgent.indexOf("Windows NT 10") > -1) {
-                info.os = "Windows 10";
-            } else {
-                info.os = "Other";
-            }
-        } else if (os.indexOf("Mac") > -1) {
-            info.os = "Mac";
-        } else if (os.indexOf("X11") > -1) {
-            info.os = "Unix";
-        } else if (os.indexOf("Linux") > -1) {
-            info.os = "Linux";
-        } else {
-            info.os = "Other";
-        }
-        if (/[Ff]irefox(\/\d+\.\d+)/.test(userAgent)) {
-            tempArray = /([Ff]irefox)\/(\d+\.\d+)/.exec(userAgent);
-            info.browserName = tempArray[1];
-            info.browserVersion = tempArray[2];
-        } else if (/[Tt]rident(\/\d+\.\d+)/.test(userAgent)) {
-            tempArray = /([Tt]rident)\/(\d+\.\d+)/.exec(userAgent);
-            if (tempArray[2] === "7.0") {
-                tempArray[2] = "11";
-            } else if (tempArray[2] === "6.0") {
-                tempArray[2] = "10";
-            } else if (tempArray[2] === "5.0") {
-                tempArray[2] = "9";
-            } else if (tempArray[2] === "4.0") {
-                tempArray[2] = "8";
-            }
-            tempArray[1] = "IE";
-            info.browserName = tempArray[1];
-            info.browserVersion = tempArray[2];
-        } else if (/[Cc]hrome\/\d+/.test(userAgent)) {
-            tempArray = /([Cc]hrome)\/(\d+)/.exec(userAgent);
-            info.browserName=tempArray[1];
-            info.browserVersion=tempArray[2];
-        } else if (/[Vv]ersion\/\d+\.\d+\.\d+(\.\d)* *[Ss]afari/.test(userAgent)) {
-            tempArray = /[Vv]ersion\/(\d+\.\d+\.\d+)(\.\d)* *([Ss]afari)/.exec(userAgent);
-            info.browserName=tempArray[3];
-            info.browserVersion=tempArray[1];
-        } else if (/[Oo]pera.+[Vv]ersion\/\d+\.\d+/.test(userAgent)) {
-            tempArray = /([Oo]pera).+[Vv]ersion\/(\d+)\.\d+/.exec(userAgent);
-            info.browserName=tempArray[1];
-            info.browserVersion=tempArray[2];
-        } else {
-            info += "unknown";
-            info.browserName="unknown";
-            info.browserVersion="unknown";
-        }
-        return info;
+      function getBrowser() {
+        let userAgent = navigator.userAgent.toLowerCase();
+        let browser;
+        userAgent.match(/edge\/([\d.]+)/) ? browser = 'Edge' :
+        userAgent.match(/rv:([\d.]+)\) like gecko/) ? browser = 'IE' :
+        userAgent.match(/msie ([\d.]+)/) ? browser = 'IE' :
+        userAgent.match(/firefox\/([\d.]+)/) ? browser = 'Firefox' :
+        userAgent.match(/chrome\/([\d.]+)/) ? browser = 'Chrome' :
+        userAgent.match(/opera.([\d.]+)/) ? browser = 'Opera' :
+        userAgent.match(/version\/([\d.]+).*safari/) ? browser = 'Safari' : 
+        browser = 'other';
+        return browser;
       };
-      let browser = getOSAndBrowser();
-
+      let browser = getBrowser();
+      
       let formData = new FormData();
       formData.append("sid", this.site.Name);
       formData.append("device", device.ios ? "ios" : (device.android ? "android" : "pc"));
-      formData.append("browser", browser.browserName);
+      formData.append("browser", browser);
       formData.append("type", this.getUserIp_type);
 
       let xhr = new XMLHttpRequest();
@@ -651,7 +592,7 @@ export default {
       xhr.send(formData);
       xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-          
+
         }
       }
     },
@@ -1030,7 +971,7 @@ export default {
         const vm = this;
 
         if(id === undefined){
-          vm.urlPush(`/cart`, true)
+          vm.urlPush(`/cart/`, true)
         }
         else{
           vm.urlPush(`/cart/?id=${id}`, true)
@@ -1044,15 +985,15 @@ export default {
     vm.protocol = location.protocol;
 
     // timeAnalysis activePages
-    let activePages = localStorage.getItem('activePages') || 0 ;
+    let activePages = localStorage.getItem('activePages') || 0;
     activePages ++;
     localStorage.setItem('activePages', activePages);
   
     // timeAnalysis ajax
     function leave(){
       // activePages
-      let activePages = localStorage.getItem('activePages') || 0 ;
-      +activePages --;
+      let activePages = localStorage.getItem('activePages') * 1;
+      activePages = activePages - 1;
       localStorage.setItem('activePages', activePages);
 
       if(activePages > 0) {

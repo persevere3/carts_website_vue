@@ -653,6 +653,14 @@ $primary_color: #4db38e;
           }
         }
       }
+
+      .prev{
+        width: 10px;
+        position: absolute;
+        left: 10px;
+        cursor: pointer;
+        display: none;
+      }
   
       .logo{
         margin-bottom: 5px;
@@ -785,6 +793,10 @@ $primary_color: #4db38e;
         flex-direction: row;
         justify-content: flex-start;
 
+        .prev.active{
+          display: flex;
+        }
+
         .logo{
           img{
             width: 110px;
@@ -823,6 +835,16 @@ $primary_color: #4db38e;
     }
   }
 
+  @include m{
+    .header, .header.is_scrollTop{
+      .widthContainer{
+        .prev.active{
+          display: flex;
+        }
+      }
+    }
+  }
+
   @include common;
 }
 
@@ -848,6 +870,14 @@ $primary_color: #4db38e;
       align-items: center;
       // ie
       height: 100px;
+
+      .prev{
+        width: 10px;
+        position: absolute;
+        left: 10px;
+        cursor: pointer;
+        display: none;
+      }
 
       .logo{
         position: absolute;
@@ -1083,6 +1113,15 @@ $primary_color: #4db38e;
         
         .navbar{
           display: none;
+        }
+      }
+    }
+  }
+  @include m{
+    .header, .header.is_scrollTop{
+      .widthContainer{
+        .prev.active{
+          display: flex;
         }
       }
     }

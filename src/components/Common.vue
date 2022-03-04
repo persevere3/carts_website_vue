@@ -95,6 +95,10 @@
           </div>
         </div>
 
+        <div class="prev" @click="prev" :class="{ active : pathname !== '/' }">
+          <img src=".././assets/img/arrow.png" alt="">
+        </div>
+
         <div class="logo" v-if="store" @click="urlPush('/')">
           <img :src="store.Logo" alt="">
         </div>
@@ -204,6 +208,9 @@ export default {
 
       api: '',
       protocol: '',
+
+      // 
+      pathname: 'other',
 
       // search
       is_search: 0,
@@ -413,12 +420,20 @@ export default {
     },
     pushTo_cart(id){
       this.$bus.$emit('pushTo_cart', id);
+    },
+    prev(){
+      window.history.go(-1);
     }
 
   },
   created(){
     this.api = location.host;
     this.protocol = location.protocol;
+
+    let pathname = location.pathname;
+    if( pathname === '/' || pathname === '/index.html'){
+      this.pathname = '/';
+    }
 
     // cordova
     // this.api = 'demo.uniqcarttest.tk';
