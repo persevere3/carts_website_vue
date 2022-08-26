@@ -89,6 +89,9 @@
             <li @click="pushTo_cart()">
               <i class="fa fa-shopping-cart" aria-hidden="true"></i>
             </li>
+            <li @click="urlPush('/order.html')">
+              <i class="fas fa-list-ol"></i>
+            </li>
           </ul>
           <div class='navbar_button' @click="open_sidebar" :class="{is_background: window_scrollTop > 100}">
             <i class="fa fa-th-list" aria-hidden="true"></i>

@@ -13,7 +13,7 @@ html{
   // word-break: break-all;
   
   .fa{
-    font-family: FontAwesome;
+    font-family: Font Awesome 5 Free;
   }
 }
 
@@ -588,6 +588,7 @@ $primary_color: #4db38e;
 
             &:hover{
               input{
+                border-bottom: 1px solid #555;
                 width: 100px;
               }
             }
@@ -610,11 +611,11 @@ $primary_color: #4db38e;
               outline: none;
   
               background-color: white;
-              border-bottom: 1px solid #555;
   
               transition: .5s;
 
               &:focus{
+                border-bottom: 1px solid #555;
                 width: 100px;
               }
             }
@@ -922,6 +923,7 @@ $primary_color: #4db38e;
 
             &:hover{
               input{
+                border-bottom: 1px solid #555;
                 width: 100px;
               }
             }
@@ -944,10 +946,10 @@ $primary_color: #4db38e;
               outline: none;
   
               background-color: white;
-              border-bottom: 1px solid #555;
   
               transition: .5s;
               &:focus{
+                border-bottom: 1px solid #555;
                 width: 100px;
               }
             }

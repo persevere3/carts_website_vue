@@ -37,6 +37,12 @@ module.exports = {
       filename: 'search.html', 
       chunks: ['chunk-vendors', 'chunk-common', 'search']
     },
+    order : {
+      entry: 'src/pages/order/main.js',
+      template: 'src/pages/order/index.html',
+      filename: 'order.html', 
+      chunks: ['chunk-vendors', 'chunk-common', 'order']
+    },
     error : {
       entry: 'src/pages/error/main.js',
       template: 'src/pages/error/index.html',

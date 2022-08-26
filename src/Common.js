@@ -51,6 +51,36 @@ export default {
       // res
       contact: '',
 
+      // order
+      order_mail: '',
+      order_name: '',
+      order_phone: '',
+      
+      order: '',
+      product_active: '',
+
+      payStatus_arr: [
+        '', '付款成功', '待付款', '已退款', '待對帳'
+      ],
+      delivery_arr: [
+        '', '已出貨', '待付款', '已退貨', '已取消'
+      ],
+
+      order_page_number: 0,
+      order_page_index: 1,
+      order_page_size: 10,
+      select_active: false,
+
+      is_payModal: false,
+      payModal_message: '',
+      
+      bank: '',
+      bank_code: '',
+      bank_account: '',
+
+      order_number: '',
+      account_number: '',
+    
       // timeAnalysis
       getUserIp_type: 0,
 
@@ -620,6 +650,11 @@ export default {
 
           let data = JSON.parse(xhr.response).data[0];
           let Ad = JSON.parse(xhr.response).Advertise;
+          for(let i = Ad.length - 1; i >= 0; i--){
+            if(!Ad[i].URL){
+              Ad.splice(i, 1)
+            }
+          }
 
           if(!data){
             return;
@@ -820,6 +855,112 @@ export default {
           vm.perpage_num =  6;
           vm.search_totalpage_num = Math.ceil(vm.search.length / vm.perpage_num);
           vm.product_page_active = 1;
+
+          vm.$forceUpdate();
+        }
+      }
+    },
+
+    // order
+    getOrder(){
+      if(!this.order_mail || !this.order_name || !this.order_phone){
+        this.payModal_message = '請填寫搜尋條件';
+        this.is_payModal = true;
+        this.order = null;
+        return
+      }
+
+      let vm = this;
+
+      let formData = new FormData();
+      formData.append("mail", this.order_mail.trim());
+      formData.append("name", this.order_name.trim());
+      formData.append("phone", this.order_phone.trim());
+
+      formData.append("pageindex", this.order_page_index);
+      formData.append("pagesize", this.order_page_size);
+
+      formData.append("Store", this.site.Store);
+      formData.append("Site", this.site.Site);
+
+      let xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+      xhr.open('post', `${vm.protocol}//${vm.api}/interface/web/GetOrderContactAjax`, true);
+      xhr.send(formData);
+      xhr.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          if(JSON.parse(xhr.response).errormessage){
+            vm.login(vm.getOrder);
+            return;
+          }
+
+          vm.order = JSON.parse(xhr.response).Orders;
+          vm.order_page_number = Math.ceil(JSON.parse(xhr.response).Count / vm.order_page_size);
+          vm.bank = require('./assets/bank.json');
+
+          if(vm.order_page_number == 0){
+            vm.payModal_message = '查無訂單資料';
+            vm.is_payModal = true;
+            vm.order = null;
+            return;
+          }
+
+          console.log(vm.order)
+
+          vm.$nextTick(function(){
+            let max_height = parseInt( getComputedStyle( document.querySelector('.td.products') )['maxHeight']);
+            let uls = document.querySelectorAll('.td.products ul');
+            uls.forEach(function(item, index){
+              // vm.$set(vm.order[index],"is_active", false)
+              if(item.getBoundingClientRect().height > max_height){
+                vm.$set(vm.order[index],"expandable", true)
+              }
+            })
+          })
+        }
+      }
+    },
+    copy(text){
+      let copy_input = document.querySelector('#copy_input');
+      copy_input.value = text;
+      copy_input.select();
+      document.execCommand('copy');
+    },
+    filter_account_number(){
+      if(this.account_number.length > 6){
+        this.account_number = this.account_number.substring(0, 6)
+      }
+    },
+    checkPay(){
+      if(!this.order_number || !this.account_number){
+        this.payModal_message = '請填寫匯款帳號末6碼';
+        this.is_payModal = true;
+        return
+      }
+
+      let vm = this;
+
+      let formData = new FormData();
+      formData.append("payflino", this.order_number);
+      formData.append("paytradeno", this.account_number);
+
+      let xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+      xhr.open('post', `${vm.protocol}//${vm.api}/interface/web/ATMComfirmBack`, true);
+      xhr.send(formData);
+      xhr.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          if(JSON.parse(xhr.response).errormessage){
+            vm.login(vm.getOrder);
+            return;
+          }
+          if(JSON.parse(xhr.response).status){
+            vm.payModal_message = '確認付款已送出';
+            vm.is_payModal = true;
+          } else {
+            vm.payModal_message = '確認付款失敗';
+            vm.is_payModal = true;
+          }
 
           vm.$forceUpdate();
         }
