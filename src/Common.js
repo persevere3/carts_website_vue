@@ -80,9 +80,6 @@ export default {
 
       order_number: '',
       account_number: '',
-    
-      // timeAnalysis
-      getUserIp_type: 0,
 
       // 
       status_500_counter: 0,
@@ -253,10 +250,6 @@ export default {
           vm.getStore();
           vm.getCopyRight();
           vm.getCustomerService();
-
-          vm.OpenPage();
-          vm.initTimeAnalysis();
-          vm.getUserIp();
 
           let pathname = location.pathname;
 
@@ -539,91 +532,6 @@ export default {
       // 
       for(let i = 0; i < script_arr.length; i++){
         document.querySelector(tag).appendChild(script_arr[i])
-      }
-    },
-
-    // timeAnalysis
-    OpenPage(){
-      let vm = this;
-      let page = location.pathname.split('/');
-      page = page[1] ? page[1] : "index.html";
-
-      let formData = new FormData();
-      formData.append("id", this.site.Name);
-      formData.append("page", page);
-
-      let xhr = new XMLHttpRequest();
-      xhr.withCredentials = true;
-      xhr.open('post',`${vm.protocol}//${vm.api}/interface/store/OpenPage`, true);
-      xhr.send(formData);
-      xhr.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-
-        } 
-      }
-    },
-    initTimeAnalysis(){
-      let activePages = localStorage.getItem('activePages');
-      let lastTimeAnalysis = JSON.parse(localStorage.getItem('timeAnalysis'));
-      let now = new Date().getTime();
-      // 另開分頁
-      if(activePages > 1){
-        this.getUserIp_type = 1;
-        return;
-      }
-
-      // 第一次進站 or 新一次瀏覽
-      if(!lastTimeAnalysis || parseInt((now - lastTimeAnalysis.endTime)/1000) > 5 ){
-        let timeAnalysis = {
-          startTime: new Date().getTime(),
-          endTime: '',
-          stayTime: '',
-        }
-        localStorage.setItem('timeAnalysis', JSON.stringify(timeAnalysis));
-        localStorage.setItem('failureProbabilityType', 0);
-        localStorage.setItem('isActiveUser', 0);
-      }      
-      else{ // 重整or站內跳頁，繼續上次瀏覽
-        this.getUserIp_type = 1;  
-      }    
-    },
-    getUserIp(){
-      let vm = this;
-
-      let device = {
-        ios: !!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/),
-        android: navigator.userAgent.indexOf('Android') > -1 || navigator.userAgent.indexOf('Linux') > -1,
-      }
-
-      function getBrowser() {
-        let userAgent = navigator.userAgent.toLowerCase();
-        let browser;
-        userAgent.match(/edge\/([\d.]+)/) ? browser = 'Edge' :
-        userAgent.match(/rv:([\d.]+)\) like gecko/) ? browser = 'IE' :
-        userAgent.match(/msie ([\d.]+)/) ? browser = 'IE' :
-        userAgent.match(/firefox\/([\d.]+)/) ? browser = 'Firefox' :
-        userAgent.match(/chrome\/([\d.]+)/) ? browser = 'Chrome' :
-        userAgent.match(/opera.([\d.]+)/) ? browser = 'Opera' :
-        userAgent.match(/version\/([\d.]+).*safari/) ? browser = 'Safari' : 
-        browser = 'other';
-        return browser;
-      };
-      let browser = getBrowser();
-      
-      let formData = new FormData();
-      formData.append("sid", this.site.Name);
-      formData.append("device", device.ios ? "ios" : (device.android ? "android" : "pc"));
-      formData.append("browser", browser);
-      formData.append("type", this.getUserIp_type);
-
-      let xhr = new XMLHttpRequest();
-      xhr.withCredentials = true;
-      xhr.open('post',`${vm.protocol}//${vm.api}/interface/store/getUserIp`, true);
-      xhr.send(formData);
-      xhr.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-
-        }
       }
     },
 
@@ -982,25 +890,6 @@ export default {
       this.$forceUpdate();
     },
     
-    PostBanner(id){
-      let vm = this;
-      localStorage.setItem('isActiveUser', 1);
-
-      let formData = new FormData();
-      formData.append("sid", vm.site.Name);
-      formData.append("adid", id);
-
-      let xhr = new XMLHttpRequest();
-      xhr.withCredentials = true;
-      xhr.open('post',`${vm.protocol}//${vm.api}/interface/store/PostBanner`, true);
-      xhr.send(formData);
-      xhr.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-          
-        }
-      }
-    },
-
     // allProducts, category, rich, contact(map)
     unescapeHTML(str){
       let vm = this;
@@ -1124,92 +1013,6 @@ export default {
     let vm = this;
     vm.api = location.host;
     vm.protocol = location.protocol;
-
-    // timeAnalysis activePages
-    let activePages = localStorage.getItem('activePages') || 0;
-    activePages ++;
-    localStorage.setItem('activePages', activePages);
-  
-    // timeAnalysis ajax
-    function leave(){
-      // activePages
-      let activePages = localStorage.getItem('activePages') * 1;
-      activePages = activePages - 1;
-      localStorage.setItem('activePages', activePages);
-
-      if(activePages > 0) {
-        return;
-      }
-
-      let isGetSite = localStorage.getItem('isGetSite') ;
-      let timeAnalysis = JSON.parse(localStorage.getItem('timeAnalysis'));
-      if(isGetSite){
-        timeAnalysis.endTime = new Date().getTime();
-        timeAnalysis.stayTime = Math.floor( (timeAnalysis.endTime - timeAnalysis.startTime) / 1000 );
-        localStorage.setItem('timeAnalysis', JSON.stringify(timeAnalysis));
-      }
-      else { // getSite 失敗 ， 沒有執行 initTimeAnalysis
-        return;
-      }
-
-      const url = `${vm.protocol}//${vm.api}/interface/store/ClosePage`;
-
-      // user
-      let user = localStorage.getItem('isActiveUser') 
-                              ? JSON.parse(localStorage.getItem('isActiveUser'))  
-                              : 0;
-
-      // type
-      // 失敗率 failureProbabilityType
-      let failureProbabilityType = localStorage.getItem('failureProbabilityType') 
-                              ? JSON.parse(localStorage.getItem('failureProbabilityType'))  
-                              : 0;
-      // isShowCartPage false: type0 
-      // isShowCartPage true: type1
-      // isClickNext true: type2
-      // isClickFinishOrder true: type3
-      let type;
-      switch(failureProbabilityType){
-        case 0:
-          type = 3;
-          break;
-        case 1:
-          type = 1;
-          break;
-        case 2:
-          type = 2;
-          break;
-        case 3:
-          type = 0;
-          break;
-      }
-      
-      // page
-      let page = location.pathname.split('/');
-      page = page[1] ? page[1] : "index.html";
-
-      let formData = new FormData();
-      formData.append('id', vm.site.Name + '');
-      formData.append('stayTime', timeAnalysis.stayTime + '');
-      formData.append('user', user);
-      formData.append('type', type);
-      formData.append('page', page);
-      
-      let xhr = new XMLHttpRequest();
-      xhr.withCredentials = true;
-      xhr.open('POST', url, true);
-      xhr.send(formData);
-      xhr.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-        }
-      }
-    }
-    if('onbeforeunload' in window){
-      window.addEventListener('beforeunload', leave);
-    }
-    else{
-      window.addEventListener('pagehide', leave);
-    }
 
     // login
     vm.$bus.$on('login', () => {

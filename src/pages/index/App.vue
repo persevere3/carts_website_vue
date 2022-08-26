@@ -16,7 +16,6 @@
             <div class="swiper-wrapper">
               <div class="swiper-slide" v-for="item in homePage.Ad" 
                    :key="item.ID" :style="{backgroundImage: `url(${item.URL})`}"
-                   @click="PostBanner(item.ID)"
               >
               </div>
             </div>
