@@ -10,9 +10,7 @@
       <div class="main">
         <div class="box">
           <div class="info">
-            <input type="text" placeholder="購買人Email" v-model="order_mail">
-            <input type="text" placeholder="購買人姓名" v-model="order_name">
-            <input type="text" placeholder="購買人連絡電話" v-model="order_phone">
+            <input type="text" placeholder="請輸入購買人連絡電話" v-model="order_phone" @keyup.enter="getOrder">
             <div class="button_row">
               <div class="button" @click="getOrder"> 搜尋 </div>
             </div>
@@ -60,19 +58,27 @@
                 </div>
                 <div class="td payState">
                   <div class="l_head"> 付款狀態 </div>
-                  <!-- PayStatus == 2 (待付款)，PayType == 'ATM' (ATM)，PayFilNo.indexOf('ECPay') == -1 (轉帳給公司) -->
-                  <div v-if="item.PayStatus == 2 && item.PayType == 'ATM' && item.PayFilNo.indexOf('ECPay') == -1">
-                    <div class="show_bank">
-                      <div class="button" @click.stop="is_payModal = true; payModal_message =  'template1'">
-                        銀行帳戶
+                  <!-- PayStatus == 2 (待付款)，PayMethod == 'ATM' (ATM)，PayType == 1 (轉帳給公司) -->
+                  <div class="state_container" v-if="item.PayStatus == 2 && item.PayMethod == 'ATM' && item.PayType == 1">
+                    <template v-if="store.SelfAtmStatus == 0">
+                      <div v-if="item.PayMethod" class="payMethod"> {{payMethod_obj[item.PayMethod]}} </div>
+                      <div> ATM帳戶關閉，請聯繫賣家 </div>
+                    </template>
+                    <template v-else>
+                      <div v-if="item.PayMethod" class="payMethod"> {{payMethod_obj[item.PayMethod]}} </div>
+                      <div class="show_bank">
+                        <div class="button" @click.stop="is_payModal = true; payModal_message =  'template1'">
+                          銀行帳戶
+                        </div>
                       </div>
-                    </div>
-                    <div class="button" @click.stop="is_payModal = true; payModal_message = 'template2'; account_number = ''; order_number = item.PayFilNo">
-                      確認付款
-                    </div>
+                      <div class="button" @click.stop="is_payModal = true; payModal_message = 'template2'; account_number = ''; order_number = item.PayFilNo">
+                        確認付款
+                      </div>
+                    </template>
                   </div>
-                  <div v-else>
-                    {{ payStatus_arr[item.PayStatus] }}
+                  <div class="state_container" v-else>
+                    <div v-if="item.PayMethod" class="payMethod"> {{payMethod_obj[item.PayMethod]}} </div>
+                    <div> {{ payStatus_arr[item.PayStatus] }} </div>
                   </div>
                 </div>
                 <div class="td transportState">
@@ -91,9 +97,9 @@
           <div class="page_container">
             <div class="page">
               <ul>
-                <li :class="{'disabled' : order_page_index < 2}" @click="order_page_index > 1 ? order_page_index-- : ''; getOrder()"> <i class="fas fa-caret-left"></i> </li>
-                <li v-show="order_page_index > Math.floor(5/2) && order_page_index < order_page_number - Math.floor(5/2) ? item >= order_page_index - Math.floor(5/2) && item <= order_page_index + Math.floor(5/2) : order_page_index <= 5  ? item <= 5 : item > order_page_number - 5" :class="{'active' : order_page_index === item}" v-for="item in order_page_number" :key="item" @click="order_page_index = item; getOrder()"> {{item}} </li>
-                <li :class="{'disabled' : order_page_index > order_page_number - 1}" @click="order_page_index < order_page_number ? order_page_index++ : ''; getOrder();"> <i class="fas fa-caret-right"></i> </li>
+                <li :class="{'disabled' : order_page_index < 2}" @click="order_page_index > 1 ? order_page_index-- : ''; getOrder('page')"> <i class="fas fa-caret-left"></i> </li>
+                <li v-show="order_page_index > Math.floor(5/2) && order_page_index < order_page_number - Math.floor(5/2) ? item >= order_page_index - Math.floor(5/2) && item <= order_page_index + Math.floor(5/2) : order_page_index <= 5  ? item <= 5 : item > order_page_number - 5" :class="{'active' : order_page_index === item}" v-for="item in order_page_number" :key="item" @click="order_page_index = item; getOrder('page')"> {{item}} </li>
+                <li :class="{'disabled' : order_page_index > order_page_number - 1}" @click="order_page_index < order_page_number ? order_page_index++ : ''; getOrder('page');"> <i class="fas fa-caret-right"></i> </li>
               </ul>
             </div>
             <div class="total"> {{ order_page_index }} / {{ order_page_number }} </div>
@@ -113,10 +119,10 @@
           <div class="close" @click="is_payModal = false; payModal_message = '';"><i class="fas fa-times"></i></div>
         
           <template v-if="payModal_message == 'template1'">
-            <div> {{bank_code}} {{bank[bank_code]}}</div>
+            <div> {{store.SelfAtmBankId}} {{bank[store.SelfAtmBankId]}}</div>
             <div class='bank_account'>
-              <input type='text' id='copy_input' readonly v-model='bank_account'>
-              <div class='copy' @click='copy(bank_account)'> 
+              <input type='text' id='copy_input' readonly v-model='store.SelfAtmId'>
+              <div class='copy' @click='copy(store.SelfAtmId)'> 
                 <i class='fas fa-copy'></i> 
               </div>
             </div>

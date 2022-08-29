@@ -52,8 +52,6 @@ export default {
       contact: '',
 
       // order
-      order_mail: '',
-      order_name: '',
       order_phone: '',
       
       order: '',
@@ -65,6 +63,14 @@ export default {
       delivery_arr: [
         '', '已出貨', '待付款', '已退貨', '已取消'
       ],
+      payMethod_obj: {
+        'CreditCard':'信用卡',
+        'ATM':'ATM',
+        'PayCode':'超商代碼',
+        'PayBarCode':'超商條碼',
+        'PayOnDelivery':'超商取貨付款',
+        'LinePay':'LinePay',
+      },
 
       order_page_number: 0,
       order_page_index: 1,
@@ -75,8 +81,6 @@ export default {
       payModal_message: '',
       
       bank: '',
-      bank_code: '',
-      bank_account: '',
 
       order_number: '',
       account_number: '',
@@ -423,7 +427,8 @@ export default {
           //   vm.login(vm.getStore);
           //   return;
           // }
-
+          
+          vm.bank = require('./assets/bank.json');
           vm.store = JSON.parse(xhr.response).data[0];
           let title = vm.store.Name;
 
@@ -770,9 +775,9 @@ export default {
     },
 
     // order
-    getOrder(){
-      if(!this.order_mail || !this.order_name || !this.order_phone){
-        this.payModal_message = '請填寫搜尋條件';
+    getOrder(type){
+      if(!this.order_phone){
+        this.payModal_message = '請填寫購買人連絡電話';
         this.is_payModal = true;
         this.order = null;
         return
@@ -781,11 +786,13 @@ export default {
       let vm = this;
 
       let formData = new FormData();
-      formData.append("mail", this.order_mail.trim());
-      formData.append("name", this.order_name.trim());
       formData.append("phone", this.order_phone.trim());
 
-      formData.append("pageindex", this.order_page_index);
+      if(type == 'page'){
+        formData.append("pageindex", this.order_page_index);
+      } else {
+        formData.append("pageindex", '1');
+      }
       formData.append("pagesize", this.order_page_size);
 
       formData.append("Store", this.site.Store);
@@ -804,7 +811,9 @@ export default {
 
           vm.order = JSON.parse(xhr.response).Orders;
           vm.order_page_number = Math.ceil(JSON.parse(xhr.response).Count / vm.order_page_size);
-          vm.bank = require('./assets/bank.json');
+          if(!type){
+            vm.order_page_index = 1;
+          }
 
           if(vm.order_page_number == 0){
             vm.payModal_message = '查無訂單資料';
@@ -840,7 +849,7 @@ export default {
       }
     },
     checkPay(){
-      if(!this.order_number || !this.account_number){
+      if(!this.order_number || !this.account_number || this.account_number.length < 6){
         this.payModal_message = '請填寫匯款帳號末6碼';
         this.is_payModal = true;
         return
@@ -869,6 +878,7 @@ export default {
             vm.payModal_message = '確認付款失敗';
             vm.is_payModal = true;
           }
+          vm.getOrder();
 
           vm.$forceUpdate();
         }
