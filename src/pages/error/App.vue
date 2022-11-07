@@ -12,10 +12,6 @@ export default {
     let api = location.host;
     let protocol = location.protocol;
 
-    // cordova
-    // let api = 'demo.uniqcarttest.tk';
-    // let protocol = 'http:';
-
     let xhr = new XMLHttpRequest();
     xhr.withCredentials = true;
     xhr.open('get',`${protocol}//${api}/interface/web/GetSite`, true);

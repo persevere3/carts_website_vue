@@ -6,6 +6,9 @@
       :json_store="JSON.stringify(store)"
       :json_footer_community="JSON.stringify(footer_community)"
       :json_copyRight="JSON.stringify(copyRight)"
+      :json_customerService="JSON.stringify(customerService)"
+      :json_carts="JSON.stringify(carts)"
+      :json_favorite="JSON.stringify(favorite)"
     > 
       <!-- customize  -->
       <div class="main" v-if="rich_cid == 3">

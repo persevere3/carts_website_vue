@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div @click.stop="is_carts_hover = false; is_favorite_hover = false">
 
     <div class="search_container" :class="{search_active : is_search}" @mousedown="close_search">
       <div class="search">
@@ -57,6 +57,26 @@
         <div class="other">
           <div class="text">其他</div>
           <ul>
+            <li @click="is_search = 1; is_sidebar = 0">
+              搜尋
+              <i class="fa fa-search" aria-hidden="true" @click="is_search = 1"></i>
+            </li>
+            <li @click.stop="is_favorite_hover = !is_favorite_hover; is_carts_hover = false">
+              我的最愛
+              <i class="fas fa-heart"></i>
+            </li>
+            <li @click.stop="carts.length ? is_carts_hover = !is_carts_hover : urlPush('/cart', true); is_favorite_hover = false">
+              購物車
+              <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+            </li>
+            <li @click="urlPush('/order.html')">
+              訂單查詢
+              <i class="fas fa-list-ol"></i>
+            </li>
+            <li v-if="site.MemberFuction * 1" @click="urlPush('/user.html')">
+              會員登入
+              <i class="fas fa-sign-in-alt"></i>
+            </li>
             <li @click="open_connect">
               聯絡我們
               <i class="fa fa-comment" aria-hidden="true"></i>
@@ -86,11 +106,17 @@
             <li class="connect_button" @click="open_connect">
               <i class="fa fa-comment" aria-hidden="true"></i>
             </li>
-            <li @click="pushTo_cart()">
+            <li @click.stop="is_favorite_hover = !is_favorite_hover; is_carts_hover = false">
+              <i class="fas fa-heart"></i>
+            </li>
+            <li @click.stop="carts.length ? is_carts_hover = !is_carts_hover : urlPush('/cart', true); is_favorite_hover = false">
               <i class="fa fa-shopping-cart" aria-hidden="true"></i>
             </li>
             <li @click="urlPush('/order.html')">
               <i class="fas fa-list-ol"></i>
+            </li>
+            <li v-if="site.MemberFuction * 1" @click="urlPush('/user.html')">
+              <i class="fas fa-sign-in-alt"></i>
             </li>
           </ul>
           <div class='navbar_button' @click="open_sidebar" :class="{is_background: window_scrollTop > 100}">
@@ -128,6 +154,97 @@
       </div>
     </div>
 
+    <div class="carts_container" :class="{hover : is_carts_hover}" v-if="carts.length">
+      <ul class="carts_items">
+        <template v-for="item in carts" :key="item.ID">
+          <!-- 有規格 -->
+          <template v-if="item.specArr">
+            <li v-for="spec in item.specArr " :key="spec.ID" v-show="spec.buyQty != 0 || spec.buyQty === ''" @click.stop="pushTo_cart(item.ID)">
+              <div class="img_and_name">
+                <div class="img" :style="{backgroundImage: `url(${item.Img1})`}"></div>
+                <div class="name"> {{ item.Name }}({{spec.Name}}) </div>
+              </div>
+              <div class="price_and_delete">
+                <div class="price"> NT${{numberThousands(item.NowPrice)}} x {{spec.buyQty}}  </div>
+                <div class="delete" @click.stop="spec.buyQty = 0">
+                  <i class="fas fa-trash-alt"></i>
+                </div>
+              </div>
+            </li>
+          </template>
+          <!-- 沒有規格 -->
+          <li v-if="!item.specArr" @click.stop="pushTo_cart(item.ID)">
+            <div class="img_and_name">
+              <div class="img" :style="{backgroundImage: `url(${item.Img1})`}"></div>
+              <div class="name"> {{ item.Name }} </div>
+            </div>
+            <div class="price_and_delete">
+              <div class="price"> NT${{numberThousands(item.NowPrice)}} x {{item.buyQty}}  </div>
+              <div class="delete" @click.stop="delete_carts_item(item.ID)">
+                <i class="fas fa-trash-alt"></i>
+              </div>
+            </div>
+          </li>
+
+          <template v-if="item.addPrice">
+            <template v-for=" (item2, index2) in item.addPrice">
+              <!-- 有規格 -->
+              <template v-if="item2.specArr">
+                <li v-for="(spec2, specIndex2) in item2.specArr" :key="spec2.ID" v-show="spec2.buyQty != 0 || spec2.buyQty === ''" @click.stop="pushTo_cart(item.ID)">
+                  <div class="img_and_name">
+                    <div class="img" :style="{backgroundImage: `url(${item2.Img})`}"></div>
+                    <div class="name"> 加價購 {{ item2.Name }}({{spec2.Name}}) </div>
+                  </div>
+                  <div class="price_and_delete">
+                    <div class="price"> NT${{numberThousands(item2.Price)}} x {{spec2.buyQty}}  </div>
+                    <div class="delete" @click.stop="spec2.buyQty = 0">
+                      <i class="fas fa-trash-alt"></i>
+                    </div>
+                  </div>
+                </li>
+              </template>
+              <!-- 沒有規格 -->
+              <li v-if="!item2.specArr" @click.stop="pushTo_cart(item.ID)">
+                <div class="img_and_name">
+                  <div class="img" :style="{backgroundImage: `url(${item2.Img})`}"></div>
+                  <div class="name"> 加價購 {{ item2.Name }} </div>
+                </div>
+                <div class="price_and_delete">
+                  <div class="price"> NT${{numberThousands(item2.Price)}} x {{item2.buyQty}}  </div>
+                  <div class="delete" @click.stop="item2.buyQty = 0">
+                    <i class="fas fa-trash-alt"></i>
+                  </div>
+                </div>
+              </li>
+            </template>
+          </template>
+        </template>
+      </ul>
+      <div class="pushTo_cart" @click.stop="pushTo_cart()">
+        <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+        前往購物車
+      </div>
+    </div>
+
+    <div class="favorite_container" :class="{hover : is_favorite_hover}" v-if="Object.keys(favorite).length">
+      <ul class="favorite_items">
+        <template v-for="item in favorite" :key="item.ID">
+          <li @click.stop="pushTo_cart(item.ID)">
+            <div class="img_and_name">
+              <div class="img" :style="{backgroundImage: `url(${item.Img1})`}"></div>
+              <div class="name"> {{ item.Name }} </div>
+            </div>
+            <div class="price_and_delete">
+              <div class="price"> NT${{numberThousands(item.NowPrice)}} </div>
+              <div class="delete" @click.stop="toggleFavorite(item.ID)">
+                <i class="fas fa-trash-alt"></i>
+              </div>
+            </div>
+          </li>
+        </template>
+      </ul>
+    </div>
+    
     <slot></slot>
     
     <div class="footer">
@@ -183,7 +300,7 @@
 
       <div class="footer_text" v-if="copyRight && copyRight.Footer">{{copyRight.Footer.trim()}}</div>
       <div class="copyright" v-if="copyRight && copyRight.Text"> {{copyRight.Text}} </div>
-      <div class="copyright" v-else> Copyright © 2021 Uniqcart </div>  
+      <div class="copyright" v-else> Copyright © 2021 HONG BO Technology </div>  
 
       <div class="credit_list">
         <ul>
@@ -194,12 +311,19 @@
       </div>
     </div>
 
+    <div id="fb-root"></div>
+    <div id="fb-customer-chat" class="fb-customerchat"></div>
+
+    <div class="line_icon" v-if="customerService && customerService.CSText" @click="urlPush(customerService.CSText, true)">
+      <img src="../assets/img/line_icon.png" alt="">
+    </div>
+
   </div>
 </template>
 
 <script>
 export default {
-  props: ['json_site', 'json_all', 'json_store', 'json_footer_community', 'json_copyRight'],
+  props: ['json_site', 'json_all', 'json_store', 'json_footer_community', 'json_copyRight', 'json_customerService', 'json_carts', 'json_favorite'],
   data(){
     return{
       // ajax
@@ -208,6 +332,11 @@ export default {
       store: '',
       footer_community: '',
       copyRight: '',
+      customerService: '',
+      carts: [],
+      is_carts_hover: false,
+      favorite: {},
+      is_favorite_hover: false,
 
       api: '',
       protocol: '',
@@ -250,6 +379,15 @@ export default {
     },
     json_copyRight(){
       this.copyRight = JSON.parse(this.json_copyRight);
+    },
+    json_customerService(){
+      this.customerService = JSON.parse(this.json_customerService);
+    },
+    json_carts(){
+      this.carts = JSON.parse(this.json_carts);
+    },
+    json_favorite(){
+      this.favorite = JSON.parse(this.json_favorite);
     }
   },
   computed:{
@@ -372,6 +510,23 @@ export default {
       }
     },
 
+    //
+    delete_carts_item(id) {
+      let vm = this;
+      vm.carts.forEach((item, index)=> {
+        if(item.ID === id) {
+          vm.carts.splice(index, 1);
+        }
+      })
+      vm.setCarts();
+    },
+    setCarts() {
+      localStorage.setItem(`${this.site.Name}@carts`, JSON.stringify(this.carts));
+    },
+    numberThousands(number) {
+      return String(number).replace( /(\d)(?=(?:\d{3})+$)/g, '$1,')
+    },
+
     // sidebar
     open_sidebar(){
       const vm = this;
@@ -391,6 +546,11 @@ export default {
     },
     changeDropDown(index){
       this.$bus.$emit('changeDropDown', index);
+    },
+
+    // 
+    toggleFavorite(id) {
+      this.$bus.$emit('toggleFavorite', id);
     },
 
     // scroll

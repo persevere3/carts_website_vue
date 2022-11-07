@@ -13,6 +13,11 @@
     outline: none;
     color: #333;
 
+    transition: box-shadow .3s;
+    &:focus{
+      box-shadow: 0 0 3px 1px #4db38e;
+    }
+
     &[type=number]::-webkit-outer-spin-button,
     &[type=number]::-webkit-inner-spin-button {
       -webkit-appearance: none;
@@ -27,12 +32,17 @@
     height: 35px;
     line-height: 35px;
     padding: 0px 10px;
-    display: inline-block;
     border-radius: 3px;
     background-color: #4db38e;
     color: #fff;
     white-space: nowrap;
+    opacity: 0.8;
+    transition: .2s;
     cursor: pointer;
+
+    &:hover{
+      opacity: 1;
+    }
   }
 
   // ============================================================
@@ -307,13 +317,10 @@
           left: 0;
           transform: translateY(100%);
           z-index: 10;
+          display: none;
 
-          max-height: 0;
-          overflow: hidden;
-          transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
           &.active{
-            max-height: 1000px;
-            transition: max-height 1s ease-in-out;
+            display: block;
           }
 
           li{

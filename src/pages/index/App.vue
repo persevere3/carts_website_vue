@@ -6,7 +6,10 @@
       :json_store="JSON.stringify(store)"
       :json_footer_community="JSON.stringify(footer_community)"
       :json_copyRight="JSON.stringify(copyRight)"
-    > 
+      :json_customerService="JSON.stringify(customerService)"
+      :json_carts="JSON.stringify(carts)"
+      :json_favorite="JSON.stringify(favorite)"
+    >
       <div class="main" v-if="homePage">
         <div class="img_container pc" v-if="homePage.TopImg" :style="{backgroundImage: `url(${homePage.TopImg})`}"></div>
         <div class="img_container mobile" v-if="homePage.PhoneImg" :style="{backgroundImage: `url(${homePage.PhoneImg})`}"></div>
@@ -41,19 +44,25 @@
           </div>
           <div class="product_list">
             <ul>
-              <li v-for="(item, index) in all.data" :key="index" 
+              <li v-for="(item, index) in all.data" :key="index"
                   @click="pushTo_cart(item.ID)"
                   v-show="product_page_active * perpage_num - (perpage_num + 1)  < index && index < product_page_active * perpage_num"
               >
                 <div class="pic" :style="{backgroundImage: `url(${item.Img1})`}">
+                  <div class="addTo_favorite_btn" @click.stop="toggleFavorite(item.ID)">
+                    加入我的最愛 <i class="fas fa-heart" :class="{is_favorite : favorite[item.ID]}"></i>
+                  </div>
                   <div class="addTo_cart_btn">
                     加入購物車
                   </div>
                 </div>
                 <div class="info">
                   <div class="name"> {{item.Name}} </div>
-                  <div class="discount_price"> NT$ {{item.NowPrice}} </div>
-                  <div class="origin_price"> NT$ {{item.Price}} </div>
+                  <div class="discount_price"> NT$ {{ numberThousands(item.NowPrice) }} </div>
+                  <div class="origin_price"> NT$ {{ numberThousands(item.Price) }} </div>
+                </div>
+                <div class="l_addTo_favorite_btn" @click.stop="toggleFavorite(item.ID)">
+                  <i class="fas fa-heart" :class="{is_favorite : favorite[item.ID]}"></i>
                 </div>
                 <div class="l_addTo_cart_btn">
                   <i class="fa fa-shopping-cart" aria-hidden="true"></i>

@@ -6,6 +6,9 @@
       :json_store="JSON.stringify(store)"
       :json_footer_community="JSON.stringify(footer_community)"
       :json_copyRight="JSON.stringify(copyRight)"
+      :json_customerService="JSON.stringify(customerService)"
+      :json_carts="JSON.stringify(carts)"
+      :json_favorite="JSON.stringify(favorite)"
     > 
       <div class="main">
         <div class="box">
@@ -49,17 +52,20 @@
                   <div class="icon"> <i class="fas fa-caret-down"></i> </div>
                   <ul>
                     <li v-for="(item2, index) in item.Items" :key="index">
-                      {{item2.ProductType == 2 ? '加價購' : ''}} {{item2.Name}}{{item2.Spec ? `(${item2.Spec})` : ''}} NT${{item2.Price}} x {{item2.Amount}}
+                      {{item2.ProductType == 2 ? '加價購' : ''}} {{item2.Name}}{{item2.Spec ? `(${item2.Spec})` : ''}} NT${{numberThousands(item2.Price)}} x {{item2.Amount}}
                     </li>
                   </ul>
                 </div>
                 <div class="td amount">
-                  NT$ {{item.TotalAmount}}
+                  NT$ {{numberThousands(item.TotalAmount)}}
                 </div>
                 <div class="td payState">
                   <div class="l_head"> 付款狀態 </div>
                   <!-- PayStatus == 2 (待付款)，PayMethod == 'ATM' (ATM)，PayType == 1 (轉帳給公司) -->
-                  <div class="state_container" v-if="item.PayStatus == 2 && item.PayMethod == 'ATM' && item.PayType == 1">
+                  <div class="state_container" v-if="item.Delivery > 2">
+                    {{ delivery_arr[item.Delivery] }}
+                  </div>
+                  <div class="state_container" v-else-if="item.PayStatus == 2 && item.PayMethod == 'ATM' && item.PayType == 1">
                     <template v-if="store.SelfAtmStatus == 0">
                       <div v-if="item.PayMethod" class="payMethod"> {{payMethod_obj[item.PayMethod]}} </div>
                       <div> ATM帳戶關閉，請聯繫賣家 </div>

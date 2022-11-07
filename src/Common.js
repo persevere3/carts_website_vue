@@ -1,9 +1,13 @@
 import Swiper from './assets/js/swiper.js'
 import Common from './components/Common.vue'
 
+import DatePicker from 'vue2-datepicker';
+import 'vue2-datepicker/index.css';
+
 export default {
   components: {
-    Common
+    Common,
+    DatePicker
   },
   data(){
     return{
@@ -14,6 +18,10 @@ export default {
       footer_community: '',
       copyRight: '',
       customerService: '',
+
+      carts: [],
+
+      favorite: {},
 
       api: '',
       protocol: '',
@@ -79,11 +87,317 @@ export default {
 
       is_payModal: false,
       payModal_message: '',
+      is_logout: false,
       
       bank: '',
 
       order_number: '',
       account_number: '',
+
+      // user
+      user_nav_active: 'login',
+
+      r_recommender:{
+        value: '',
+        rules: {
+        },
+      },
+      r_name: {
+        value: '',
+        rules: {
+          required: {
+            message: '此項目為必填'
+          },
+        },
+        is_error: false,
+        message: '',
+      },
+      r_mail: {
+        value: '',
+        rules: {
+          required: {
+            message: '此項目為必填'
+          },
+          mail: {
+            message: 'email格式不符',
+          }
+        },
+        is_error: false,
+        message: '',
+      },
+      r_birthday: {
+        value: '',
+        rules: {
+          required: {
+            message: '此項目為必填'
+          },
+        },
+        is_error: false,
+        message: '',
+      },
+      sex: 'male',
+      r_account: {
+        value: '',
+        rules: {
+          required: {
+            message: '此項目為必填'
+          },
+          cellphone: {
+            message: '手機格式錯誤'
+          }
+        },
+        is_error: false,
+        message: '',
+      },
+      r_verify_code: {
+        value: '',
+        rules: {
+          required: {
+            message: '此項目為必填'
+          },
+          length: {
+            min: 6,
+            max: 6,
+            message: '驗證碼為6位',
+          }
+        },
+        is_error: false,
+        message: '',
+      },
+      second: 0,
+      o_password: {
+        value: '',
+        rules: {
+          required: {
+            message: '此項目為必填'
+          },
+          length: {
+            min: 8,
+            message: '不得少於8位',
+          }
+        },
+        is_error: false,
+        message: '',
+      },
+      o_password_type: 'password',
+      r_password: {
+        value: '',
+        rules: {
+          required: {
+            message: '此項目為必填'
+          },
+          length: {
+            min: 8,
+            message: '不得少於8位',
+          }
+        },
+        is_error: false,
+        message: '',
+      },
+      r_confirm_password: {
+        value: '',
+        rules: {
+          required: {
+            message: '此項目為必填'
+          },
+          confirm: {
+            password: 'r_password',
+            message: '密碼不正確',
+          }
+        },
+        is_error: false,
+        message: '',
+      },
+      r_password_type: 'password',
+      r_confirm_password_type: 'password',
+      r_is_agree: false,
+
+      l_account: {
+        value: '',
+        rules: {
+          required: {
+            message: '此項目為必填'
+          },
+        },
+        is_error: false,
+        message: '',
+      },
+      l_password: {
+        value: '',
+        rules: {
+          required: {
+            message: '此項目為必填'
+          },
+          length: {
+            min: 8,
+            message: '不得少於8位',
+          }
+        },
+        is_error: false,
+        message: '',
+      },
+      l_password_type: 'password',
+
+      forget_step: 1,
+      f_account: {
+        value: '',
+        rules: {
+          required: {
+            message: '此項目為必填'
+          },
+          cellphone: {
+            message: '手機格式錯誤'
+          }
+        },
+        is_error: false,
+        message: '',
+      },
+      f_mail: {
+        value: '',
+        rules: {
+          required: {
+            message: '此項目為必填'
+          },
+          mail: {
+            message: 'email格式不符',
+          }
+        },
+        is_error: false,
+        message: '',
+      },
+      f_verify_code: {
+        value: '',
+        rules: {
+          required: {
+            message: '此項目為必填'
+          },
+          length: {
+            min: 6,
+            max: 6,
+            message: '驗證碼為6位',
+          }
+        },
+        is_error: false,
+        message: '',
+      },
+      f_second: 0,
+      f_password: {
+        value: '',
+        rules: {
+          required: {
+            message: '此項目為必填'
+          },
+          length: {
+            min: 8,
+            message: '不得少於8位',
+          }
+        },
+        is_error: false,
+        message: '',
+      },
+      f_confirm_password: {
+        value: '',
+        rules: {
+          required: {
+            message: '此項目為必填'
+          },
+          confirm: {
+            password: 'f_password',
+            message: '密碼不正確',
+          }
+        },
+        is_error: false,
+        message: '',
+      },
+      f_password_type: 'password',
+      f_confirm_password_type: 'password',
+
+      is_userModal: false,
+      is_userMessage: false,
+      user_message: '',
+
+      // user_info
+      user_account: '',
+
+      user_info_nav_active: 'info',
+
+      city_district : {
+        '臺北市': [
+            '中正區', '大同區', '中山區', '萬華區', '信義區', '松山區', '大安區', '南港區', '北投區', '內湖區', '士林區', '文山區'
+        ],
+        '新北市': [
+            '板橋區', '新莊區', '泰山區', '林口區', '淡水區', '金山區', '八里區', '萬里區', '石門區', '三芝區', '瑞芳區', '汐止區', '平溪區', '貢寮區', '雙溪區', '深坑區', '石碇區', '新店區', '坪林區', '烏來區', '中和區', '永和區', '土城區', '三峽區', '樹林區', '鶯歌區', '三重區', '蘆洲區', '五股區'
+        ],
+        '基隆市': [
+            '仁愛區', '中正區', '信義區', '中山區', '安樂區', '暖暖區', '七堵區'
+        ],
+        '桃園市': [
+            '桃園區', '中壢區', '平鎮區', '八德區', '楊梅區', '蘆竹區', '龜山區', '龍潭區', '大溪區', '大園區', '觀音區', '新屋區', '復興區'
+        ],
+        '新竹縣': [
+            '竹北市', '竹東鎮', '新埔鎮', '關西鎮', '峨眉鄉', '寶山鄉', '北埔鄉', '橫山鄉', '芎林鄉', '湖口鄉', '新豐鄉', '尖石鄉', '五峰鄉'
+        ],
+        '新竹市': [
+            '東區', '北區', '香山區'
+        ],
+        '苗栗縣': [
+            '苗栗市', '通霄鎮', '苑裡鎮', '竹南鎮', '頭份鎮', '後龍鎮', '卓蘭鎮', '西湖鄉', '頭屋鄉', '公館鄉', '銅鑼鄉', '三義鄉', '造橋鄉', '三灣鄉', '南庄鄉', '大湖鄉', '獅潭鄉', '泰安鄉'
+        ],
+        '臺中市': [
+            '中區', '東區', '南區', '西區', '北區', '北屯區', '西屯區', '南屯區', '太平區', '大里區', '霧峰區', '烏日區', '豐原區', '后里區', '東勢區', '石岡區', '新社區', '和平區', '神岡區', '潭子區', '大雅區', '大肚區', '龍井區', '沙鹿區', '梧棲區', '清水區', '大甲區', '外埔區', '大安區'
+        ],
+        '南投縣': [
+            '南投市', '埔里鎮', '草屯鎮', '竹山鎮', '集集鎮', '名間鄉', '鹿谷鄉', '中寮鄉', '魚池鄉', '國姓鄉', '水里鄉', '信義鄉', '仁愛鄉'
+        ],
+        '彰化縣': [
+            '彰化市', '員林鎮', '和美鎮', '鹿港鎮', '溪湖鎮', '二林鎮', '田中鎮', '北斗鎮', '花壇鄉', '芬園鄉', '大村鄉', '永靖鄉', '伸港鄉', '線西鄉', '福興鄉', '秀水鄉', '埔心鄉', '埔鹽鄉', '大城鄉', '芳苑鄉', '竹塘鄉', '社頭鄉', '二水鄉', '田尾鄉', '埤頭鄉', '溪州鄉'
+        ],
+        '雲林縣': [
+            '斗六市', '斗南鎮', '虎尾鎮', '西螺鎮', '土庫鎮', '北港鎮', '莿桐鄉', '林內鄉', '古坑鄉', '大埤鄉', '崙背鄉', '二崙鄉', '麥寮鄉', '臺西鄉', '東勢鄉', '褒忠鄉', '四湖鄉', '口湖鄉', '水林鄉', '元長鄉'
+        ],
+        '嘉義縣': [
+            '太保市', '朴子市', '布袋鎮', '大林鎮', '民雄鄉', '溪口鄉', '新港鄉', '六腳鄉', '東石鄉', '義竹鄉', '鹿草鄉', '水上鄉', '中埔鄉', '竹崎鄉', '梅山鄉', '番路鄉', '大埔鄉', '阿里山鄉'
+        ],
+        '嘉義市': [
+            '東區', '西區'
+        ],
+        '臺南市': [
+            '中西區', '東區', '南區', '北區', '安平區', '安南區', '永康區', '歸仁區', '新化區', '左鎮區', '玉井區', '楠西區', '南化區', '仁德區', '關廟區', '龍崎區', '官田區', '麻豆區', '佳里區', '西港區', '七股區', '將軍區', '學甲區', '北門區', '新營區', '後壁區', '白河區', '東山區', '六甲區', '下營區', '柳營區', '鹽水區', '善化區', '大內區', '山上區', '新市區', '安定區'
+        ],
+        '高雄市': [
+            '楠梓區', '左營區', '鼓山區', '三民區', '鹽埕區', '前金區', '新興區', '苓雅區', '前鎮區', '小港區', '旗津區', '鳳山區', '大寮區', '鳥松區', '林園區', '仁武區', '大樹區', '大社區', '岡山區', '路竹區', '橋頭區', '梓官區', '彌陀區', '永安區', '燕巢區', '田寮區', '阿蓮區', '茄萣區', '湖內區', '旗山區', '美濃區', '內門區', '杉林區', '甲仙區', '六龜區', '茂林區', '桃源區', '那瑪夏區'
+        ],
+        '屏東縣': [
+            '屏東市', '潮州鎮', '東港鎮', '恆春鎮', '萬丹鄉', '長治鄉', '麟洛鄉', '九如鄉', '里港鄉', '鹽埔鄉', '高樹鄉', '萬巒鄉', '內埔鄉', '竹田鄉', '新埤鄉', '枋寮鄉', '新園鄉', '崁頂鄉', '林邊鄉', '南州鄉', '佳冬鄉', '琉球鄉', '車城鄉', '滿州鄉', '枋山鄉', '霧台鄉', '瑪家鄉', '泰武鄉', '來義鄉', '春日鄉', '獅子鄉', '牡丹鄉', '三地門鄉'
+        ],
+        '宜蘭縣': [
+            '宜蘭市', '羅東鎮', '蘇澳鎮', '頭城鎮', '礁溪鄉', '壯圍鄉', '員山鄉', '冬山鄉', '五結鄉', '三星鄉', '大同鄉', '南澳鄉'
+        ],
+        '花蓮縣': [
+            '花蓮市', '鳳林鎮', '玉里鎮', '新城鄉', '吉安鄉', '壽豐鄉', '秀林鄉', '光復鄉', '豐濱鄉', '瑞穗鄉', '萬榮鄉', '富里鄉', '卓溪鄉'
+        ],
+        '臺東縣': [
+            '臺東市', '成功鎮', '關山鎮', '長濱鄉', '海端鄉', '池上鄉', '東河鄉', '鹿野鄉', '延平鄉', '卑南鄉', '金峰鄉', '大武鄉', '達仁鄉', '綠島鄉', '蘭嶼鄉', '太麻里鄉'
+        ],
+        '澎湖縣': [
+            '馬公市', '湖西鄉', '白沙鄉', '西嶼鄉', '望安鄉', '七美鄉'
+        ],
+        '金門縣': [
+            '金城鎮', '金湖鎮', '金沙鎮', '金寧鄉', '烈嶼鄉', '烏坵鄉'
+        ],
+        '連江縣': [
+            '南竿鄉', '北竿鄉', '莒光鄉', '東引鄉'
+        ]
+      },
+
+      delivery_address: {
+      },
+      address_select_active: '',
+
+      recommend_code: '',
+
+      // 
+      total_bonus: 0,
 
       // 
       status_500_counter: 0,
@@ -227,7 +541,6 @@ export default {
     getSite(){
       const vm = this;
 
-      localStorage.setItem('isGetSite', false);
       let xhr = new XMLHttpRequest();
       xhr.withCredentials = true;
       xhr.open('get',`${vm.protocol}//${vm.api}/interface/web/GetSite`, true);
@@ -239,8 +552,6 @@ export default {
             return;
           }
 
-          localStorage.setItem('isGetSite', true);
-
           vm.site = JSON.parse(xhr.response).data[0];
 
           if(vm.site.WebEnable == 0){
@@ -249,11 +560,14 @@ export default {
           } 
 
           localStorage.setItem('site', JSON.stringify(vm.site));
+          
+          vm.user_account = localStorage.getItem('user_account');
 
           vm.getAll();
           vm.getStore();
           vm.getCopyRight();
           vm.getCustomerService();
+          vm.getCarts();
 
           let pathname = location.pathname;
 
@@ -302,6 +616,33 @@ export default {
               vm.getSearch();
             }
           }
+
+          // user
+          if (pathname === '/user.html') {
+            if(!(vm.site.MemberFuction * 1)){
+              vm.urlPush('/');
+            }
+            if(vm.user_account){
+              vm.urlPush('/user_info.html');
+            }
+
+            if( vm.site.TermsNotices && location.search.split('?term=')[1]){
+              vm.user_nav_active = 'register';
+              vm.is_userModal = true;
+            }
+          }
+
+          // user_info
+          if (pathname === '/user_info.html') {
+            if(!(vm.site.MemberFuction * 1)){
+              vm.urlPush('/');
+            }
+            if(vm.user_account){
+              vm.getUser_info();
+            } else {
+              vm.urlPush('/user.html');
+            }
+          }
         }
         else if(this.status == 500){
           if(vm.status_500_counter < 3){
@@ -309,6 +650,129 @@ export default {
             vm.login(vm.getSite);
           }
         }
+      }
+    },
+
+    // 
+    getCarts() {
+      let vm = this;
+      let carts = JSON.parse(localStorage.getItem(`${vm.site.Name}@carts`)) || [];
+      vm.carts = [];
+      carts.forEach((item, index)=>{
+        vm.$set(vm.carts, index, item)
+      })
+    },
+
+    //
+    getFavorite() {
+      let vm = this;
+
+      vm.user_account = localStorage.getItem('user_account');
+      if(vm.user_account) {
+        let formData = new FormData();
+        formData.append("storeid", vm.site.Name);
+        formData.append("phone", vm.user_account);
+
+        let xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+        xhr.open('post',`${vm.protocol}//${vm.api}/interface/WebMember/FavoriteInfo`, true);
+        xhr.send(formData);
+        xhr.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            if(!JSON.parse(xhr.response).status) {
+              if(JSON.parse(xhr.response).msg == '請先登入會員') {
+                localStorage.removeItem('user_account');
+                vm.getFavorite()
+              }
+              else {
+                vm.favorite = {};
+              }
+              return
+            }
+
+            let favorite_list = JSON.parse(xhr.response).datas[0];
+            vm.favorite = {};
+            for(let favorite of favorite_list){
+              let id = favorite.Product;
+              let index = vm.all.data.map((item) => item.ID).indexOf('' + id);
+              if(index > -1){
+                vm.$set(vm.favorite, id, vm.all.data[index])
+              }
+            }
+          }
+        }
+      }
+      else {
+        vm.favorite = JSON.parse(localStorage.getItem(`${vm.site.Name}@favorite`)) || {};
+        for(let key in vm.favorite) {
+          let favorite = vm.favorite[key];
+          let index = vm.all.data.map((item) => item.ID).indexOf(favorite.ID)
+          favorite = vm.all.data[index];
+        }
+      }
+    },
+    toggleFavorite(id) {
+      let vm = this;
+
+      if(vm.user_account) {
+        // delete
+        if(vm.favorite[id]){
+          let formData = new FormData();
+          formData.append("storeid", vm.site.Name);
+          formData.append("phone", vm.user_account);
+          formData.append("productid[]", id);
+
+          let xhr = new XMLHttpRequest();
+          xhr.withCredentials = true;
+          xhr.open('post',`${vm.protocol}//${vm.api}/interface/WebMember/DeleteFavorite`, true);
+          xhr.send(formData);
+          xhr.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+              if(!JSON.parse(xhr.response).status) {
+                if(JSON.parse(xhr.response).msg == '請先登入會員') {
+                  localStorage.removeItem('user_account');
+                }
+              }
+              vm.getFavorite();
+            }
+          }
+        }
+        // add
+        else {
+          let formData = new FormData();
+          formData.append("storeid", vm.site.Name);
+          formData.append("phone", vm.user_account);
+          formData.append("productid[]", id);
+
+          let xhr = new XMLHttpRequest();
+          xhr.withCredentials = true;
+          xhr.open('post',`${vm.protocol}//${vm.api}/interface/WebMember/AddFavorite`, true);
+          xhr.send(formData);
+          xhr.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+              if(!JSON.parse(xhr.response).status) {
+                if(JSON.parse(xhr.response).msg == '請先登入會員') {
+                  localStorage.removeItem('user_account');
+                }
+              }
+              vm.getFavorite();
+            }
+          }
+        }
+      }
+      else {
+        if(vm.favorite[id]){
+          vm.$delete(vm.favorite, id)
+        }
+        else {
+          vm.all.data.forEach((item) => {
+            if(item.ID === id){
+              vm.$set(vm.favorite, id, item)
+            }
+          })
+        }
+
+        localStorage.setItem(`${vm.site.Name}@favorite`, JSON.stringify(vm.favorite))
       }
     },
 
@@ -406,6 +870,8 @@ export default {
               client.push(footer[i]);
             }
           }
+
+          vm.getFavorite();
         }
       }
     },
@@ -427,25 +893,25 @@ export default {
           //   vm.login(vm.getStore);
           //   return;
           // }
-          
           vm.bank = require('./assets/bank.json');
+          
           vm.store = JSON.parse(xhr.response).data[0];
-          let title = vm.store.Name;
 
           // 新增 store.footer 放聯絡我們 icon 
           // 有 link 才顯示
           vm.footer_community = JSON.parse(xhr.response).footer[0];
 
-          // GA
-          let GAText = vm.store.GA;
-          vm.appendScript(GAText, 'head');
-
+          let title = vm.store.Name;
           if(vm.site.WebPreview == 1){
             document.title = title;
           }
           else if(vm.site.WebPreview == 2){
             document.title = title + ' (預覽模式)';
           }
+
+          // GA
+          let GAText = vm.store.GA;
+          vm.appendScript(GAText, 'head');
         }
       }
     },
@@ -492,12 +958,13 @@ export default {
           //   return;
           // }
           let data = JSON.parse(xhr.response).data;
-          if( !data.length || !data[0].Text){
+          if( !data.length){
             return;
           }
 
           vm.customerService = data[0];
           vm.customerService.Type == 1 ? vm.appendScript(vm.customerService.Text, 'head'): vm.appendScript(vm.customerService.Text, 'body');
+          if( vm.customerService.FBText ) vm.appendScript(vm.customerService.FBText, 'body');
         }
       }
     },
@@ -542,7 +1009,6 @@ export default {
 
     // single
     getHomePage() {
-
       let vm = this;
 
       let site_webPreview = (JSON.parse(localStorage.getItem('site')).WebPreview || '') ;
@@ -788,11 +1254,10 @@ export default {
       let formData = new FormData();
       formData.append("phone", this.order_phone.trim());
 
-      if(type == 'page'){
-        formData.append("pageindex", this.order_page_index);
-      } else {
-        formData.append("pageindex", '1');
+      if(!type){
+        this.order_page_index = 1
       }
+      formData.append("pageindex", this.order_page_index);
       formData.append("pagesize", this.order_page_size);
 
       formData.append("Store", this.site.Store);
@@ -804,16 +1269,8 @@ export default {
       xhr.send(formData);
       xhr.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
-          if(JSON.parse(xhr.response).errormessage){
-            vm.login(vm.getOrder);
-            return;
-          }
-
           vm.order = JSON.parse(xhr.response).Orders;
           vm.order_page_number = Math.ceil(JSON.parse(xhr.response).Count / vm.order_page_size);
-          if(!type){
-            vm.order_page_index = 1;
-          }
 
           if(vm.order_page_number == 0){
             vm.payModal_message = '查無訂單資料';
@@ -822,13 +1279,10 @@ export default {
             return;
           }
 
-          console.log(vm.order)
-
           vm.$nextTick(function(){
             let max_height = parseInt( getComputedStyle( document.querySelector('.td.products') )['maxHeight']);
             let uls = document.querySelectorAll('.td.products ul');
             uls.forEach(function(item, index){
-              // vm.$set(vm.order[index],"is_active", false)
               if(item.getBoundingClientRect().height > max_height){
                 vm.$set(vm.order[index],"expandable", true)
               }
@@ -837,7 +1291,118 @@ export default {
         }
       }
     },
-    copy(text){
+    getMemberOrder(type){
+      return new Promise((resolve)=>{
+        let vm = this;
+
+        let formData = new FormData();
+        formData.append("storename", this.site.Store);
+        formData.append("storeid", this.site.Name);
+        formData.append("phone", this.user_account);
+        formData.append("site", this.site.Site);
+        if (!type) {
+          this.order_page_index = 1;
+        }
+        formData.append("pageindex", this.order_page_index);
+        formData.append("pagesize", this.order_page_size);
+
+        let xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+        xhr.open('post', `${vm.protocol}//${vm.api}/interface/WebMember/GetMemberOrders`, true);
+        xhr.send(formData);
+        xhr.onreadystatechange = function(){
+          if (this.readyState == 4 && this.status == 200) {
+            if(JSON.parse(xhr.response).status){
+              let data = JSON.parse(xhr.response).datas[0]
+
+              vm.order_page_number = Math.ceil(data.Count / vm.order_page_size);
+              if(vm.order_page_number == 0){
+                vm.payModal_message = '查無訂單資料';
+                vm.is_payModal = true;
+                vm.order = null;
+                return;
+              }
+
+              vm.order = data.Orders;
+
+              vm.$nextTick(function(){
+                let max_height = parseInt( getComputedStyle( document.querySelector('.td.products') )['maxHeight']);
+                let uls = document.querySelectorAll('.td.products ul');
+                uls.forEach(function(item, index){
+                  if(item.getBoundingClientRect().height > max_height){
+                    vm.$set(vm.order[index],"expandable", true)
+                  }
+                })
+              })
+            } else {
+              vm.payModal_message = JSON.parse(xhr.response).msg;
+              vm.check_logout();
+              vm.is_payModal = true;
+            }
+
+            resolve()
+          }
+        }
+      })
+    },
+    async searchOrder(number){
+      if(!this.order){
+        await this.getMemberOrder();
+      }
+
+      this.order.forEach((item) => {
+        if(item.FilNo === number){
+          return
+        }
+      })
+    },
+
+    getBonus(type){
+      let vm = this;
+
+      let formData = new FormData();
+      formData.append("storeid", this.site.Name);
+      formData.append("storename", this.site.Store);
+      formData.append("phone", this.user_account);
+      formData.append("recommander", this.recommend_code);
+      if (!type) {
+        this.order_page_index = 1;
+      }
+      formData.append("pageindex", this.order_page_index);
+      formData.append("pagesize", this.order_page_size);
+
+      let xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+      xhr.open('post', `${vm.protocol}//${vm.api}/interface/Webmember/GetMemberBonusOrders`, true);
+      xhr.send(formData);
+      xhr.onreadystatechange = function(){
+        if (this.readyState == 4 && this.status == 200) {
+          if(JSON.parse(xhr.response).status){
+            let data = JSON.parse(xhr.response).datas[0]
+
+            vm.order_page_number = Math.ceil(data.Count / vm.order_page_size);
+            if(vm.order_page_number == 0){
+              vm.payModal_message = '沒有購物金紀錄';
+              vm.is_payModal = true;
+              vm.bonus = null;
+              return;
+            }
+
+            vm.bonus = data.Bonuses;
+            vm.bonus.forEach((item) => {
+              if(item.Type.indexOf('使用點數') > -1){
+                item.FeedBack = -item.FeedBack;
+              }
+            })
+          } else {
+            vm.payModal_message = JSON.parse(xhr.response).msg;
+            vm.check_logout();
+            vm.is_payModal = true;
+          }
+        }
+      }
+    },
+    copy(text) {
       let copy_input = document.querySelector('#copy_input');
       copy_input.value = text;
       copy_input.select();
@@ -867,22 +1432,496 @@ export default {
       xhr.send(formData);
       xhr.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
-          if(JSON.parse(xhr.response).errormessage){
-            vm.login(vm.getOrder);
-            return;
-          }
           if(JSON.parse(xhr.response).status){
             vm.payModal_message = '確認付款已送出';
-            vm.is_payModal = true;
           } else {
             vm.payModal_message = '確認付款失敗';
-            vm.is_payModal = true;
           }
-          vm.getOrder();
+          vm.is_payModal = true;
+
+          let pathname = location.pathname;
+          if (pathname.indexOf('/order.html') > -1 ) {
+            vm.getOrder();
+          } else {
+            vm.getMemberOrder()
+          }
 
           vm.$forceUpdate();
         }
       }
+    },
+
+    // user
+    required_verify(item) {
+      if(!item.hasOwnProperty('value')){
+        if (!item.city || !item.district || !item.detail ) {
+          item.is_error = true;
+          item.message = item.rules.required.message;
+          return false;
+        }
+        else {
+          item.is_error = false;
+          item.message = '';
+          return true;
+        }
+      }
+      else {
+        if (!item.value) {
+          item.is_error = true;
+          item.message = item.rules.required.message;
+          return false;
+        }
+        else {
+          item.is_error = false;
+          item.message = '';
+          return true;
+        }
+      }
+    },
+    cellphone_verify(item) {
+      let rep = /^(09)[0-9]{8}$/;
+      if (!rep.test(item.value)) {
+        item.is_error = true;
+        item.message = item.rules.cellphone.message;
+        return false;
+      }
+      else {
+        item.is_error = false;
+        item.message = '';
+        return true;
+      }
+    },
+    length_verify(item) {
+      if (item.value.length < item.rules.length.min || item.value.length > item.rules.length.max) {
+        item.is_error = true;
+        item.message = item.rules.length.message;
+        return false;
+      }
+      else {
+        item.is_error = false;
+        item.message = '';
+        return true;
+      }
+    },
+    mail_verify(item) {
+      let rep = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+      if (!rep.test(item.value)) {
+        item.is_error = true;
+        item.message = item.rules.mail.message;
+        return false;
+      }
+      else {
+        item.is_error = false;
+        item.message = '';
+        return true;
+      }
+    },
+    confirm_verify(item) {
+      if (item.value != this[item.rules.confirm.password].value) {
+        item.is_error = true;
+        item.message = item.rules.confirm.message;
+        return false;
+      }
+      else {
+        item.is_error = false;
+        item.message = '';
+        return true;
+      }
+    },
+    send_verify_code(){
+      if( (this.store.NotificationSystem == 0 && !this.verify(this.r_mail)) || (this.store.NotificationSystem == 1 && !this.verify(this.r_account)) || this.second > 0){
+        return
+      }
+
+      let vm = this;
+
+      let formData = new FormData();
+      formData.append("phoneormail", this.store.NotificationSystem == 1 ? this.r_account.value.trim() : this.r_mail.value.trim());
+      formData.append("notificationsystem", this.store.NotificationSystem)
+      formData.append("storeName", this.site.Store);
+      formData.append("storeid", this.site.Name);
+
+      let xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+      xhr.open('POST', `${vm.protocol}//${vm.api}/interface/WebMember/SendValidateMessage`, true);
+      xhr.send(formData);
+      xhr.onreadystatechange = function(){
+        if (this.readyState == 4 && this.status == 200) {
+          if(JSON.parse(xhr.response).status){
+            vm.second = 60;
+            let interval =  setInterval(() => {
+              vm.second -= 1;
+              if(vm.second < 1){
+                clearInterval(interval);
+              }
+            }, 1000)
+          }
+          vm.user_message = JSON.parse(xhr.response).msg
+          vm.is_userMessage = true;
+        }
+      }
+    },
+    verify(...arr) {
+      let is_valid = true;
+      for (let item of arr) {
+        for (let rule in item.rules) {
+          if (!this[`${rule}_verify`](item)) {
+            is_valid = false;
+            break
+          }
+        }
+      }
+      return is_valid;
+    },
+    register() {
+      if (this.site.TermsNotices && !this.r_is_agree) {
+        return
+      }
+      if (!this.verify(this.r_name, this.r_mail, this.r_birthday, this.r_account, this.r_verify_code, this.r_password, this.r_confirm_password)) {
+        return
+      }
+
+      let vm = this;
+
+      let formData = new FormData();
+      formData.append("storeid", this.site.Name);
+      formData.append("phone", this.r_account.value);
+      formData.append("validate", this.r_verify_code.value);
+      formData.append("password", this.r_password.value);
+      formData.append("name", this.r_name.value);
+      let b = this.r_birthday.value
+      let birthday = `${b.getFullYear()}/${b.getMonth() + 1 < 10  ? '0' : '' }${b.getMonth() + 1}/${b.getDate() < 10  ? '0' : '' }${b.getDate()}`
+      formData.append("birthday", birthday);
+      formData.append("gender", this.sex == 'male' ? 1 : 0 );
+      formData.append("email", this.r_mail.value);
+      formData.append("recommender", this.r_recommender.value);
+
+      let xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+      xhr.open('POST', `${vm.protocol}//${vm.api}/interface/WebMember/MemberRegister`, true);
+      xhr.send(formData);
+      xhr.onreadystatechange = function(){
+        if (this.readyState == 4 && this.status == 200) {
+          vm.user_message = JSON.parse(xhr.response).msg
+          vm.is_userMessage = true;
+          
+          if(JSON.parse(xhr.response).status){
+            vm.r_account.value = ''
+            vm.r_password.value = ''
+            vm.r_confirm_password.value = ''
+            vm.r_name.value = ''
+            vm.r_mail.value = ''
+            vm.r_birthday.value = ''
+            vm.r_recommender.value = ''
+            vm.r_verify_code.value = ''
+            vm.r_is_agree = false
+          
+            vm.is_userMessage = true;
+            vm.user_nav_active = 'login'
+          }
+          else {
+            vm.user_message = JSON.parse(xhr.response).msg
+            vm.is_userMessage = true;
+          }
+        }
+      }
+    },
+    user_login() {
+      if (!this.verify(this.l_account, this.l_password)) {
+        return
+      }
+
+      let vm = this;
+
+      let formData = new FormData();
+      formData.append("storeid", this.site.Name);
+      formData.append("phone", this.l_account.value);
+      formData.append("password", this.l_password.value);
+
+      let xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+      xhr.open('POST', `${vm.protocol}//${vm.api}/interface/WebMember/MemberLogin`, true);
+      xhr.send(formData);
+      xhr.onreadystatechange = function(){
+        if (this.readyState == 4 && this.status == 200) {
+          if(JSON.parse(xhr.response).status){
+            localStorage.setItem('user_account', vm.l_account.value);
+            vm.urlPush('/user_info.html');
+
+            vm.getFavorite()
+          }
+          else {
+            vm.user_message = JSON.parse(xhr.response).msg
+            vm.is_userMessage = true;
+          }
+        }
+      }
+    },
+    post_logout(){
+      let vm = this;
+      let xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+      xhr.open('POST', `${vm.protocol}//${vm.api}/interface/WebMember/MemberLogout`, true);
+      xhr.send();
+      xhr.onreadystatechange = function(){
+        if (this.readyState == 4 && this.status == 200) {
+          vm.logout();
+        }
+      }
+    },
+    logout(){
+      localStorage.removeItem('user_account');
+      this.urlPush('/user.html');
+    },
+    send_forget_verify_code() {
+      if( (this.store.NotificationSystem == 0 && !this.verify(this.f_mail)) || (this.store.NotificationSystem == 1 && !this.verify(this.f_account)) || this.f_second > 0){
+        return
+      }
+
+      let vm = this;
+
+      let formData = new FormData();
+      formData.append("phoneormail", this.store.NotificationSystem == 1 ? this.f_account.value.trim() : this.f_mail.value.trim());
+      formData.append("storeName", this.site.Store);
+      formData.append("storeid", this.site.Name);
+      formData.append("notificationsystem", this.store.NotificationSystem)
+
+      let xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+      xhr.open('POST', `${vm.protocol}//${vm.api}/interface/WebMember/ForgetPasswordValidateMessage`, true);
+      xhr.send(formData);
+      xhr.onreadystatechange = function(){
+        if (this.readyState == 4 && this.status == 200) {
+          if(JSON.parse(xhr.response).status){
+            vm.reset_input('f_verify_code');
+            vm.forget_step = 2;
+
+            vm.f_second = 60;
+            let interval =  setInterval(() => {
+              vm.f_second -= 1;
+              if(vm.f_second < 1){
+                clearInterval(interval);
+              }
+            }, 1000)
+          } else {
+            vm.user_message = JSON.parse(xhr.response).msg
+            vm.is_userMessage = true;
+          }
+        }
+      }
+    },
+    check_forget_verify_code() {
+      if(!this.verify(this.f_verify_code)){
+        return
+      }
+
+      let vm = this;
+
+      let formData = new FormData();
+      formData.append("storeid", this.site.Name);
+      formData.append("phoneormail", this.store.NotificationSystem == 1 ? this.f_account.value.trim() : this.f_mail.value.trim());
+      formData.append("validate", this.f_verify_code.value);
+
+      let xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+      xhr.open('POST', `${vm.protocol}//${vm.api}/interface/WebMember/CheckForgetPasswordValidate`, true);
+      xhr.send(formData);
+      xhr.onreadystatechange = function(){
+        if (this.readyState == 4 && this.status == 200) {
+          vm.user_message = JSON.parse(xhr.response).msg
+          vm.is_userMessage = true;
+          if(JSON.parse(xhr.response).status){
+            vm.reset_input('f_password');
+            vm.reset_input('f_confirm_password');
+            vm.forget_step = 3;
+          }
+        }
+      }
+    },
+    reset_input(name) {
+      this[name].value = '';
+      this[name].is_error = false;
+      this[name].message = '';
+    },
+    edit_forget_pass() {
+      if (!this.verify(this.f_password, this.f_confirm_password)) {
+        return
+      }
+
+      let vm = this;
+
+      let formData = new FormData();
+      formData.append("storeid", this.site.Name);
+      formData.append("phoneormail", this.store.NotificationSystem == 1 ? this.f_account.value.trim() : this.f_mail.value.trim());
+      formData.append("validate", this.f_verify_code.value);
+      formData.append("newpassword", this.f_password.value);
+
+      let xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+      xhr.open('POST', `${vm.protocol}//${vm.api}/interface/WebMember/changeforgetpasswordvalidate`, true);
+      xhr.send(formData);
+      xhr.onreadystatechange = function(){
+        if (this.readyState == 4 && this.status == 200){
+          vm.user_message = JSON.parse(xhr.response).msg
+          vm.is_userMessage = true;
+          if(JSON.parse(xhr.response).status){
+            vm.reset_input('f_account');
+            vm.reset_input('f_verify_code');
+            vm.reset_input('f_password');
+            vm.reset_input('f_confirm_password');
+            vm.forget_step = 1;
+            vm.user_nav_active = 'login'
+          }
+        }
+      }
+    },
+
+    // user_info
+    getUser_info(){
+      let vm = this;
+
+      let formData = new FormData();
+      formData.append("storeid", this.site.Name);
+      formData.append("phone", this.user_account);
+
+      let xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+      xhr.open('POST', `${vm.protocol}//${vm.api}/interface/WebMember/GetMemberInfo`, true);
+      xhr.send(formData);
+      xhr.onreadystatechange = function(){
+        if (this.readyState == 4 && this.status == 200) {  
+          if(JSON.parse(xhr.response).status){
+            let data = JSON.parse(xhr.response).datas[0][0];
+
+            vm.r_account.value = data.Phone
+            vm.r_name.value = data.Name
+            vm.r_mail.value = data.Email
+            vm.r_birthday.value = new Date(data.Birthday)
+            vm.sex = data.Gender == 1 ? 'male' : 'female' 
+            vm.recommend_code = data.Promocode
+            vm.total_bonus = data.Wallet * 1
+
+            let address_obj = {};
+            let address_arr = data.Adress.split('_#_');
+            address_arr.length = address_arr.length - 1;
+            for(let address of address_arr){
+              let item = address.split('_ _');
+              address_obj[item[0]] = {
+                id: item[0],
+                city: item[1],
+                district: item[2],
+                detail: item[3],
+                rules: {
+                  required: {
+                    message: '請輸入完整地址'
+                  },
+                },
+                is_error: false,
+                message: '',
+              }
+            }
+            vm.delivery_address = address_obj;
+          } else {
+            vm.payModal_message = JSON.parse(xhr.response).msg;
+            vm.check_logout();
+            vm.is_payModal = true;
+          }
+        }
+      }
+    },
+    add_address() {
+      let id = new Date().getTime();
+
+      this.$set(this.delivery_address, id, {
+        id,
+        city: '',
+        district: '',
+        detail: '',
+        rules: {
+          required: {
+            message: '請輸入完整地址'
+          },
+        },
+        is_error: false,
+        message: '',
+      })
+    },
+    delete_address(id) {
+      let vm = this;
+      this.$delete(vm.delivery_address, id)
+    },
+    edit_info() {
+      let arr = Object.values(this.delivery_address);
+      if (!this.verify(this.r_name, this.r_mail, this.r_birthday, ...arr)) {
+        return
+      }
+
+      let vm = this;
+
+      let formData = new FormData();
+      formData.append("storeid", this.site.Name);
+      formData.append("phone", this.user_account);
+      formData.append("name", this.r_name.value);
+      let b = this.r_birthday.value;
+      let birthday = `${b.getFullYear()}/${b.getMonth() + 1 < 10  ? '0' : '' }${b.getMonth() + 1}/${b.getDate() < 10  ? '0' : '' }${b.getDate()}`
+      formData.append("birthday", birthday);
+      formData.append("gender", this.sex == 'male' ? 1 : 0 );
+      formData.append("email", this.r_mail.value);
+      let address_str = '';
+      for(let key in this.delivery_address){
+        let item = this.delivery_address[key];
+        address_str += `${item.id}_ _${item.city}_ _${item.district}_ _${item.detail}_#_`
+      }
+      formData.append("address", address_str);
+
+      let xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+      xhr.open('POST', `${vm.protocol}//${vm.api}/interface/WebMember/EditMemberInfo`, true);
+      xhr.send(formData);
+      xhr.onreadystatechange = function(){
+        if (this.readyState == 4 && this.status == 200) {
+          vm.getUser_info();
+          vm.payModal_message = JSON.parse(xhr.response).msg;
+          if(!(JSON.parse(xhr.response).status)){
+            vm.check_logout()
+          }
+          vm.is_payModal = true;
+        }
+      }
+    },
+    edit_pass() {
+      if (!this.verify(this.o_password, this.r_password, this.r_confirm_password)) {
+        return
+      }
+
+      let vm = this;
+
+      let formData = new FormData();
+      formData.append("storeid", this.site.Name);
+      formData.append("phone", this.user_account);
+      formData.append("oldpassword", this.o_password.value);
+      formData.append("newpassword", this.r_password.value);
+
+      let xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+      xhr.open('POST', `${vm.protocol}//${vm.api}/interface/WebMember/EditMemberPassWord`, true);
+      xhr.send(formData);
+      xhr.onreadystatechange = function(){
+        if (this.readyState == 4 && this.status == 200){
+          vm.payModal_message = JSON.parse(xhr.response).msg;
+          if(!(JSON.parse(xhr.response).status)){
+            vm.check_logout()
+          }
+          vm.is_payModal = true;
+        }
+      }
+    },
+    check_logout(){
+      let vm = this;
+      if(vm.payModal_message == '請先登入會員' ||
+        vm.payModal_message == '閒置逾時，請重新登入' ||
+        vm.payModal_message == '已登出，請重新登入'
+      ) vm.is_logout = true;
     },
 
     // sidebar change all.Navbar[index].isDropDown
@@ -958,6 +1997,11 @@ export default {
       }
     },
 
+    // 
+    numberThousands(number) {
+      return String(number).replace( /(\d)(?=(?:\d{3})+$)/g, '$1,')
+    },
+
     // allProducts, category
     videoHandler(url){
       let code = '';
@@ -993,11 +2037,9 @@ export default {
         return;
       }
       if(isOpen){
-        localStorage.setItem('isActiveUser', 1);
         window.open(url);
       }
       else{
-        localStorage.setItem('isActiveUser', 1);
         window.location.href = url;
       }
     },
@@ -1011,10 +2053,10 @@ export default {
         const vm = this;
 
         if(id === undefined){
-          vm.urlPush(`/cart/`, true)
+          vm.urlPush(`/cart?open_carts=true`, true)
         }
         else{
-          vm.urlPush(`/cart/?id=${id}`, true)
+          vm.urlPush(`/cart?id=${id}`, true)
         }
       }
     },
@@ -1031,6 +2073,10 @@ export default {
     // sidebar
     vm.$bus.$on('changeDropDown', index => {
       vm.changeDropDown(index)
+    })
+    // 
+    vm.$bus.$on('toggleFavorite', (id) => {
+      vm.toggleFavorite(id);
     })
     // urlPush
     vm.$bus.$on('urlPush', (url, isOpen) => {
