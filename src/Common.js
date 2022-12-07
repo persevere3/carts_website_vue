@@ -508,6 +508,11 @@ export default {
       }
       return object;
     },
+
+    birthday() {
+      let b = new Date(this.r_birthday.value);
+      return `${b.getFullYear()}/${b.getMonth() + 1 < 10  ? '0' : '' }${b.getMonth() + 1}/${b.getDate() < 10  ? '0' : '' }${b.getDate()}`
+    }
   },
   methods: {
     // all

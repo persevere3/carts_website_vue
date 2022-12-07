@@ -49,11 +49,7 @@
               </div>
               <div class="input_container" :class="{ error: r_birthday.is_error }">
                 <div class="title"> 生日 </div>
-                <date-picker placeholder="* 請輸入生日" v-model="r_birthday.value" @close="verify(r_birthday)"
-                  @clear="verify(r_birthday)"></date-picker>
-                <div class="error message">
-                  <i class="error_icon fas fa-exclamation-circle"></i> {{ r_birthday.message }}
-                </div>
+                <input type="text" readonly v-model.trim="birthday">
               </div>
               <div class="radio_container">
                 <div class="title"> 性別 </div>
@@ -74,9 +70,6 @@
               <div class="input_container" :class="{ error: r_account.is_error }">
                 <div class="title"> 手機 </div>
                 <input type="number" readonly v-model.trim="r_account.value">
-                <div class="error message">
-                  <i class="error_icon fas fa-exclamation-circle"></i> {{ r_account.message }}
-                </div>
               </div>
               <div class="password_container">
                 <div class="title"> 密碼 </div>
