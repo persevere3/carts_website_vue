@@ -71,11 +71,11 @@
             </li>
             <li @click="urlPush('/order.html')">
               訂單查詢
-              <i class="fas fa-list-ol"></i>
+              <img src=".././assets/img/order.png" alt="">
             </li>
             <li v-if="site.MemberFuction * 1" @click="urlPush('/user.html')">
               會員登入
-              <i class="fas fa-sign-in-alt"></i>
+              <i class="fas fa-user"></i>
             </li>
             <li @click="open_connect">
               聯絡我們
@@ -113,10 +113,10 @@
               <i class="fa fa-shopping-cart" aria-hidden="true"></i>
             </li>
             <li @click="urlPush('/order.html')">
-              <i class="fas fa-list-ol"></i>
+              <img src=".././assets/img/order.png" alt="">
             </li>
             <li v-if="site.MemberFuction * 1" @click="urlPush('/user.html')">
-              <i class="fas fa-sign-in-alt"></i>
+              <i class="fas fa-user"></i>
             </li>
           </ul>
           <div class='navbar_button' @click="open_sidebar" :class="{is_background: window_scrollTop > 100}">

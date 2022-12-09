@@ -43,6 +43,11 @@
     input{
       margin-bottom: 5px;
       border: 1px solid #ddd;
+
+      &[readonly=readonly]{
+        background: #eee;
+        cursor: not-allowed;
+      }
     }
 
     .eyes_icon{
@@ -422,8 +427,11 @@
             .tr{
               display: flex;
     
+              &:nth-child(2n+1){
+                background-color: #f7f7f7;
+              }
               &:nth-child(2n){
-                background-color: #ddd;
+                background-color: #e4e4e4;
               }
               &:hover{
                 background-color: #666;
@@ -487,6 +495,7 @@
                   transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
     
                   &.expandable{
+                    align-items: flex-start;
                     cursor: pointer;
     
                     &.active{
@@ -522,7 +531,6 @@
     
                   li{
                     line-height: 25px;
-                    border-bottom: 1px solid #333;
                   }
                 }
                 &.amount{
@@ -592,7 +600,7 @@
             .tr{
               .td{
                 &.products{
-                  align-items: flex-start;
+                  align-items: center;
                 }
               }
             }
@@ -603,7 +611,7 @@
           justify-content: flex-end;
           align-items: flex-start;
     
-          margin-top: 10px;
+          margin-top: 25px;
     
           .page{
             ul{
@@ -737,10 +745,10 @@
                   }
     
                   &.number{
-                    width: 25%;
+                    width: 30%;
                   }
                   &.products{
-                    width: 50%;
+                    width: 45%;
                   }
                   &.amount{
                     width: 25%;
@@ -768,6 +776,16 @@
                   &.time{
                     display: none;
                   }
+                }
+              }
+            }
+          }
+
+          .body{
+            .tr{
+              .td{
+                &.products{
+                  align-items: flex-start;
                 }
               }
             }

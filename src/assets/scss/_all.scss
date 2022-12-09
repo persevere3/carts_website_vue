@@ -713,6 +713,10 @@ $primary_color: #4db38e;
           }
           li:hover{
             color: #888;
+
+            img {
+              opacity: .6;
+            }
           }
           .search_button{
             position: relative;

@@ -13,6 +13,7 @@
       <div class="main">
         <div class="box">
           <div class="info">
+            <label> 訂單查詢 </label>
             <input type="text" placeholder="請輸入購買人連絡電話" v-model="order_phone" @keyup.enter="getOrder">
             <div class="button_row">
               <div class="button" @click="getOrder"> 搜尋 </div>
@@ -74,11 +75,11 @@
                       <div v-if="item.PayMethod" class="payMethod"> {{payMethod_obj[item.PayMethod]}} </div>
                       <div class="show_bank">
                         <div class="button" @click.stop="is_payModal = true; payModal_message =  'template1'">
-                          銀行帳戶
+                          匯款帳戶
                         </div>
                       </div>
                       <div class="button" @click.stop="is_payModal = true; payModal_message = 'template2'; account_number = ''; order_number = item.PayFilNo">
-                        確認付款
+                        付款確認
                       </div>
                     </template>
                   </div>

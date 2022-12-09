@@ -245,12 +245,12 @@
                         <div v-if="item.PayMethod" class="payMethod"> {{payMethod_obj[item.PayMethod]}} </div>
                         <div class="show_bank">
                           <div class="button" @click.stop="is_payModal = true; payModal_message =  'template1'">
-                            銀行帳戶
+                            匯款帳戶
                           </div>
                         </div>
                         <div class="button"
                           @click.stop="is_payModal = true; payModal_message = 'template2'; account_number = ''; order_number = item.PayFilNo">
-                          確認付款
+                          付款確認
                         </div>
                       </template>
                     </div>

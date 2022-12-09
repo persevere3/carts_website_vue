@@ -622,6 +622,16 @@ export default {
             }
           }
 
+          // order
+          if (pathname === '/order.html') {
+            let phone = location.href.split('phone=')[1];
+            if(phone){
+              window.history.replaceState({}, document.title, "/order.html");
+              vm.order_phone = phone;
+              vm.getOrder();
+            }
+          }
+
           // user
           if (pathname === '/user.html') {
             if(!(vm.site.MemberFuction * 1)){
@@ -1010,6 +1020,21 @@ export default {
       for(let i = 0; i < script_arr.length; i++){
         document.querySelector(tag).appendChild(script_arr[i])
       }
+
+      this.$nextTick(() => {
+        let chat_iframe = document.querySelector('.widget-visible iframe');
+        if(!chat_iframe) {
+          console.log('設定錯誤或沒抓到')
+          return
+        }
+        let chat_style = window.getComputedStyle(chat_iframe);
+        console.log(parseInt(chat_style['right']), parseInt(chat_style['bottom']))
+        if(parseInt(chat_style['right']) === 20 && parseInt(chat_style['bottom']) === 20){
+          console.log('LINE 在中間')
+        } else {
+          console.log('LINE 在最下')
+        }
+      })
     },
 
     // single
@@ -1534,14 +1559,14 @@ export default {
       }
     },
     send_verify_code(){
-      if( (this.store.NotificationSystem == 0 && !this.verify(this.r_mail)) || (this.store.NotificationSystem == 1 && !this.verify(this.r_account)) || this.second > 0){
-        return
-      }
+      if( ( !this.verify(this.r_mail, this.r_account)) || this.second > 0) return
 
       let vm = this;
 
       let formData = new FormData();
-      formData.append("phoneormail", this.store.NotificationSystem == 1 ? this.r_account.value.trim() : this.r_mail.value.trim());
+      formData.append("phone", this.r_account.value.trim());
+      formData.append("mail", this.r_mail.value.trim());
+
       formData.append("notificationsystem", this.store.NotificationSystem)
       formData.append("storeName", this.site.Store);
       formData.append("storeid", this.site.Name);
