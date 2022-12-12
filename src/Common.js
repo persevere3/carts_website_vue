@@ -1020,21 +1020,6 @@ export default {
       for(let i = 0; i < script_arr.length; i++){
         document.querySelector(tag).appendChild(script_arr[i])
       }
-
-      this.$nextTick(() => {
-        let chat_iframe = document.querySelector('.widget-visible iframe');
-        if(!chat_iframe) {
-          console.log('設定錯誤或沒抓到')
-          return
-        }
-        let chat_style = window.getComputedStyle(chat_iframe);
-        console.log(parseInt(chat_style['right']), parseInt(chat_style['bottom']))
-        if(parseInt(chat_style['right']) === 20 && parseInt(chat_style['bottom']) === 20){
-          console.log('LINE 在中間')
-        } else {
-          console.log('LINE 在最下')
-        }
-      })
     },
 
     // single
@@ -2119,5 +2104,37 @@ export default {
   mounted(){
     this.getSite();
     document.querySelector('body').style['padding-top'] = document.querySelector('.header').getBoundingClientRect().height + 'px';
+
+    // dom 監測
+    document.addEventListener("webkitAnimationStart", (event)=> {
+      if (event.animationName === "nodeInserted") {
+        let chat = event.target;
+        let chatParent = chat.parentNode;
+        if([...(chatParent.classList)].includes('fb_dialog_content')){
+          chat.style.bottom = '20px';
+          chat.style.transition = '.5s';
+
+          let line = document.querySelector('.line_icon')
+          if(line) {
+            chat.style.bottom = parseInt(line.style.bottom) + 70 + 'px';
+          } else {
+            let tawk = document.querySelector('.widget-visible iframe')
+            if(tawk) {
+              let tawk_style = window.getComputedStyle(tawk);
+              if(parseInt(tawk_style['right']) === 20 && parseInt(tawk_style['bottom']) === 20){
+                chat.style.bottom = '90px'
+              }
+            }
+          }
+        }
+        else if([...(chatParent.classList)].includes('widget-visible')){
+          let chat_style = window.getComputedStyle(chat);
+          if(parseInt(chat_style['right']) === 20 && parseInt(chat_style['bottom']) === 20){
+            let line = document.querySelector('.line_icon')
+            line.style.bottom = '90px'
+          }
+        }
+      }
+    });
   }
 }
