@@ -60,6 +60,7 @@
     .info{
       display: flex;
 
+
       label {
         height: 35px;
         line-height: 35px;
@@ -67,17 +68,12 @@
         color: #222;
       }
       input{
-        width: 120px;
+        width: 150px;
         margin-right: 15px;
       }
       .button_row{
         flex: 1 1;
         display: flex;
-        justify-content: flex-end;
-        
-        .button{
-          margin-right: 5px;
-        }
       }
     }
     .table{
@@ -97,11 +93,6 @@
             background-color: #666;
             color: #fff;
 
-            .td.products{
-              li{
-                border-bottom: 1px solid #fff;
-              }
-            }
             .td.payState{
               .state_container{
                 .payMethod{
@@ -112,7 +103,7 @@
             }
           }
           .td{
-            padding: 5px 10px;
+            padding: 3px 5px;
             min-height: 45px;
             display: flex;
             justify-content: center;
@@ -227,6 +218,10 @@
         .tr{
           background-color: #333 !important;
           color: #fff !important;
+          
+          .td {
+            justify-content: center;
+          }
         }
       }
 
@@ -364,6 +359,8 @@
             flex-wrap: wrap;
 
             .td{
+              flex-direction: column;
+
               &:before{
                 display: none;
               }
@@ -371,7 +368,7 @@
               .l_head{
                 display: block;
                 width: 100%;
-                margin: 10px 0px 5px 0px;
+                margin: 0px 0px 5px 0px;
                 padding: 5px 0px;
                 text-align: center;
                 
@@ -391,9 +388,6 @@
 
               &.payState, &.transportState, &.time{
                 width: 33.333333%;
-
-                flex-direction: column;
-                justify-content: flex-start;
               }
             }
           }
@@ -411,6 +405,14 @@
               &.time{
                 display: none;
               }
+            }
+          }
+        }
+
+        .body {
+          .tr {
+            .td {
+              justify-content: flex-start;
             }
           }
         }

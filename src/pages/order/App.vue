@@ -14,7 +14,7 @@
         <div class="box">
           <div class="info">
             <label> 訂單查詢 </label>
-            <input type="text" placeholder="請輸入購買人連絡電話" v-model="order_phone" @keyup.enter="getOrder">
+            <input type="text" placeholder="購買人連絡電話" v-model="order_phone" @keyup.enter="getOrder">
             <div class="button_row">
               <div class="button" @click="getOrder"> 搜尋 </div>
             </div>
