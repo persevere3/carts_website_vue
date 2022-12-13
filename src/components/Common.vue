@@ -597,10 +597,6 @@ export default {
     if( pathname === '/' || pathname === '/index.html'){
       this.pathname = '/';
     }
-
-    // cordova
-    // this.api = 'demo.uniqcarttest.tk';
-    // this.protocol = 'http';
   },
   mounted(){
     window.addEventListener('scroll', this.scrollHandler);

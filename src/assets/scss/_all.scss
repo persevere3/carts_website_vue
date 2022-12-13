@@ -38,7 +38,7 @@ body ::-webkit-scrollbar-track {
     opacity: 1; 
   }
 }
-.widget-visible iframe, .fb_dialog_content iframe {
+.widget-visible iframe, .fb_dialog iframe:nth-child(4) {
   animation-duration: 0.001s;
   animation-name: nodeInserted;
 }

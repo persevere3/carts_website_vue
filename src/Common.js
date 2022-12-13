@@ -2105,34 +2105,54 @@ export default {
     this.getSite();
     document.querySelector('body').style['padding-top'] = document.querySelector('.header').getBoundingClientRect().height + 'px';
 
+    function parents(dom, parent_class){
+      if(dom.parentNode == document.body){
+          return null
+      } else {
+          if(dom.parentNode.classList.contains(parent_class)){
+              return dom.parentNode
+          } else {
+              return parents(dom.parentNode, parent_class)  
+          }
+      }
+    }
+
     // dom 監測
     document.addEventListener("webkitAnimationStart", (event)=> {
       if (event.animationName === "nodeInserted") {
         let chat = event.target;
-        let chatParent = chat.parentNode;
-        if([...(chatParent.classList)].includes('fb_dialog_content')){
-          chat.style.bottom = '20px';
-          chat.style.transition = '.5s';
-
-          let line = document.querySelector('.line_icon')
-          if(line) {
-            chat.style.bottom = parseInt(line.style.bottom) + 70 + 'px';
-          } else {
-            let tawk = document.querySelector('.widget-visible iframe')
-            if(tawk) {
-              let tawk_style = window.getComputedStyle(tawk);
-              if(parseInt(tawk_style['right']) === 20 && parseInt(tawk_style['bottom']) === 20){
-                chat.style.bottom = '90px'
-              }
-            }
-          }
-        }
-        else if([...(chatParent.classList)].includes('widget-visible')){
-          let chat_style = window.getComputedStyle(chat);
-          if(parseInt(chat_style['right']) === 20 && parseInt(chat_style['bottom']) === 20){
+        if(parents(chat, 'widget-visible')){
+          let chatStyle = window.getComputedStyle(chat);
+          if(parseInt(chatStyle['right']) === 20 && parseInt(chatStyle['bottom']) === 20){
             let line = document.querySelector('.line_icon')
             line.style.bottom = '90px'
           }
+        }
+        else if (parents(chat, 'fb_dialog')){
+          let bottom = 20;
+        
+          let line = document.querySelector('.line_icon')
+          if(line) {
+            let lineStyle = window.getComputedStyle(line)
+            bottom = parseInt(lineStyle.bottom) + 70;
+          } else {
+            let tawk = document.querySelector('.widget-visible iframe')
+            if(tawk) {
+              let tawkStyle = window.getComputedStyle(tawk);
+              if(parseInt(tawkStyle['right']) === 20 && parseInt(tawkStyle['bottom']) === 20){
+                bottom = 90
+              }
+            }
+          }
+
+          let iframes = parents(chat, 'fb_dialog').querySelectorAll('iframe')
+          iframes[0].style.bottom = bottom + 'px';
+          iframes[1].style.bottom = bottom - 2.5 + 'px';
+          iframes[2].style.bottom = bottom + 44 + 'px';
+
+          let a = window.getComputedStyle(document.querySelector('.fb_iframe_widget iframe'));
+          document.querySelector('.fb_iframe_widget iframe').style.bottom = bottom + 60 + 'px';
+          console.log(a.bottom);
         }
       }
     });
