@@ -914,7 +914,7 @@ export default {
 
           // 新增 store.footer 放聯絡我們 icon 
           // 有 link 才顯示
-          vm.footer_community = JSON.parse(xhr.response).footer[0];
+          vm.footer_community = JSON.parse(xhr.response).footer[0] || {};
 
           let title = vm.store.Name;
           if(vm.site.WebPreview == 1){
@@ -1417,8 +1417,13 @@ export default {
         }
       }
     },
-    copy(text) {
-      let copy_input = document.querySelector('#copy_input');
+    copy(text, id) {
+      let copy_input
+      if(id) {
+        copy_input = document.querySelector(`#${id}`);
+      } else {
+        copy_input = document.querySelector('#copy_input');
+      }
       copy_input.value = text;
       copy_input.select();
       document.execCommand('copy');
@@ -2116,7 +2121,6 @@ export default {
           }
       }
     }
-
     // dom 監測
     document.addEventListener("webkitAnimationStart", (event)=> {
       if (event.animationName === "nodeInserted") {
@@ -2129,6 +2133,7 @@ export default {
           }
         }
         else if (parents(chat, 'fb_dialog')){
+          console.log(chat)
           let bottom = 20;
         
           let line = document.querySelector('.line_icon')
@@ -2146,13 +2151,16 @@ export default {
           }
 
           let iframes = parents(chat, 'fb_dialog').querySelectorAll('iframe')
+
+          // let svg = iframes[0].contentWindow.document.querySelector('svg');
+          // iframes[0].style.opacity = 0;
+          // svg.style.opacity = 0;
+          // console.log(svg);
+
           iframes[0].style.bottom = bottom + 'px';
           iframes[1].style.bottom = bottom - 2.5 + 'px';
           iframes[2].style.bottom = bottom + 44 + 'px';
-
-          let a = window.getComputedStyle(document.querySelector('.fb_iframe_widget iframe'));
           document.querySelector('.fb_iframe_widget iframe').style.bottom = bottom + 60 + 'px';
-          console.log(a.bottom);
         }
       }
     });

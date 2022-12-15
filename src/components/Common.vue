@@ -71,7 +71,7 @@
             </li>
             <li @click="urlPush('/order.html')">
               訂單查詢
-              <img src=".././assets/img/order.png" alt="">
+              <i class="fas fa-clipboard-list"></i>
             </li>
             <li v-if="site.MemberFuction * 1" @click="urlPush('/user.html')">
               會員登入
@@ -113,7 +113,7 @@
               <i class="fa fa-shopping-cart" aria-hidden="true"></i>
             </li>
             <li @click="urlPush('/order.html')">
-              <img src=".././assets/img/order.png" alt="">
+              <i class="fas fa-clipboard-list"></i>
             </li>
             <li v-if="site.MemberFuction * 1" @click="urlPush('/user.html')">
               <i class="fas fa-user"></i>

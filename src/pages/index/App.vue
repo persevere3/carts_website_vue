@@ -10,7 +10,7 @@
       :json_carts="JSON.stringify(carts)"
       :json_favorite="JSON.stringify(favorite)"
     >
-      <div class="main" v-if="homePage">
+      <div class="main">
         <div class="img_container pc" v-if="homePage.TopImg" :style="{backgroundImage: `url(${homePage.TopImg})`}"></div>
         <div class="img_container mobile" v-if="homePage.PhoneImg" :style="{backgroundImage: `url(${homePage.PhoneImg})`}"></div>
 

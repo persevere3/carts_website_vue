@@ -38,11 +38,12 @@ body ::-webkit-scrollbar-track {
     opacity: 1; 
   }
 }
-.widget-visible iframe, .fb_dialog iframe:nth-child(4) {
+.widget-visible iframe, .fb_dialog iframe[data-testid="greeting_iframe"] {
   animation-duration: 0.001s;
   animation-name: nodeInserted;
 }
 
+// 
 .hide_text{
   overflow: hidden;
   text-overflow: ellipsis;

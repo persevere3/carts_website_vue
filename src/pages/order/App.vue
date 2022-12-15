@@ -122,15 +122,16 @@
       </div>
 
       <div class="payModal_container" v-if="is_payModal">
-        <div class="payModal">
+        <div class="payModal bank">
           <div class="close" @click="is_payModal = false; payModal_message = '';"><i class="fas fa-times"></i></div>
         
           <template v-if="payModal_message == 'template1'">
-            <div> {{store.SelfAtmBankId}} {{bank[store.SelfAtmBankId]}}</div>
+            <div> 匯款銀行 : {{store.SelfAtmBankId}} {{bank[store.SelfAtmBankId]}} </div>
             <div class='bank_account'>
+              <div class="bank_title"> 匯款帳號 : </div>
               <input type='text' id='copy_input' readonly v-model='store.SelfAtmId'>
               <div class='copy' @click='copy(store.SelfAtmId)'> 
-                <i class='fas fa-copy'></i> 
+                <i class='fas fa-copy'></i>
               </div>
             </div>
           </template>
