@@ -38,6 +38,11 @@ body ::-webkit-scrollbar-track {
     opacity: 1; 
   }
 }
+
+.fb_dialog iframe {
+  box-shadow: none !important;
+}
+
 .widget-visible iframe, .fb_dialog iframe[data-testid="greeting_iframe"] {
   animation-duration: 0.001s;
   animation-name: nodeInserted;

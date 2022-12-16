@@ -2133,7 +2133,6 @@ export default {
           }
         }
         else if (parents(chat, 'fb_dialog')){
-          console.log(chat)
           let bottom = 20;
         
           let line = document.querySelector('.line_icon')
@@ -2151,13 +2150,11 @@ export default {
           }
 
           let iframes = parents(chat, 'fb_dialog').querySelectorAll('iframe')
-
-          // let svg = iframes[0].contentWindow.document.querySelector('svg');
-          // iframes[0].style.opacity = 0;
-          // svg.style.opacity = 0;
-          // console.log(svg);
-
-          iframes[0].style.bottom = bottom + 'px';
+          iframes[0].style.transition = '1s';
+          iframes[0].style.bottom = '20px';
+          setTimeout(function() {
+            iframes[0].style.bottom = bottom + 'px';
+          }, 1000)
           iframes[1].style.bottom = bottom - 2.5 + 'px';
           iframes[2].style.bottom = bottom + 44 + 'px';
           document.querySelector('.fb_iframe_widget iframe').style.bottom = bottom + 60 + 'px';
