@@ -310,18 +310,26 @@
         </ul>
       </div>
     </div>
+    
+    <!-- chat controler -->
+    <div class="chat_controler" @click="is_chat = !is_chat">
+      <i class="fa-solid fa-comment-dots" v-if="!is_chat"></i>
+      <i class="fa-solid fa-xmark" v-else></i>
+    </div>
 
+    <!-- fb -->
     <div id="fb-root"></div>
     <div id="fb-customer-chat" class="fb-customerchat"></div>
 
+    <!-- line -->
     <div class="line_icon" v-if="customerService && customerService.CSText" @click="urlPush(customerService.CSText, true)">
       <img src="../assets/img/line_icon.png" alt="">
     </div>
-
   </div>
 </template>
 
 <script>
+
 export default {
   props: ['json_site', 'json_all', 'json_store', 'json_footer_community', 'json_copyRight', 'json_customerService', 'json_carts', 'json_favorite'],
   data(){
@@ -343,6 +351,9 @@ export default {
 
       // 
       pathname: 'other',
+
+      //
+      is_chat: false,
 
       // search
       is_search: 0,
@@ -388,6 +399,57 @@ export default {
     },
     json_favorite(){
       this.favorite = JSON.parse(this.json_favorite);
+    },
+    is_chat(val) {
+      let arr = [];
+
+      let tawk = document.querySelector('.widget-visible iframe')
+      tawk.style.transition = '.5s';
+      let tawkStyle;
+      if (tawk) {
+        tawkStyle = window.getComputedStyle(tawk);
+        arr.push(tawk)
+      }
+      
+      let line = document.querySelector('.line_icon')
+      line.style.transition = '.5s';
+      let lineStyle;
+      if (line) {
+        lineStyle = window.getComputedStyle(line);
+        arr.push(line)
+      }
+
+      let fbs = document.querySelectorAll('.fb_dialog iframe')
+      fbs[0].style.transition = '.5s';
+      fbs[1].style.transition = '.5s';
+      fbs[2].style.transition = '.5s';
+      if(fbs) {
+        arr.push(fbs)
+      }
+
+      if(val) {
+        let bottom = 90;
+        for(let item of arr) {
+          if(item.length) {
+            item[0].style.bottom = bottom + 'px'
+            item[1].style.bottom = bottom + 'px'
+            item[2].style.bottom = bottom + 'px'
+          } else {
+            item.style.bottom = bottom + 'px'
+          }
+          bottom += 70;
+        }
+      } else {
+        for(let item of arr) {
+          if(item.length) {
+            item[0].style.bottom = '20px'
+            item[1].style.bottom = '20px'
+            item[2].style.bottom = '20px'
+          } else {
+            item.style.bottom = '20px'
+          }
+        }
+      }
     }
   },
   computed:{
