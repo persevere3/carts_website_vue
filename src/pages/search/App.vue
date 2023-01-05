@@ -9,6 +9,7 @@
       :json_customerService="JSON.stringify(customerService)"
       :json_carts="JSON.stringify(carts)"
       :json_favorite="JSON.stringify(favorite)"
+      :user_account="user_account"
     > 
       <div class="breadcrumb">
         <div class="container" v-if="search_title">

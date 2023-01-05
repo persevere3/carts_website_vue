@@ -9,6 +9,7 @@
       :json_customerService="JSON.stringify(customerService)"
       :json_carts="JSON.stringify(carts)"
       :json_favorite="JSON.stringify(favorite)"
+      :user_account="user_account"
     >
       <div class="main">
         <template v-if="category_product && category_product.Data && category_product.Data[0].Img.length" >

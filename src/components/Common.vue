@@ -69,11 +69,11 @@
               購物車
               <i class="fa fa-shopping-cart" aria-hidden="true"></i>
             </li>
-            <li @click="urlPush('/order.html')">
+            <li @click="user_account ? urlPush(`/order.html?phone=${user_account}`) : urlPush('/order.html')">
               訂單查詢
               <i class="fas fa-clipboard-list"></i>
             </li>
-            <li v-if="site.MemberFuction * 1" @click="urlPush('/user.html')">
+            <li v-if="site.MemberFuction * 1" @click="user_account ? urlPush('/user_info.html') : urlPush('/user.html')">
               會員登入
               <i class="fas fa-user"></i>
             </li>
@@ -112,10 +112,10 @@
             <li @click.stop="carts.length ? is_carts_hover = !is_carts_hover : urlPush('/cart', true); is_favorite_hover = false">
               <i class="fa fa-shopping-cart" aria-hidden="true"></i>
             </li>
-            <li @click="urlPush('/order.html')">
+            <li @click="user_account ? urlPush(`/order.html?phone=${user_account}`) : urlPush('/order.html')">
               <i class="fas fa-clipboard-list"></i>
             </li>
-            <li v-if="site.MemberFuction * 1" @click="urlPush('/user.html')">
+            <li v-if="site.MemberFuction * 1" @click="user_account ? urlPush('/user_info.html') : urlPush('/user.html')">
               <i class="fas fa-user"></i>
             </li>
           </ul>
@@ -332,7 +332,7 @@
 <script>
 
 export default {
-  props: ['json_site', 'json_all', 'json_store', 'json_footer_community', 'json_copyRight', 'json_customerService', 'json_carts', 'json_favorite'],
+  props: ['json_site', 'json_all', 'json_store', 'json_footer_community', 'json_copyRight', 'json_customerService', 'json_carts', 'json_favorite', 'user_account'],
   data(){
     return{
       // ajax

@@ -69,7 +69,7 @@ export default {
         '', '付款成功', '待付款', '已退款', '待對帳'
       ],
       delivery_arr: [
-        '', '已出貨', '待付款', '已退貨', '已取消'
+        '', '已出貨', '準備中', '已退貨', '已取消'
       ],
       payMethod_obj: {
         'CreditCard':'信用卡',
@@ -120,6 +120,21 @@ export default {
           },
           mail: {
             message: 'email格式不符',
+          }
+        },
+        is_error: false,
+        message: '',
+      },
+      r_verify_code2: {
+        value: '',
+        rules: {
+          required: {
+            message: '此項目為必填'
+          },
+          length: {
+            min: 6,
+            max: 6,
+            message: '驗證碼為6位',
           }
         },
         is_error: false,
@@ -239,12 +254,10 @@ export default {
       l_password_type: 'password',
 
       forget_step: 1,
+      mailOrAccount: 0,
       f_account: {
         value: '',
         rules: {
-          required: {
-            message: '此項目為必填'
-          },
           cellphone: {
             message: '手機格式錯誤'
           }
@@ -255,9 +268,6 @@ export default {
       f_mail: {
         value: '',
         rules: {
-          required: {
-            message: '此項目為必填'
-          },
           mail: {
             message: 'email格式不符',
           }
@@ -1295,10 +1305,18 @@ export default {
           }
 
           vm.$nextTick(function(){
-            let max_height = parseInt( getComputedStyle( document.querySelector('.td.products') )['maxHeight']);
+            // let max_height = parseInt( getComputedStyle( document.querySelector('.td.products') )['maxHeight']);
+            // let uls = document.querySelectorAll('.td.products ul');
+            // uls.forEach(function(item, index){
+            //   if(item.getBoundingClientRect().height > max_height){
+            //     vm.$set(vm.order[index],"expandable", true)
+            //   }
+            // })
+
             let uls = document.querySelectorAll('.td.products ul');
             uls.forEach(function(item, index){
-              if(item.getBoundingClientRect().height > max_height){
+              let lis = item.querySelectorAll('li')
+              if(lis.length > 4){
                 vm.$set(vm.order[index],"expandable", true)
               }
             })
@@ -1341,10 +1359,18 @@ export default {
               vm.order = data.Orders;
 
               vm.$nextTick(function(){
-                let max_height = parseInt( getComputedStyle( document.querySelector('.td.products') )['maxHeight']);
+                // let max_height = parseInt( getComputedStyle( document.querySelector('.td.products') )['maxHeight']);
+                // let uls = document.querySelectorAll('.td.products ul');
+                // uls.forEach(function(item, index){
+                //   if(item.getBoundingClientRect().height > max_height){
+                //     vm.$set(vm.order[index],"expandable", true)
+                //   }
+                // })
+
                 let uls = document.querySelectorAll('.td.products ul');
                 uls.forEach(function(item, index){
-                  if(item.getBoundingClientRect().height > max_height){
+                  let lis = item.querySelectorAll('li')
+                  if(lis.length > 4){
                     vm.$set(vm.order[index],"expandable", true)
                   }
                 })
@@ -1549,7 +1575,17 @@ export default {
       }
     },
     send_verify_code(){
-      if( ( !this.verify(this.r_mail, this.r_account)) || this.second > 0) return
+      if(this.second > 0) return
+
+      if(this.store.NotificationSystem == 0) {
+        if( !this.verify(this.r_mail) ) return
+      }
+      else if(this.store.NotificationSystem == 1) {
+        if( !this.verify(this.r_account) ) return
+      }
+      else {
+        if( !this.verify(this.r_account) || !this.verify(this.r_mail) ) return
+      }
 
       let vm = this;
 
@@ -1558,6 +1594,7 @@ export default {
       formData.append("mail", this.r_mail.value.trim());
 
       formData.append("notificationsystem", this.store.NotificationSystem)
+      formData.append("type", this.store.NotificationSystem)
       formData.append("storeName", this.site.Store);
       formData.append("storeid", this.site.Name);
 
@@ -1568,7 +1605,7 @@ export default {
       xhr.onreadystatechange = function(){
         if (this.readyState == 4 && this.status == 200) {
           if(JSON.parse(xhr.response).status){
-            vm.second = 60;
+            vm.second = 300;
             let interval =  setInterval(() => {
               vm.second -= 1;
               if(vm.second < 1){
@@ -1597,7 +1634,20 @@ export default {
       if (this.site.TermsNotices && !this.r_is_agree) {
         return
       }
-      if (!this.verify(this.r_name, this.r_mail, this.r_birthday, this.r_account, this.r_verify_code, this.r_password, this.r_confirm_password)) {
+
+      let verify_code = [];
+      if(this.store.NotificationSystem == 0) {
+        verify_code.push(this.r_verify_code2)
+      }
+      else if(this.store.NotificationSystem == 1) {
+        verify_code.push(this.r_verify_code)
+      }
+      else {
+        verify_code.push(this.r_verify_code)
+        verify_code.push(this.r_verify_code2)
+      }
+
+      if (!this.verify(this.r_name, this.r_mail, this.r_birthday, this.r_account, ...verify_code, this.r_password, this.r_confirm_password)) {
         return
       }
 
@@ -1606,7 +1656,18 @@ export default {
       let formData = new FormData();
       formData.append("storeid", this.site.Name);
       formData.append("phone", this.r_account.value);
-      formData.append("validate", this.r_verify_code.value);
+
+      if(this.store.NotificationSystem == 0) {
+        formData.append("validate2", this.r_verify_code2.value);
+      }
+      else if(this.store.NotificationSystem == 1) {
+        formData.append("validate", this.r_verify_code.value);
+      }
+      else {
+        formData.append("validate", this.r_verify_code.value);
+        formData.append("validate2", this.r_verify_code2.value);
+      }
+
       formData.append("password", this.r_password.value);
       formData.append("name", this.r_name.value);
       let b = this.r_birthday.value
@@ -1615,6 +1676,7 @@ export default {
       formData.append("gender", this.sex == 'male' ? 1 : 0 );
       formData.append("email", this.r_mail.value);
       formData.append("recommender", this.r_recommender.value);
+      formData.append("type", this.store.NotificationSystem)
 
       let xhr = new XMLHttpRequest();
       xhr.withCredentials = true;
@@ -1634,6 +1696,7 @@ export default {
             vm.r_birthday.value = ''
             vm.r_recommender.value = ''
             vm.r_verify_code.value = ''
+            vm.r_verify_code2.value = ''
             vm.r_is_agree = false
           
             vm.is_userMessage = true;
@@ -1693,15 +1756,31 @@ export default {
       localStorage.removeItem('user_account');
       this.urlPush('/user.html');
     },
+
+    // forget password
     send_forget_verify_code() {
-      if( (this.store.NotificationSystem == 0 && !this.verify(this.f_mail)) || (this.store.NotificationSystem == 1 && !this.verify(this.f_account)) || this.f_second > 0){
-        return
+      if(this.f_second > 0) return
+
+      if(this.store.NotificationSystem == 0 || (this.store.NotificationSystem == 2 && this.mailOrAccount == 0) ) {
+        if( !this.verify(this.f_mail) ) return
+      }
+      else if(this.store.NotificationSystem == 1 || (this.store.NotificationSystem == 2 && this.mailOrAccount == 1) ) {
+        if( !this.verify(this.f_account) ) return
       }
 
       let vm = this;
 
       let formData = new FormData();
-      formData.append("phoneormail", this.store.NotificationSystem == 1 ? this.f_account.value.trim() : this.f_mail.value.trim());
+      let phoneormail;
+      if(this.store.NotificationSystem == 0) {
+        phoneormail = this.f_mail.value.trim()
+      }
+      else if(this.store.NotificationSystem == 1) {
+        phoneormail = this.f_account.value.trim()
+      } else {
+        phoneormail = this.mailOrAccount == 0 ? this.f_mail.value.trim() : this.f_account.value.trim()
+      }
+      formData.append("phoneormail", phoneormail);
       formData.append("storeName", this.site.Store);
       formData.append("storeid", this.site.Name);
       formData.append("notificationsystem", this.store.NotificationSystem)
@@ -1716,7 +1795,7 @@ export default {
             vm.reset_input('f_verify_code');
             vm.forget_step = 2;
 
-            vm.f_second = 60;
+            vm.f_second = 300;
             let interval =  setInterval(() => {
               vm.f_second -= 1;
               if(vm.f_second < 1){
@@ -1739,7 +1818,16 @@ export default {
 
       let formData = new FormData();
       formData.append("storeid", this.site.Name);
-      formData.append("phoneormail", this.store.NotificationSystem == 1 ? this.f_account.value.trim() : this.f_mail.value.trim());
+      let phoneormail;
+      if(this.store.NotificationSystem == 0) {
+        phoneormail = this.f_mail.value.trim()
+      }
+      else if(this.store.NotificationSystem == 1) {
+        phoneormail = this.f_account.value.trim()
+      } else {
+        phoneormail = this.mailOrAccount == 0 ? this.f_mail.value.trim() : this.f_account.value.trim()
+      }
+      formData.append("phoneormail", phoneormail);
       formData.append("validate", this.f_verify_code.value);
 
       let xhr = new XMLHttpRequest();
@@ -1772,7 +1860,16 @@ export default {
 
       let formData = new FormData();
       formData.append("storeid", this.site.Name);
-      formData.append("phoneormail", this.store.NotificationSystem == 1 ? this.f_account.value.trim() : this.f_mail.value.trim());
+      let phoneormail;
+      if(this.store.NotificationSystem == 0) {
+        phoneormail = this.f_mail.value.trim()
+      }
+      else if(this.store.NotificationSystem == 1) {
+        phoneormail = this.f_account.value.trim()
+      } else {
+        phoneormail = this.mailOrAccount == 0 ? this.f_mail.value.trim() : this.f_account.value.trim()
+      }
+      formData.append("phoneormail", phoneormail);
       formData.append("validate", this.f_verify_code.value);
       formData.append("newpassword", this.f_password.value);
 
@@ -1786,6 +1883,7 @@ export default {
           vm.is_userMessage = true;
           if(JSON.parse(xhr.response).status){
             vm.reset_input('f_account');
+            vm.reset_input('f_mail');
             vm.reset_input('f_verify_code');
             vm.reset_input('f_password');
             vm.reset_input('f_confirm_password');
@@ -2109,5 +2207,8 @@ export default {
   mounted(){
     this.getSite();
     document.querySelector('body').style['padding-top'] = document.querySelector('.header').getBoundingClientRect().height + 'px';
+
+    // 457696369898735
+
   }
-}
+} 

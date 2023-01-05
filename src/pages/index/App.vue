@@ -9,6 +9,7 @@
       :json_customerService="JSON.stringify(customerService)"
       :json_carts="JSON.stringify(carts)"
       :json_favorite="JSON.stringify(favorite)"
+      :user_account="user_account"
     >
       <div class="main">
         <div class="img_container pc" v-if="homePage.TopImg" :style="{backgroundImage: `url(${homePage.TopImg})`}"></div>

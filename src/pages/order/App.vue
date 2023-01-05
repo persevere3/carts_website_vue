@@ -9,6 +9,7 @@
       :json_customerService="JSON.stringify(customerService)"
       :json_carts="JSON.stringify(carts)"
       :json_favorite="JSON.stringify(favorite)"
+      :user_account="user_account"
     > 
       <div class="main">
         <div class="box">
@@ -50,15 +51,27 @@
                   {{item.FilNo}}
                 </div>
                 <div class="td products" :class="{active : product_active == item.FilNo, expandable : item.expandable }" @click="product_active == item.FilNo ? product_active = '' : product_active = item.FilNo">
-                  <div class="icon"> <i class="fas fa-caret-down"></i> </div>
                   <ul>
-                    <li v-for="(item2, index) in item.Items" :key="index">
+                    <li v-for="(item2, index) in item.Items" :key="index" v-show="product_active == item.FilNo || index < 4">
                       {{item2.ProductType == 2 ? '加價購' : ''}} {{item2.Name}}{{item2.Spec ? `(${item2.Spec})` : ''}} NT${{numberThousands(item2.Price)}} x {{item2.Amount}}
                     </li>
                   </ul>
+                  <template v-if="item.expandable">
+                    <div class="icon" v-if="product_active == item.FilNo"> <i class="fa-solid fa-chevron-up"></i> </div>
+                    <div class="icon" v-else> <i class="fa-solid fa-chevron-down"></i> </div>
+                  </template>
                 </div>
                 <div class="td amount">
-                  NT$ {{numberThousands(item.TotalAmount)}}
+                  <div class="total">
+                    NT$ {{numberThousands(item.TotalAmount)}}
+                  </div>
+                  <div class="additional">
+                    <div v-if="item.Shipping * 1"> 運費: NT$ {{numberThousands(item.Shipping)}} </div>
+                    <div v-if="item.Discount * 1"> 折扣: NT$ {{numberThousands(item.Discount)}} </div>
+                    <div v-if="item.DiscountCode && item.DiscountCode.split(' ')[0] * 1">
+                      <div> 折扣碼優惠: NT$ {{numberThousands(item.DiscountCode.split(' ')[0])}} {{item.DiscountCode.split(' ')[1]}} </div>
+                    </div>
+                  </div>
                 </div>
                 <div class="td payState">
                   <div class="l_head"> 付款狀態 </div>
@@ -137,11 +150,11 @@
           </template>
 
           <template v-else-if="payModal_message == 'template2'">
-            <div class="message">
+            <div class="message" style="margin: 0 auto;">
               請輸入匯款帳戶末6碼:
               <input type="number" @input="filter_account_number" @keydown.enter="checkPay" v-model="account_number">
             </div>
-            <div class="button_row">
+            <div class="button_row" style="margin: 0 auto;">
               <div class="button" @click="checkPay">
                 確認
               </div>

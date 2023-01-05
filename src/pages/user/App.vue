@@ -9,6 +9,7 @@
       :json_customerService="JSON.stringify(customerService)"
       :json_carts="JSON.stringify(carts)"
       :json_favorite="JSON.stringify(favorite)"
+      :user_account="user_account"
     > 
       <div class="main" :class="user_nav_active">
         <!-- <div class="test" style=" padding: 10px 20px; 
@@ -52,12 +53,39 @@
                 <i class="error_icon fas fa-exclamation-circle"></i> {{  r_name.message  }}
               </div>
             </div>
+
+            <div class="input_container" :class="{ error: r_account.is_error }">
+              <input type="number" placeholder="* 請輸入手機(帳號)" v-model.trim="r_account.value" @blur="verify(r_account)">
+              <div class="error message">
+                <i class="error_icon fas fa-exclamation-circle"></i> {{  r_account.message  }}
+              </div>
+            </div>
+            <template v-if="store.NotificationSystem == 1 || store.NotificationSystem == 2">
+              <div class="input_container" :class="{ error: r_verify_code.is_error }">
+                <input type="text" placeholder="* 請輸入手機驗證碼" v-model.trim="r_verify_code.value" @blur="verify(r_verify_code)"> 
+                <div class="error message">
+                  <i class="error_icon fas fa-exclamation-circle"></i> {{  r_verify_code.message  }}
+                </div>
+              </div>
+            </template>
+
             <div class="input_container" :class="{ error: r_mail.is_error }">
               <input type="text" placeholder="* 請輸入電子信箱" v-model.trim="r_mail.value" @blur="verify(r_mail)">
               <div class="error message">
                 <i class="error_icon fas fa-exclamation-circle"></i> {{  r_mail.message  }}
               </div>
             </div>
+            <template v-if="store.NotificationSystem == 0 || store.NotificationSystem == 2">
+              <div class="input_container" :class="{ error: r_verify_code2.is_error }">
+                <input type="text" placeholder="* 請輸入電子信箱驗證碼" v-model.trim="r_verify_code2.value" @blur="verify(r_verify_code2)"> 
+                <div class="error message">
+                  <i class="error_icon fas fa-exclamation-circle"></i> {{  r_verify_code2.message  }}
+                </div>
+              </div>
+            </template>
+            
+            <div class="button" style="margin-bottom: 20px;" @click="send_verify_code"> 獲取驗證碼 <span v-if="second > 0"> ( {{second}}s ) </span> </div>
+
             <div class="input_container" :class="{ error: r_birthday.is_error }">
               <date-picker placeholder="* 請輸入生日" format="YYYY/MM/DD" v-model="r_birthday.value" @close="verify(r_birthday)"
                 @clear="verify(r_birthday)"></date-picker>
@@ -77,19 +105,7 @@
               </div>
               <label for="female"> 女 </label>
             </div>
-            <div class="input_container" :class="{ error: r_account.is_error }">
-              <input type="number" placeholder="* 請輸入手機(帳號)" v-model.trim="r_account.value" @blur="verify(r_account)">
-              <div class="error message">
-                <i class="error_icon fas fa-exclamation-circle"></i> {{  r_account.message  }}
-              </div>
-            </div>
-            <div class="input_container verify" :class="{ error: r_verify_code.is_error }">
-              <input type="text" placeholder="* 請輸入驗證碼" v-model.trim="r_verify_code.value" @blur="verify(r_verify_code)"> 
-              <div class="button" @click="send_verify_code"> 獲取驗證碼 <span v-if="second > 0"> ( {{second}}s ) </span> </div>
-              <div class="error message">
-                <i class="error_icon fas fa-exclamation-circle"></i> {{  r_verify_code.message  }}
-              </div>
-            </div>
+
             <div class="input_container" :class="{ error: r_password.is_error }">
               <input :type="r_password_type" placeholder="* 請輸入密碼" v-model.trim="r_password.value"
                 @blur="verify(r_password)" autocomplete="false">
@@ -152,16 +168,20 @@
 
           <div class="form forget_form">
             <template v-if="forget_step == 1">
-              <div class="input_container" :class="{ error: f_account.is_error }" v-if="store.NotificationSystem == 1">
-                <input type="number" placeholder="* 請輸入手機(帳號)" v-model.trim="f_account.value" @blur="verify(f_account)">
-                <div class="error message">
-                  <i class="error_icon fas fa-exclamation-circle"></i> {{  f_account.message  }}
-                </div>
-              </div>
-              <div class="input_container" :class="{ error: f_mail.is_error }" v-if="store.NotificationSystem == 0">
+              <select name="" id="" v-model="mailOrAccount" v-if="store.NotificationSystem == 2">
+                <option value="0"> 電子信箱 </option>
+                <option value="1"> 手機 </option>
+              </select>
+              <div class="input_container" :class="{ error: f_mail.is_error }" v-if="store.NotificationSystem == 0 || (store.NotificationSystem == 2 && mailOrAccount == 0)">
                 <input type="text" placeholder="* 請輸入電子信箱" v-model.trim="f_mail.value" @blur="verify(f_mail)">
                 <div class="error message">
                   <i class="error_icon fas fa-exclamation-circle"></i> {{  f_mail.message  }}
+                </div>
+              </div>
+              <div class="input_container" :class="{ error: f_account.is_error }" v-if="store.NotificationSystem == 1 || (store.NotificationSystem == 2 && mailOrAccount == 1)">
+                <input type="number" placeholder="* 請輸入手機(帳號)" v-model.trim="f_account.value" @blur="verify(f_account)">
+                <div class="error message">
+                  <i class="error_icon fas fa-exclamation-circle"></i> {{  f_account.message  }}
                 </div>
               </div>
               <div class="button" @click="send_forget_verify_code"> 獲取驗證碼 <span v-if="f_second > 0"> ( {{f_second}}s ) </span> </div>
@@ -176,8 +196,8 @@
               </div>
               <div class="button" @click="check_forget_verify_code"> 送出 </div>
 
-              <div class="button" @click="reset_input('f_account') ; forget_step = 1;" v-if="store.NotificationSystem == 1"> 重新輸入手機 </div>
-              <div class="button" @click="reset_input('f_mail') ; forget_step = 1;" v-if="store.NotificationSystem == 0"> 重新輸入電子信箱 </div>
+              <div class="button" @click="reset_input('f_mail') ; forget_step = 1;" v-if="store.NotificationSystem == 0 || (store.NotificationSystem == 2 && mailOrAccount  == 0)"> 重新輸入電子信箱 </div>
+              <div class="button" @click="reset_input('f_account') ; forget_step = 1;" v-if="store.NotificationSystem == 1 || (store.NotificationSystem == 2 && mailOrAccount == 1)"> 重新輸入手機 </div>
             </template>
 
             <template v-if="forget_step == 3">
@@ -207,8 +227,8 @@
               </div>
 
               <div class="button" @click="edit_forget_pass"> 確認修改 </div>
-              <div class="button" @click="reset_input('f_account'); forget_step = 1;" v-if="store.NotificationSystem == 1"> 重新輸入手機 </div>
-              <div class="button" @click="reset_input('f_account'); forget_step = 1;" v-if="store.NotificationSystem == 0"> 重新輸入電子信箱 </div>
+              <div class="button" @click="reset_input('f_mail'); forget_step = 1;" v-if="store.NotificationSystem == 0 || (store.NotificationSystem == 2 && mailOrAccount == 0)"> 重新輸入電子信箱 </div>
+              <div class="button" @click="reset_input('f_account'); forget_step = 1;" v-if="store.NotificationSystem == 1 || (store.NotificationSystem == 2 && mailOrAccount == 1)"> 重新輸入手機 </div>
             </template>
           </div>
         </form>
@@ -235,8 +255,12 @@
   </div>
 </template>
 
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+
 <script src="../.././Common.js"></script>
 
 <style lang="scss">
 @import "../.././assets/scss/user.scss";
 </style>
+
+
