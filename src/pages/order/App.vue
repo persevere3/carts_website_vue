@@ -75,29 +75,29 @@
                 </div>
                 <div class="td payState">
                   <div class="l_head"> 付款狀態 </div>
-                  <!-- PayStatus == 2 (待付款)，PayMethod == 'ATM' (ATM)，PayType == 1 (轉帳給公司) -->
-                  <div class="state_container" v-if="item.Delivery > 2">
-                    {{ delivery_arr[item.Delivery] }}
-                  </div>
+                  <div v-if="item.PayMethod && item.Delivery != 4 " class="payMethod"> {{payMethod_obj[item.PayMethod]}} </div>
+                  <div v-if="item.Delivery == 4"> {{ delivery_arr[item.Delivery] }} </div>
+                  <!-- PayStatus == 2 (待付款)，PayMethod == 'ATM'，PayType == 1 (公司) -->
                   <div class="state_container" v-else-if="item.PayStatus == 2 && item.PayMethod == 'ATM' && item.PayType == 1">
                     <template v-if="store.SelfAtmStatus == 0">
-                      <div v-if="item.PayMethod" class="payMethod"> {{payMethod_obj[item.PayMethod]}} </div>
                       <div> ATM帳戶關閉，請聯繫賣家 </div>
                     </template>
                     <template v-else>
-                      <div v-if="item.PayMethod" class="payMethod"> {{payMethod_obj[item.PayMethod]}} </div>
                       <div class="show_bank">
                         <div class="button" @click.stop="is_payModal = true; payModal_message =  'template1'">
                           匯款帳戶
                         </div>
                       </div>
-                      <div class="button" @click.stop="is_payModal = true; payModal_message = 'template2'; account_number = ''; order_number = item.PayFilNo">
+                      <div class="button"
+                        @click.stop="is_payModal = true; payModal_message = 'template2'; account_number = ''; order_number = item.PayFilNo">
                         付款確認
                       </div>
                     </template>
                   </div>
+                  <div class="state_container" v-else-if="item.PayStatus == 2 && item.PayMethod != 'PayOnDelivery'">
+                    <div class="button"  @click="pay_method = item.PayMethod; rePay(item.FilNo, `${protocol}//${api}/order.html?phone=${order_phone}`)"> 前往付款 </div>
+                  </div>
                   <div class="state_container" v-else>
-                    <div v-if="item.PayMethod" class="payMethod"> {{payMethod_obj[item.PayMethod]}} </div>
                     <div> {{ payStatus_arr[item.PayStatus] }} </div>
                   </div>
                 </div>
@@ -166,6 +166,8 @@
           </template>
         </div>
       </div>
+
+      <div class="ECPay_form_container" v-html="ECPay_form"></div>
     </Common>
   </div>
 </template>

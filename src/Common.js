@@ -66,7 +66,7 @@ export default {
       product_active: '',
 
       payStatus_arr: [
-        '', '付款成功', '待付款', '已退款', '待對帳'
+        '', '付款成功', '尚未付款', '已退款', '待對帳'
       ],
       delivery_arr: [
         '', '已出貨', '準備中', '已退貨', '已取消'
@@ -76,7 +76,7 @@ export default {
         'ATM':'ATM',
         'PayCode':'超商代碼',
         'PayBarCode':'超商條碼',
-        'PayOnDelivery':'超商取貨付款',
+        'PayOnDelivery':'取貨付款',
         'LinePay':'LinePay',
       },
 
@@ -93,6 +93,11 @@ export default {
 
       order_number: '',
       account_number: '',
+
+      pay_method: '',
+      payResult: '',
+      ECPay_form: '',
+      
 
       // user
       user_nav_active: 'login',
@@ -326,6 +331,9 @@ export default {
       is_userMessage: false,
       user_message: '',
 
+      // 
+      LineToken: '',
+
       // user_info
       user_account: '',
 
@@ -405,6 +413,8 @@ export default {
       address_select_active: '',
 
       recommend_code: '',
+
+      bonus: [],
 
       // 
       total_bonus: 0,
@@ -636,7 +646,8 @@ export default {
           if (pathname === '/order.html') {
             let phone = location.href.split('phone=')[1];
             if(phone){
-              window.history.replaceState({}, document.title, "/order.html");
+              console.log(123)
+              // window.history.replaceState({}, document.title, "/order.html");
               vm.order_phone = phone;
               vm.getOrder();
             }
@@ -655,15 +666,31 @@ export default {
               vm.user_nav_active = 'register';
               vm.is_userModal = true;
             }
+
+            vm.LineToken = location.href.split('code=')[1] && 
+                          location.href.split('code=')[1].split('&')[0];       
+            if(vm.LineToken){
+              window.history.replaceState({}, document.title, "/user.html");
+              vm.getLineProfile();
+            }
           }
 
           // user_info
           if (pathname === '/user_info.html') {
+            // 沒有開啟會員功能
             if(!(vm.site.MemberFuction * 1)){
               vm.urlPush('/');
             }
+            // 
             if(vm.user_account){
               vm.getUser_info();
+              let active_page = location.href.split('page=')[1] && 
+              location.href.split('page=')[1].split('&')[0];       
+              if(active_page && active_page == 'order'){
+                window.history.replaceState({}, document.title, "/user_info.html");
+                vm.user_info_nav_active = 'order'; 
+                vm.getMemberOrder()
+              }
             } else {
               vm.urlPush('/user.html');
             }
@@ -1497,6 +1524,51 @@ export default {
       }
     },
 
+    rePay(FilNo, url) {
+      let vm = this;
+
+      let formData = new FormData();
+      formData.append("StoreId", this.site.Name);
+      formData.append("flino", FilNo);
+      formData.append("url", url);
+
+      let xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+      xhr.open('post', `${vm.protocol}//${vm.api}/LineMK/Line/RePayConfirm`, true);
+      xhr.send(formData);
+      xhr.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          vm.payResult = JSON.parse(xhr.response)
+          vm.toPay()
+        }
+      }
+    },
+    toPay(){
+      // LinePay
+      if(this.pay_method == 'LinePay'){
+        this.urlPush(this.payResult.payUrl)
+      }
+      // ecpay
+      else {
+        if(this.api.indexOf('demo') > -1){
+          this.ECPay_form = `<form id="ECPay_form" action="https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5" method="post">`
+        } else {
+          this.ECPay_form = `<form id="ECPay_form" action="https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5" method="post">`
+        }
+        for(let item in this.payResult){
+          if(item === 'success' || item === 'message') continue
+          // EncryptType TotalAmount ExpireDate: number，other: text
+          this.ECPay_form += `<input type="${item == 'EncryptType' || item == 'TotalAmount' || item == 'ExpireDate' ? 'number' : 'text'}" name="${item}" value="${this.payResult[item]}">`;
+        }
+        this.ECPay_form += `</form>`;
+
+        this.$nextTick(()=>{
+          let ECPay_form = document.querySelector('#ECPay_form');
+          ECPay_form.submit();
+        })
+      }
+    },
+
     // user
     required_verify(item) {
       if(!item.hasOwnProperty('value')){
@@ -1688,19 +1760,9 @@ export default {
           vm.is_userMessage = true;
           
           if(JSON.parse(xhr.response).status){
-            vm.r_account.value = ''
-            vm.r_password.value = ''
-            vm.r_confirm_password.value = ''
-            vm.r_name.value = ''
-            vm.r_mail.value = ''
-            vm.r_birthday.value = ''
-            vm.r_recommender.value = ''
-            vm.r_verify_code.value = ''
-            vm.r_verify_code2.value = ''
-            vm.r_is_agree = false
-          
-            vm.is_userMessage = true;
-            vm.user_nav_active = 'login'
+            vm.l_account.value = vm.r_account.value;
+            vm.l_password.value = vm.r_password.value;
+            vm.user_login();
           }
           else {
             vm.user_message = JSON.parse(xhr.response).msg
@@ -2149,6 +2211,72 @@ export default {
       return iframe;
     },
 
+    // FB
+    // FBLogin() {
+    //   let vm = this;
+    //   FB.getLoginStatus(function(response) {
+    //     console.log(response);
+    //     if (response.status === "connected") {
+    //       vm.getProfile();
+    //     } else {
+    //       FB.login(function(res) {
+    //         console.log(res)
+    //         vm.getProfile();
+    //       });
+    //     }
+    //   });
+    // },
+    // FBLogout() {
+    //   // 檢查登入狀態
+    //   FB.getLoginStatus(function(response) {
+    //     // 檢查登入狀態
+    //     if (response.status === "connected") {
+    //       // 移除授權
+    //       FB.api("/me/permissions", "DELETE", function(res) {
+    //         // 用戶登出
+    //         FB.logout();
+    //       });
+    //     } else {
+    //       // do something
+    //     }
+    //   });
+    // },
+    // getProfile() {
+    //   FB.api("/me?fields=name, id, email", function(res) {
+    //     console.log(res)
+    //   });
+    // },
+
+    // Line
+    // https://demo.uniqcarttest.tk/?code=cYECgbvDcN1egeR6UyPk&state=login
+    LineLogin() {
+      let client_id = '1657797715';
+      let redirect_uri = `${this.protocol}//${this.api}/user.html`;
+      
+      let link = 'https://access.line.me/oauth2/v2.1/authorize?';
+      link += 'response_type=code';
+      link += '&client_id=' + client_id;
+      link += '&redirect_uri=' + redirect_uri;
+      link += '&state=login';
+      link += '&scope=openid%20profile';
+      window.location.href = link;
+    },
+
+    getLineProfile() {
+      let vm = this;
+
+      let xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+      xhr.open('get', `https://api.line.me/oauth2/v2.1/userinfo`, true);
+      xhr.setRequestHeader("Authorization", `Bearer ${this.LineToken}`); 
+      xhr.send();
+      xhr.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          console.log(JSON.parse(xhr.response));
+        }
+      }
+    },
+
     // urlPush
     urlPush(url, isOpen){
       if(!url){
@@ -2208,7 +2336,23 @@ export default {
     this.getSite();
     document.querySelector('body').style['padding-top'] = document.querySelector('.header').getBoundingClientRect().height + 'px';
 
-    // 457696369898735
-
+    // window.fbAsyncInit = function() {
+    //   FB.init({
+    //     appId      : '851665509219913',
+    //     cookie     : true,
+    //     xfbml      : true,
+    //     version    : 'v15.0'
+    //   });
+        
+    //   FB.AppEvents.logPageView();   
+    // };
+  
+    // (function(d, s, id){
+    //   var js, fjs = d.getElementsByTagName(s)[0];
+    //   if (d.getElementById(id)) {return;}
+    //   js = d.createElement(s); js.id = id;
+    //   js.src = "https://connect.facebook.net/en_US/sdk.js";
+    //   fjs.parentNode.insertBefore(js, fjs);
+    // }(document, 'script', 'facebook-jssdk'));
   }
 } 

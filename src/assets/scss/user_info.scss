@@ -438,11 +438,9 @@
                 color: #fff;
   
                 .td.payState{
-                  .state_container{
-                    .payMethod{
-                      border: 1px solid #fff;
-                      color: #fff;
-                    }
+                  .payMethod{
+                    border: 1px solid #fff;
+                    color: #fff;
                   }
                 }
                 .td.products {
@@ -530,20 +528,22 @@
                 }
                 &.payState{
                   width: 12.5%;
-    
+                  flex-direction: column;
+                  
+                  .payMethod{
+                    text-align: center;
+                    margin-bottom: 5px;
+                    padding: 2px 4px;
+                    border-radius: 3px;
+                    border: 1px solid #000;
+                    color: #000;
+                  }
+                  
                   .state_container{
                     display: flex;
                     flex-direction: column;
                     align-items: center;
     
-                    .payMethod{
-                      text-align: center;
-                      margin-bottom: 5px;
-                      padding: 2px 4px;
-                      border-radius: 3px;
-                      border: 1px solid #000;
-                      color: #000;
-                    }
                     .show_bank{
                       margin-bottom: 1px;
                       display: flex;

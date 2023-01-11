@@ -29,7 +29,6 @@
                                 l_account.value = '0912123123';
                                 l_password.value = '123456789';"
         > test </div> -->
-
         <div class="navs">
           <div class="nav register_nav" @click="user_nav_active = 'register'">
             註冊會員
@@ -232,6 +231,12 @@
             </template>
           </div>
         </form>
+
+        <!-- test -->
+        <div class="third_login" style="display: none">
+          <div class="button" style="background-color: #3B5998;" > <i class="fa-brands fa-facebook"></i> 使用Facebook登入 </div>
+          <div class="button" style="background-color: #00c300;" > <i class="fa-brands fa-line"></i> 使用Line登入 </div>
+        </div>
       </div>
 
       <div class="user_modal_container" v-if="is_userModal">

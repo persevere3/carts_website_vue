@@ -68,6 +68,14 @@ body ::-webkit-scrollbar-track {
 }
 
 // 
+.ECPay_form_container{
+  position: absolute;
+  top: 0;
+  opacity: 0;
+  z-index: -1;
+}
+
+// 
 @keyframes fbchatInserted {
   from { opacity: 0.99; }
   to { opacity: 1; }
