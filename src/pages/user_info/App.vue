@@ -43,14 +43,14 @@
               </div>
               <div class="input_container" :class="{ error: r_mail.is_error }">
                 <div class="title"> 電子信箱 </div>
-                <input type="text" placeholder="* 請輸入電子信箱" v-model.trim="r_mail.value" @blur="verify(r_mail)">
+                <input type="text" readonly placeholder="* 請輸入電子信箱" v-model.trim="r_mail.value" @input="r_mail.value = $event.target.value">
                 <div class="error message">
                   <i class="error_icon fas fa-exclamation-circle"></i> {{ r_mail.message }}
                 </div>
               </div>
               <div class="input_container" :class="{ error: r_birthday.is_error }">
                 <div class="title"> 生日 </div>
-                <input type="text" readonly v-model.trim="birthday">
+                <input type="text" readonly v-model.trim="birthday" @input="birthday = $event.target.value">
               </div>
               <div class="radio_container">
                 <div class="title"> 性別 </div>
@@ -70,7 +70,7 @@
             <div class="right">
               <div class="input_container" :class="{ error: r_account.is_error }">
                 <div class="title"> 手機 </div>
-                <input type="number" readonly v-model.trim="r_account.value">
+                <input type="number" readonly v-model.trim="r_account.value" @input="r_account.value = $event.target.value">
               </div>
               <div class="password_container">
                 <div class="title"> 密碼 </div>
@@ -78,7 +78,7 @@
               </div>
               <div class="input_container">
                 <div class="title border"> 推薦代碼 </div>
-                <input type='text' id="copy_input" readonly v-model='recommend_code'>
+                <input type='text' id="copy_input" readonly v-model='recommend_code' @input="recommend_code = $event.target.value">
                 <div class='copy' @click='copy(recommend_code)'>
                   <i class='fas fa-copy'></i>
                 </div>
@@ -86,12 +86,12 @@
 
               <div class="title">
                 常用收件地址
-                <div class="add_address" @click="add_address" v-if="Object.values(delivery_address).length < 3">
+                <div class="add_address" @click="add_address" v-if="delivery_address && delivery_address.length < 3">
                   <i class="fas fa-plus-circle"></i>
                 </div>
               </div>
-              <div class="address_container" :class="{error : item.is_error}" v-for="(item, key) in delivery_address"
-                :key="key">
+              <div class="address_container" :class="{error : item.is_error}" v-for="(item, index) in delivery_address"
+                :key="index">
                 <div class="address">
                   <div class="select"
                     @click.stop="address_select_active == `${item.id}_city`? address_select_active = '' : address_select_active = `${item.id}_city`">
@@ -118,7 +118,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="delete" @click="delete_address(key)"> <i class="fas fa-trash-alt"></i> </div>
+                <div class="delete" @click="delete_address(item.id)"> <i class="fas fa-trash-alt"></i> </div>
               </div>
             </div>
 
@@ -188,6 +188,35 @@
           </div>
 
           <div class="form order_form" v-if="order">
+            <div class="box">
+              <div class="filter">
+                <div class="item">
+                  <label> 訂單編號 </label>
+                  <input type="text" placeholder="訂單編號" v-model="filter_number">
+                </div>
+                
+                <div class="item">
+                  <label> 付款狀態 </label>
+                  <select v-model="filter_pay">
+                    <option value="0"> === 付款狀態 === </option>
+                    <option :value="index" v-for="(item, index) in payStatus_arr" :key="index" v-show="index != 0"> {{ item }} </option>
+                  </select>
+                </div>
+
+                <div class="item">
+                  <label> 運送狀態 </label>
+                  <select v-model="filter_delivery">
+                    <option value="0"> === 運送狀態 === </option>
+                    <option :value="index" v-for="(item, index) in delivery_arr" :key="index" v-show="index != 0"> {{ item }} </option>
+                  </select>
+                </div>
+
+                <div class="button_row">
+                  <div class="button" @click="getMemberOrder('', true)"> 篩選 </div>
+                </div>
+              </div>
+            </div>
+
             <div class="table">
               <div class="head">
                 <div class="tr">
@@ -232,7 +261,7 @@
                   </div>
                   <div class="td amount">
                     <div class="total">
-                      NT$ {{numberThousands(item.TotalAmount)}}
+                      應付金額: NT$ {{numberThousands(item.TotalAmount)}}
                     </div>
                     <div class="additional">
                       <div v-if="item.Shipping * 1"> 運費: NT$ {{numberThousands(item.Shipping)}} </div>
@@ -240,15 +269,19 @@
                       <div v-if="item.DiscountCode && item.DiscountCode.split(' ')[0] * 1">
                         <div> 折扣碼優惠: NT$ {{numberThousands(item.DiscountCode.split(' ')[0])}} {{item.DiscountCode.split(' ')[1]}}</div>
                       </div>
+                      <div v-if="item.UsedWallet * 1">
+                        <div> 使用購物金: NT$ {{numberThousands(item.UsedWallet)}} </div>
+                      </div>
                     </div>
                   </div>
                   <div class="td payState">
                     <div class="l_head"> 付款狀態 </div>
-                    
-                    <div v-if="item.PayMethod && item.Delivery != 4 " class="payMethod"> {{payMethod_obj[item.PayMethod]}} </div>
-                    <div v-if="item.Delivery == 4"> {{ delivery_arr[item.Delivery] }} </div>
+                    <!-- 付款方式 -->
+                    <div v-if="item.PayMethod" class="payMethod"> {{payMethod_obj[item.PayMethod]}} </div>
+
+                    <!-- 付款狀態 -->
                     <!-- PayStatus == 2 (待付款)，PayMethod == 'ATM'，PayType == 1 (公司) -->
-                    <div class="state_container" v-else-if="item.PayStatus == 2 && item.PayMethod == 'ATM' && item.PayType == 1">
+                    <div class="state_container" v-if="item.PayStatus == 2 && item.PayMethod == 'ATM' && item.PayType == 1">
                       <template v-if="store.SelfAtmStatus == 0">
                         <div> ATM帳戶關閉，請聯繫賣家 </div>
                       </template>
@@ -264,16 +297,25 @@
                         </div>
                       </template>
                     </div>
-                    <div class="state_container" v-else-if="item.PayStatus == 2 && item.PayMethod != '取貨付款'">
+                    <div class="state_container" v-else-if="item.PayStatus == 2 && item.PayMethod != 'PayOnDelivery'">
                       <div class="button"  @click="pay_method = item.PayMethod; rePay(item.FilNo, `${protocol}//${api}/user_info.html?page=order`)"> 前往付款 </div>
                     </div>
                     <div class="state_container" v-else>
                       <div> {{ payStatus_arr[item.PayStatus] }} </div>
                     </div>
+
                   </div>
                   <div class="td transportState">
                     <div class="l_head"> 運送狀態 </div>
                     {{delivery_arr[item.Delivery]}}
+                    <template v-if="item.CancelTime && (item.Delivery == 3 || item.Delivery == 4)">
+                      <div> {{ item.CancelTime.split(' ')[0] }} </div>
+                      <div> {{ item.CancelTime.split(' ')[1] }} </div>
+                    </template>
+                    <template v-else-if="item.DeliveryTime && (item.Delivery == 1 || item.Delivery == 5)">
+                      <div> {{ item.DeliveryTime.split(' ')[0] }} </div>
+                      <div> {{ item.DeliveryTime.split(' ')[1] }} </div>
+                    </template>
                   </div>
                   <div class="td time">
                     <div class="l_head"> 成立時間 </div>

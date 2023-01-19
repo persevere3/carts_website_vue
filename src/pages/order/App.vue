@@ -12,15 +12,46 @@
       :user_account="user_account"
     > 
       <div class="main">
-        <div class="box">
+        <div class="box" v-if="!user_account">
           <div class="info">
             <label> 訂單查詢 </label>
-            <input type="text" placeholder="購買人連絡電話" v-model="order_phone" @keyup.enter="getOrder">
+            <input type="text" placeholder="購買人手機號碼" v-model="order_phone" @keyup.enter="getOrder">
+            <input type="text" placeholder="購買人電子信箱" v-model="order_mail" @keyup.enter="getOrder">
             <div class="button_row">
               <div class="button" @click="getOrder"> 搜尋 </div>
             </div>
           </div>
         </div>
+
+        <div class="box" v-if="order">
+          <div class="filter">
+            <div class="item">
+              <label> 訂單編號 </label>
+              <input type="text" placeholder="訂單編號" v-model="filter_number">
+            </div>
+            
+            <div class="item">
+              <label> 付款狀態 </label>
+              <select v-model="filter_pay">
+                <option value="0"> === 付款狀態 === </option>
+                <option :value="index" v-for="(item, index) in payStatus_arr" :key="index" v-show="index != 0"> {{ item }} </option>
+              </select>
+            </div>
+
+            <div class="item">
+              <label> 運送狀態 </label>
+              <select v-model="filter_delivery">
+                <option value="0"> === 運送狀態 === </option>
+                <option :value="index" v-for="(item, index) in delivery_arr" :key="index" v-show="index != 0"> {{ item }} </option>
+              </select>
+            </div>
+
+            <div class="button_row">
+              <div class="button" @click="getOrder('', true)"> 篩選 </div>
+            </div>
+          </div>
+        </div>
+  
         <div class="box" v-if="order">
           <div class="table">
             <div class="head">
@@ -63,7 +94,7 @@
                 </div>
                 <div class="td amount">
                   <div class="total">
-                    NT$ {{numberThousands(item.TotalAmount)}}
+                    應付金額: NT$ {{numberThousands(item.TotalAmount)}}
                   </div>
                   <div class="additional">
                     <div v-if="item.Shipping * 1"> 運費: NT$ {{numberThousands(item.Shipping)}} </div>
@@ -71,14 +102,19 @@
                     <div v-if="item.DiscountCode && item.DiscountCode.split(' ')[0] * 1">
                       <div> 折扣碼優惠: NT$ {{numberThousands(item.DiscountCode.split(' ')[0])}} {{item.DiscountCode.split(' ')[1]}} </div>
                     </div>
+                    <div v-if="item.UsedWallet * 1">
+                      <div> 使用購物金: NT$ {{numberThousands(item.UsedWallet)}} </div>
+                    </div>
                   </div>
                 </div>
                 <div class="td payState">
                   <div class="l_head"> 付款狀態 </div>
-                  <div v-if="item.PayMethod && item.Delivery != 4 " class="payMethod"> {{payMethod_obj[item.PayMethod]}} </div>
-                  <div v-if="item.Delivery == 4"> {{ delivery_arr[item.Delivery] }} </div>
+                  <!-- 付款方式 -->
+                  <div v-if="item.PayMethod" class="payMethod"> {{payMethod_obj[item.PayMethod]}} </div>
+                  
+                  <!-- 付款狀態 -->
                   <!-- PayStatus == 2 (待付款)，PayMethod == 'ATM'，PayType == 1 (公司) -->
-                  <div class="state_container" v-else-if="item.PayStatus == 2 && item.PayMethod == 'ATM' && item.PayType == 1">
+                  <div class="state_container" v-if="item.PayStatus == 2 && item.PayMethod == 'ATM' && item.PayType == 1">
                     <template v-if="store.SelfAtmStatus == 0">
                       <div> ATM帳戶關閉，請聯繫賣家 </div>
                     </template>
@@ -95,15 +131,24 @@
                     </template>
                   </div>
                   <div class="state_container" v-else-if="item.PayStatus == 2 && item.PayMethod != 'PayOnDelivery'">
-                    <div class="button"  @click="pay_method = item.PayMethod; rePay(item.FilNo, `${protocol}//${api}/order.html?phone=${order_phone}`)"> 前往付款 </div>
+                    <div class="button"  @click="pay_method = item.PayMethod; rePay(item.FilNo, `${protocol}//${api}/order.html`)"> 前往付款 </div>
                   </div>
                   <div class="state_container" v-else>
                     <div> {{ payStatus_arr[item.PayStatus] }} </div>
                   </div>
+
                 </div>
                 <div class="td transportState">
                   <div class="l_head"> 運送狀態 </div>
                   {{delivery_arr[item.Delivery]}}
+                  <template v-if="item.CancelTime && (item.Delivery == 3 || item.Delivery == 4)">
+                    <div> {{ item.CancelTime.split(' ')[0] }} </div>
+                    <div> {{ item.CancelTime.split(' ')[1] }} </div>
+                  </template>
+                  <template v-else-if="item.DeliveryTime && (item.Delivery == 1 || item.Delivery == 5)">
+                    <div> {{ item.DeliveryTime.split(' ')[0] }} </div>
+                    <div> {{ item.DeliveryTime.split(' ')[1] }} </div>
+                  </template>
                 </div>
                 <div class="td time">
                   <div class="l_head"> 成立時間 </div>

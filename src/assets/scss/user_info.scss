@@ -419,6 +419,51 @@
           }
         }
 
+        .box{
+          padding: 20px;
+          margin-bottom: 10px;
+          border-radius: 3px;
+          background: #eee;
+        }
+
+        .filter{
+          display: flex;
+          flex-wrap: wrap;
+    
+          label {
+            height: 35px;
+            line-height: 35px;
+            margin-right: 15px;
+            color: #222;
+          }
+          input{
+            width: 150px;
+            margin-right: 15px;
+          }
+          .button_row{
+            flex: 1 1;
+            display: flex;
+            margin-top: 5px;
+          }
+    
+          .item {
+            display: flex;
+            margin-top: 5px;
+    
+            select {
+              width: 150px;
+              margin-right: 15px;
+              color: #333;
+              border: none;
+              outline: none;
+              cursor: pointer;
+    
+              &:focus {
+                box-shadow: 0 0 3px 1px #4db38e;
+              }
+            }
+          }
+        }
 
         .table{
           margin: 0;
@@ -553,6 +598,7 @@
                 }
                 &.transportState{
                   width: 12.5%;
+                  flex-direction: column;
                 }
                 &.time{
                   width: 15%;

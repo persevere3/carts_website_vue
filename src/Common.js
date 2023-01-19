@@ -61,6 +61,10 @@ export default {
 
       // order
       order_phone: '',
+      order_mail: '',
+      filter_number: '',
+      filter_pay: '0',
+      filter_delivery: '0',
       
       order: '',
       product_active: '',
@@ -69,7 +73,7 @@ export default {
         '', '付款成功', '尚未付款', '已退款', '待對帳'
       ],
       delivery_arr: [
-        '', '已出貨', '準備中', '已退貨', '已取消'
+        '', '已出貨', '準備中', '已退貨', '已取消', '已自取'
       ],
       payMethod_obj: {
         'CreditCard':'信用卡',
@@ -408,8 +412,7 @@ export default {
         ]
       },
 
-      delivery_address: {
-      },
+      delivery_address: [],
       address_select_active: '',
 
       recommend_code: '',
@@ -570,7 +573,7 @@ export default {
       xhr.withCredentials = true;
       xhr.open('get',`${vm.protocol}//${vm.api}/interface/web/GetSite`, true);
       xhr.send(null);
-      xhr.onreadystatechange = function() {
+      xhr.onreadystatechange = async function() {
         if (this.readyState == 4 && this.status == 200) {
           if(JSON.parse(xhr.response).errormessage){
             vm.login(vm.getSite);
@@ -644,13 +647,33 @@ export default {
 
           // order
           if (pathname === '/order.html') {
-            let phone = location.href.split('phone=')[1];
-            if(phone){
-              console.log(123)
-              // window.history.replaceState({}, document.title, "/order.html");
-              vm.order_phone = phone;
-              vm.getOrder();
+
+            let RtnMsg = location.href.split('RtnMsg=')[1] && 
+            location.href.split('RtnMsg=')[1].split('&')[0];
+            if(RtnMsg){
+              vm.payModal_message = '付款成功';
+              vm.is_payModal = true;
             }
+
+            if(vm.user_account) {
+              await vm.getUser_info();
+              vm.order_phone = vm.user_account;
+              vm.order_mail = vm.r_mail.value;
+              vm.getOrder();
+            } else {
+              let phone = location.href.split('phone=')[1] && 
+              location.href.split('phone=')[1].split('&')[0];
+              let mail = location.href.split('mail=')[1] && 
+              location.href.split('mail=')[1].split('&')[0];
+
+              if(phone && mail){
+                vm.order_phone = phone;
+                vm.order_mail = mail;
+                vm.getOrder();
+              }
+            }
+
+            window.history.replaceState({}, document.title, "/order.html");
           }
 
           // user
@@ -683,14 +706,23 @@ export default {
             }
             // 
             if(vm.user_account){
-              vm.getUser_info();
+              await vm.getUser_info();
+
+              let RtnMsg = location.href.split('RtnMsg=')[1] && 
+              location.href.split('RtnMsg=')[1].split('&')[0];
+              if(RtnMsg){
+                vm.payModal_message = '付款成功';
+                vm.is_payModal = true;
+              }
+
               let active_page = location.href.split('page=')[1] && 
-              location.href.split('page=')[1].split('&')[0];       
+              location.href.split('page=')[1].split('&')[0];
               if(active_page && active_page == 'order'){
-                window.history.replaceState({}, document.title, "/user_info.html");
                 vm.user_info_nav_active = 'order'; 
                 vm.getMemberOrder()
               }
+
+              window.history.replaceState({}, document.title, "/user_info.html");
             } else {
               vm.urlPush('/user.html');
             }
@@ -1293,9 +1325,14 @@ export default {
     },
 
     // order
-    getOrder(type){
+    getOrder(type, is_filter){
       if(!this.order_phone){
         this.payModal_message = '請填寫購買人連絡電話';
+        this.is_payModal = true;
+        this.order = null;
+        return
+      } else if(!this.order_mail){
+        this.payModal_message = '請填寫購買人電子信箱';
         this.is_payModal = true;
         this.order = null;
         return
@@ -1305,7 +1342,7 @@ export default {
 
       let formData = new FormData();
       formData.append("phone", this.order_phone.trim());
-
+      formData.append("email", this.order_mail.trim());
       if(!type){
         this.order_page_index = 1
       }
@@ -1315,20 +1352,33 @@ export default {
       formData.append("Store", this.site.Store);
       formData.append("Site", this.site.Site);
 
+      if(!is_filter) {
+        this.filter_number = '';
+        this.filter_pay = '0';
+        this.filter_delivery = '0';
+      }
+      formData.append("filter_number", this.filter_number);
+      formData.append("filter_pay", this.filter_pay);
+      formData.append("filter_delivery", this.filter_delivery);
+
       let xhr = new XMLHttpRequest();
       xhr.withCredentials = true;
       xhr.open('post', `${vm.protocol}//${vm.api}/interface/web/GetOrderContactAjax`, true);
       xhr.send(formData);
       xhr.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
-          vm.order = JSON.parse(xhr.response).Orders;
-          vm.order_page_number = Math.ceil(JSON.parse(xhr.response).Count / vm.order_page_size);
-
-          if(vm.order_page_number == 0){
+          let orders = JSON.parse(xhr.response).Orders;
+          let order_page_number = Math.ceil(JSON.parse(xhr.response).Count / vm.order_page_size)
+          if(order_page_number == 0) {
             vm.payModal_message = '查無訂單資料';
             vm.is_payModal = true;
-            vm.order = null;
+            vm.filter_number = '';
+            vm.filter_pay = '0';
+            vm.filter_delivery = '0';
             return;
+          } else {
+            vm.order = orders;
+            vm.order_page_number = order_page_number
           }
 
           vm.$nextTick(function(){
@@ -1351,7 +1401,7 @@ export default {
         }
       }
     },
-    getMemberOrder(type){
+    getMemberOrder(type, is_filter){
       return new Promise((resolve)=>{
         let vm = this;
 
@@ -1359,12 +1409,22 @@ export default {
         formData.append("storename", this.site.Store);
         formData.append("storeid", this.site.Name);
         formData.append("phone", this.user_account);
+        formData.append("email", this.r_mail.value);
         formData.append("site", this.site.Site);
         if (!type) {
           this.order_page_index = 1;
         }
         formData.append("pageindex", this.order_page_index);
         formData.append("pagesize", this.order_page_size);
+
+        if(!is_filter) {
+          this.filter_number = '';
+          this.filter_pay = '0';
+          this.filter_delivery = '0';
+        }
+        formData.append("filter_number", this.filter_number);
+        formData.append("filter_pay", this.filter_pay);
+        formData.append("filter_delivery", this.filter_delivery);
 
         let xhr = new XMLHttpRequest();
         xhr.withCredentials = true;
@@ -1456,6 +1516,7 @@ export default {
               return;
             }
 
+            vm.total_bonus = data.Total;
             vm.bonus = data.Bonuses;
             vm.bonus.forEach((item) => {
               if(item.Type.indexOf('使用點數') > -1){
@@ -1546,14 +1607,14 @@ export default {
     toPay(){
       // LinePay
       if(this.pay_method == 'LinePay'){
-        this.urlPush(this.payResult.payUrl)
+        this.urlPush(this.payResult.payUrl, true)
       }
       // ecpay
       else {
         if(this.api.indexOf('demo') > -1){
-          this.ECPay_form = `<form id="ECPay_form" action="https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5" method="post">`
+          this.ECPay_form = `<form id="ECPay_form" target="_blank" action="https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5" method="post">`
         } else {
-          this.ECPay_form = `<form id="ECPay_form" action="https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5" method="post">`
+          this.ECPay_form = `<form id="ECPay_form" target="_blank" action="https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5" method="post">`
         }
         for(let item in this.payResult){
           if(item === 'success' || item === 'message') continue
@@ -1960,59 +2021,64 @@ export default {
     getUser_info(){
       let vm = this;
 
-      let formData = new FormData();
-      formData.append("storeid", this.site.Name);
-      formData.append("phone", this.user_account);
+      return new Promise((resolve, reject) => {
+        let formData = new FormData();
+        formData.append("storeid", vm.site.Name);
+        formData.append("phone", vm.user_account);
 
-      let xhr = new XMLHttpRequest();
-      xhr.withCredentials = true;
-      xhr.open('POST', `${vm.protocol}//${vm.api}/interface/WebMember/GetMemberInfo`, true);
-      xhr.send(formData);
-      xhr.onreadystatechange = function(){
-        if (this.readyState == 4 && this.status == 200) {  
-          if(JSON.parse(xhr.response).status){
-            let data = JSON.parse(xhr.response).datas[0][0];
+        let xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+        xhr.open('POST', `${vm.protocol}//${vm.api}/interface/WebMember/GetMemberInfo`, true);
+        xhr.send(formData);
+        xhr.onreadystatechange = function(){
+          if (this.readyState == 4 && this.status == 200) {  
+            if(JSON.parse(xhr.response).status){
+              let data = JSON.parse(xhr.response).datas[0][0];
 
-            vm.r_account.value = data.Phone
-            vm.r_name.value = data.Name
-            vm.r_mail.value = data.Email
-            vm.r_birthday.value = new Date(data.Birthday)
-            vm.sex = data.Gender == 1 ? 'male' : 'female' 
-            vm.recommend_code = data.Promocode
-            vm.total_bonus = data.Wallet * 1
+              vm.r_account.value = data.Phone
+              vm.r_name.value = data.Name
+              vm.r_mail.value = data.Email
+              vm.r_birthday.value = new Date(data.Birthday)
+              vm.sex = data.Gender == 1 ? 'male' : 'female' 
+              vm.recommend_code = data.Promocode
+              vm.total_bonus = data.Wallet * 1
 
-            let address_obj = {};
-            let address_arr = data.Adress.split('_#_');
-            address_arr.length = address_arr.length - 1;
-            for(let address of address_arr){
-              let item = address.split('_ _');
-              address_obj[item[0]] = {
-                id: item[0],
-                city: item[1],
-                district: item[2],
-                detail: item[3],
-                rules: {
-                  required: {
-                    message: '請輸入完整地址'
+              let result_arr = [];
+              let address_arr = data.Adress.split('_#_');
+              address_arr.length = address_arr.length - 1;
+              for(let address of address_arr){
+                let item = address.split('_ _');
+                result_arr.push({
+                  id: item[0],
+                  city: item[1],
+                  district: item[2],
+                  detail: item[3],
+                  rules: {
+                    required: {
+                      message: '請輸入完整地址'
+                    },
                   },
-                },
-                is_error: false,
-                message: '',
+                  is_error: false,
+                  message: '',
+                })
               }
+              vm.delivery_address = result_arr;
+
+            } else {
+              vm.payModal_message = JSON.parse(xhr.response).msg;
+              vm.check_logout();
+              vm.is_payModal = true;
             }
-            vm.delivery_address = address_obj;
-          } else {
-            vm.payModal_message = JSON.parse(xhr.response).msg;
-            vm.check_logout();
-            vm.is_payModal = true;
+
+            resolve();
           }
         }
-      }
+      })
     },
     add_address() {
       let id = new Date().getTime();
-
-      this.$set(this.delivery_address, id, {
+      if (this.delivery_address.length > 2) return
+      this.delivery_address.push({
         id,
         city: '',
         district: '',
@@ -2028,10 +2094,25 @@ export default {
     },
     delete_address(id) {
       let vm = this;
-      this.$delete(vm.delivery_address, id)
+      console.log(id);
+      for(let i = vm.delivery_address.length - 1; i > -1; i--) {
+        console.log(vm.delivery_address[i].id);
+        if(vm.delivery_address[i].id == id) {
+          vm.delivery_address.splice(i, 1)
+        }
+      }
     },
     edit_info() {
-      let arr = Object.values(this.delivery_address);
+      let arr = this.delivery_address
+      for(let i = arr.length - 1; i > 0; i --) {
+        for( let j = 0; j < i; j++) {
+          if(arr[j].city == arr[i].city && arr[j].district == arr[i].district && arr[j].detail == arr[i].detail){
+            arr.splice(i, 1);
+            break;
+          }
+        }
+      }
+
       if (!this.verify(this.r_name, this.r_mail, this.r_birthday, ...arr)) {
         return
       }
@@ -2048,8 +2129,7 @@ export default {
       formData.append("gender", this.sex == 'male' ? 1 : 0 );
       formData.append("email", this.r_mail.value);
       let address_str = '';
-      for(let key in this.delivery_address){
-        let item = this.delivery_address[key];
+      for(let item of arr){
         address_str += `${item.id}_ _${item.city}_ _${item.district}_ _${item.detail}_#_`
       }
       formData.append("address", address_str);

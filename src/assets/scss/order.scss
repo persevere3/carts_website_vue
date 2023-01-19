@@ -57,9 +57,9 @@
       background: #eee;
     }
 
-    .info{
+    .info, .filter{
       display: flex;
-
+      flex-wrap: wrap;
 
       label {
         height: 35px;
@@ -75,7 +75,32 @@
         flex: 1 1;
         display: flex;
       }
+
+      .item {
+        display: flex;
+        margin-top: 5px;
+
+        select {
+          width: 150px;
+          margin-right: 15px;
+          border: none;
+          outline: none;
+          color: #333;
+          cursor: pointer;
+
+          &:focus {
+            box-shadow: 0 0 3px 1px #4db38e;
+          }
+        }
+      }
     }
+
+    .filter {
+      .button_row {
+        margin-top: 5px;
+      }
+    }
+
     .table{
       margin: 0;
 
@@ -201,6 +226,8 @@
             }
             &.transportState{
               width: 12.5%;
+
+              flex-direction: column;
             }
             &.time{
               width: 15%;
