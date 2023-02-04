@@ -704,7 +704,7 @@ export default {
             if(!(vm.site.MemberFuction * 1)){
               vm.urlPush('/');
             }
-            // 
+            //
             if(vm.user_account){
               await vm.getUser_info();
 
@@ -740,7 +740,26 @@ export default {
     // 
     getCarts() {
       let vm = this;
-      let carts = JSON.parse(localStorage.getItem(`${vm.site.Name}@carts`)) || [];
+      let carts;
+      if(vm.user_account) {
+        carts = JSON.parse(localStorage.getItem(`${vm.site.Name}@${vm.user_account}@carts`)) || [];
+        let localCarts = JSON.parse(localStorage.getItem(`${vm.site.Name}@carts`)) || [];
+        for(let localIndex in localCarts) {
+          let f = false;
+          for(let cartsIndex in carts) {
+            if(localCarts[localIndex].ID === carts[cartsIndex].ID) {
+              vm.$set(carts, cartsIndex, localCarts[localIndex])
+              f = true;
+            }
+          }
+          if(!f) {
+            this.$set(carts, carts.length, localCarts[localIndex])
+          }
+        }
+      }
+      else {
+        carts = JSON.parse(localStorage.getItem(`${vm.site.Name}@carts`)) || [];
+      }
       vm.carts = [];
       carts.forEach((item, index)=>{
         vm.$set(vm.carts, index, item)
@@ -855,7 +874,6 @@ export default {
             }
           })
         }
-
         localStorage.setItem(`${vm.site.Name}@favorite`, JSON.stringify(vm.favorite))
       }
     },
@@ -1485,8 +1503,10 @@ export default {
       })
     },
 
-    getBonus(type){
+    async getBonus(type){
       let vm = this;
+      
+      await vm.getUser_info()
 
       let formData = new FormData();
       formData.append("storeid", this.site.Name);

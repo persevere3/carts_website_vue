@@ -655,7 +655,14 @@ export default {
       vm.setCarts();
     },
     setCarts() {
-      localStorage.setItem(`${this.site.Name}@carts`, JSON.stringify(this.carts));
+      if(this.user_account) {
+        console.log('登入')
+        localStorage.setItem(`${this.site.Name}@${this.user_account}@carts`, JSON.stringify(this.carts));
+      }
+      else {
+        console.log('登出')
+        localStorage.setItem(`${this.site.Name}@carts`, JSON.stringify(this.carts));
+      }
     },
     numberThousands(number) {
       return String(number).replace( /(\d)(?=(?:\d{3})+$)/g, '$1,')

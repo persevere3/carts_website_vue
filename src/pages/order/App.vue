@@ -113,8 +113,11 @@
                   <div v-if="item.PayMethod" class="payMethod"> {{payMethod_obj[item.PayMethod]}} </div>
                   
                   <!-- 付款狀態 -->
+                  <div class="state_container" v-if="item.Delivery == 3 || item.Delivery == 4">
+                    <div> {{ payStatus_arr[item.PayStatus] }} </div>
+                  </div>
                   <!-- PayStatus == 2 (待付款)，PayMethod == 'ATM'，PayType == 1 (公司) -->
-                  <div class="state_container" v-if="item.PayStatus == 2 && item.PayMethod == 'ATM' && item.PayType == 1">
+                  <div class="state_container" v-else-if="item.PayStatus == 2 && item.PayMethod == 'ATM' && item.PayType == 1">
                     <template v-if="store.SelfAtmStatus == 0">
                       <div> ATM帳戶關閉，請聯繫賣家 </div>
                     </template>
