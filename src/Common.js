@@ -740,30 +740,12 @@ export default {
     // 
     getCarts() {
       let vm = this;
-      let carts;
       if(vm.user_account) {
-        carts = JSON.parse(localStorage.getItem(`${vm.site.Name}@${vm.user_account}@carts`)) || [];
-        let localCarts = JSON.parse(localStorage.getItem(`${vm.site.Name}@carts`)) || [];
-        for(let localIndex in localCarts) {
-          let f = false;
-          for(let cartsIndex in carts) {
-            if(localCarts[localIndex].ID === carts[cartsIndex].ID) {
-              vm.$set(carts, cartsIndex, localCarts[localIndex])
-              f = true;
-            }
-          }
-          if(!f) {
-            this.$set(carts, carts.length, localCarts[localIndex])
-          }
-        }
+        vm.carts = JSON.parse(localStorage.getItem(`${vm.site.Name}@${vm.user_account}@carts`)) || [];
       }
       else {
-        carts = JSON.parse(localStorage.getItem(`${vm.site.Name}@carts`)) || [];
+        vm.carts = JSON.parse(localStorage.getItem(`${vm.site.Name}@carts`)) || [];
       }
-      vm.carts = [];
-      carts.forEach((item, index)=>{
-        vm.$set(vm.carts, index, item)
-      })
     },
 
     //
@@ -1872,9 +1854,29 @@ export default {
         if (this.readyState == 4 && this.status == 200) {
           if(JSON.parse(xhr.response).status){
             localStorage.setItem('user_account', vm.l_account.value);
-            vm.urlPush('/user_info.html');
+            vm.user_account = vm.l_account.value;
 
-            vm.getFavorite()
+            let carts = JSON.parse(localStorage.getItem(`${vm.site.Name}@${vm.user_account}@carts`)) || [];
+            let localCarts = JSON.parse(localStorage.getItem(`${vm.site.Name}@carts`)) || [];
+            for(let localIndex in localCarts) {
+              let f = false;
+              for(let cartsIndex in carts) {
+                if(localCarts[localIndex].ID === carts[cartsIndex].ID) {
+                  vm.$set(carts, cartsIndex, localCarts[localIndex])
+                  f = true;
+                }
+              }
+              if(!f) {
+                vm.$set(carts, carts.length, localCarts[localIndex])
+              }
+            }
+            vm.carts = [];
+            carts.forEach((item, index)=>{
+              vm.$set(vm.carts, index, item)
+            })
+            localStorage.setItem(`${vm.site.Name}@${vm.user_account}@carts`, JSON.stringify(vm.carts));
+
+            vm.urlPush('/user_info.html');
           }
           else {
             vm.user_message = JSON.parse(xhr.response).msg
@@ -1897,6 +1899,8 @@ export default {
     },
     logout(){
       localStorage.removeItem('user_account');
+      this.user_account = '';
+      this.getCarts();
       this.urlPush('/user.html');
     },
 
