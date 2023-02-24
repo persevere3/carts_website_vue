@@ -61,5 +61,30 @@ module.exports = {
       filename: 'error.html', 
       chunks: ['chunk-vendors', 'chunk-common', 'error']
     },
+
+    shopping : {
+      entry: 'src/pages/shopping/main.js',
+      template: 'src/pages/shopping/index.html',
+      filename: 'shopping.html', 
+      chunks: ['chunk-vendors', 'chunk-common', 'shopping']
+    },
+    shoppingUser : {
+      entry: 'src/pages/shoppingUser/main.js',
+      template: 'src/pages/shoppingUser/index.html',
+      filename: 'shoppingUser.html', 
+      chunks: ['chunk-vendors', 'chunk-common', 'shoppingUser']
+    },
+    shoppingInfo : {
+      entry: 'src/pages/shoppingInfo/main.js',
+      template: 'src/pages/shoppingInfo/index.html',
+      filename: 'shoppingInfo.html', 
+      chunks: ['chunk-vendors', 'chunk-common', 'shoppingInfo']
+    },
+    shoppingOrder : {
+      entry: 'src/pages/shoppingOrder/main.js',
+      template: 'src/pages/shoppingOrder/index.html',
+      filename: 'shoppingOrder.html', 
+      chunks: ['chunk-vendors', 'chunk-common', 'shoppingOrder']
+    },
   }, 
 }

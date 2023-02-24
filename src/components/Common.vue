@@ -166,7 +166,7 @@
               </div>
               <div class="price_and_delete">
                 <div class="price"> NT${{numberThousands(item.NowPrice)}} x {{spec.buyQty}}  </div>
-                <div class="delete" @click.stop="spec.buyQty = 0">
+                <div class="delete" @click.stop="delete_carts_item(item.ID, spec.ID)">
                   <i class="fas fa-trash-alt"></i>
                 </div>
               </div>
@@ -197,9 +197,9 @@
                   </div>
                   <div class="price_and_delete">
                     <div class="price"> NT${{numberThousands(item2.Price)}} x {{spec2.buyQty}}  </div>
-                    <div class="delete" @click.stop="spec2.buyQty = 0">
+                    <!-- <div class="delete" @click.stop="spec2.buyQty = 0">
                       <i class="fas fa-trash-alt"></i>
-                    </div>
+                    </div> -->
                   </div>
                 </li>
               </template>
@@ -210,10 +210,10 @@
                   <div class="name"> 加價購 {{ item2.Name }} </div>
                 </div>
                 <div class="price_and_delete">
-                  <div class="price"> NT${{numberThousands(item2.Price)}} x {{item2.buyQty}}  </div>
-                  <div class="delete" @click.stop="item2.buyQty = 0">
+                  <div class="price"> NT${{numberThousands(item2.Price)}} x {{item2.Qty}}  </div>
+                  <!-- <div class="delete" @click.stop="item2.buyQty = 0">
                     <i class="fas fa-trash-alt"></i>
-                  </div>
+                  </div> -->
                 </div>
               </li>
             </template>
@@ -645,11 +645,36 @@ export default {
     },
 
     //
-    delete_carts_item(id) {
+    productTotalQty(product){
+      let totalQty = 0;
+      if(product.specArr){
+        for(let i = 0; i < product.specArr.length; i++){
+          totalQty += product.specArr[i].buyQty * 1;
+        }
+      }
+      else {
+        totalQty = product.buyQty;
+      }
+      return totalQty;
+    },
+    delete_carts_item(id, specID) {
       let vm = this;
       vm.carts.forEach((item, index)=> {
         if(item.ID === id) {
-          vm.carts.splice(index, 1);
+          if(item.specArr) {
+            item.specArr.forEach((item2, index2) => {
+              if(item2.ID === specID) {
+                item.specArr[index2].buyQty = 0;
+              }
+            })
+
+            if(vm.productTotalQty(item) < 1) {
+              vm.carts.splice(index, 1);
+            }
+          }
+          else {
+            vm.carts.splice(index, 1);
+          }
         }
       })
       vm.setCarts();
