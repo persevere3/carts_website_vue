@@ -675,7 +675,7 @@ export default {
           }
 
           // order
-          if (pathname === '/order.html' || pathname === '/shoppingOrder.html') {
+          if (pathname === '/order.html') {
 
             let RtnMsg = location.href.split('RtnMsg=')[1] && 
             location.href.split('RtnMsg=')[1].split('&')[0];
@@ -702,24 +702,16 @@ export default {
               }
             }
 
-            if(pathname.indexOf('shopping') < 0){
-              window.history.replaceState({}, document.title, "/order.html");
-            } else {
-              window.history.replaceState({}, document.title, "/shoppingOrder.html");
-            }
+            window.history.replaceState({}, document.title, "/order.html");
           }
 
           // user
-          if (pathname === '/user.html' || pathname === '/shoppingUser.html') {
+          if (pathname === '/user.html') {
             if(!(vm.site.MemberFuction * 1)){
               vm.urlPush('/');
             }
             if(vm.user_account){
-              if(pathname.indexOf('shopping') < 0){
-                vm.urlPush('/user_info.html');
-              } else {
-                vm.urlPush('/shoppingInfo.html');
-              }
+              vm.urlPush('/user_info.html');
             }
 
             if( vm.site.TermsNotices && location.search.split('?term=')[1]){
@@ -730,17 +722,13 @@ export default {
             vm.LineToken = location.href.split('code=')[1] && 
                           location.href.split('code=')[1].split('&')[0];       
             if(vm.LineToken){
-              if(pathname.indexOf('shopping') < 0){
-                window.history.replaceState({}, document.title, "/user.html");
-              } else {
-                window.history.replaceState({}, document.title, "/shoppingUser.html");
-              }
+              window.history.replaceState({}, document.title, "/user.html");
               vm.getLineProfile();
             }
           }
 
           // user_info
-          if (pathname === '/user_info.html' || pathname === '/shoppingInfo.html') {
+          if (pathname === '/user_info.html') {
             // 沒有開啟會員功能
             if(!(vm.site.MemberFuction * 1)){
               vm.urlPush('/');
@@ -763,24 +751,10 @@ export default {
                 vm.getMemberOrder()
               }
 
-              if(pathname.indexOf('shopping') < 0){
-                window.history.replaceState({}, document.title, "/user_info.html");
-              } else {
-                window.history.replaceState({}, document.title, "/shoppingInfo.html");
-              }
+              window.history.replaceState({}, document.title, "/user_info.html");
             } else {
-              if(pathname.indexOf('shopping') < 0){
-                vm.urlPush('/user.html');
-              } else {
-                vm.urlPush('/shoppingUser.html');
-              }
+              vm.urlPush('/user.html');
             }
-          }
-
-          // shopping ============================================================
-          if (pathname === '/shopping.html') {
-            vm.getCategories()
-            vm.getProducts()
           }
         }
         else if(this.status == 500){
@@ -2475,93 +2449,6 @@ export default {
         else{
           vm.urlPush(`/cart?id=${id}`, true)
         }
-      }
-    },
-
-    // shopping ============================================================
-    getCategories() {
-      let vm = this
-
-      let formData = new FormData();
-      formData.append("Preview", vm.site.Preview);
-
-      let xhr = new XMLHttpRequest();
-      xhr.withCredentials = true; 
-      xhr.open('post',`${vm.protocol}//${vm.api}/interface/store/GetCategory`, true);
-      xhr.send(formData);
-      xhr.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-          if(JSON.parse(xhr.response).errormessage) {
-            return
-          }
-
-          vm.categories =[{ID: "0", Name: "所有分類商品", Show: "1"}, ...JSON.parse(xhr.response).data];
-        }
-      }
-    },
-    getProducts() {
-      let vm = this
-
-      let formData = new FormData();
-      formData.append("Preview", vm.site.Preview);
-
-      let xhr = new XMLHttpRequest();
-      xhr.withCredentials = true; 
-      xhr.open('post',`${vm.protocol}//${vm.api}/interface/store/storeLogin`, true);
-      xhr.send(formData);
-      xhr.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-          if(JSON.parse(xhr.response).errormessage) {
-            return
-          }
-
-          vm.products = JSON.parse(xhr.response).data;
-        }
-      }
-    },
-
-    productTotalQty(product){
-      let totalQty = 0;
-      if(product.specArr){
-        for(let i = 0; i < product.specArr.length; i++){
-          totalQty += product.specArr[i].buyQty * 1;
-        }
-      }
-      else {
-        totalQty = product.buyQty;
-      }
-      return totalQty;
-    },
-    delete_carts_item(id, specID) {
-      let vm = this;
-      vm.carts.forEach((item, index)=> {
-        if(item.ID === id) {
-          if(item.specArr) {
-            item.specArr.forEach((item2, index2) => {
-              if(item2.ID === specID) {
-                item.specArr[index2].buyQty = 0;
-              }
-            })
-
-            if(vm.productTotalQty(item) < 1) {
-              vm.carts.splice(index, 1);
-            }
-          }
-          else {
-            vm.carts.splice(index, 1);
-          }
-        }
-      })
-      vm.setCarts();
-    },
-    setCarts() {
-      if(this.user_account) {
-        console.log('登入')
-        localStorage.setItem(`${this.site.Name}@${this.user_account}@carts`, JSON.stringify(this.carts));
-      }
-      else {
-        console.log('登出')
-        localStorage.setItem(`${this.site.Name}@carts`, JSON.stringify(this.carts));
       }
     },
   },
