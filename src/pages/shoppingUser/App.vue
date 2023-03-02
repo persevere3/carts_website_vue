@@ -93,13 +93,13 @@
 
     <header>
       <div class="logo" v-if="store">
-        <a href="/">
+        <a @click="urlPush(getShoppingPathname('index'))">
           <img :src="store.Logo" alt="">
         </a>
       </div>
       <div class="menu">
         <ul>
-          <li><a href="/"> <i class="fa-solid fa-house"></i> <span class="none650"> 首頁 </span> </a></li>
+          <li><a @click="urlPush(getShoppingPathname('index'))"> <i class="fa-solid fa-house"></i> <span class="none650"> 首頁 </span> </a></li>
           <li @click.stop="is_favorite_hover = !is_favorite_hover; is_carts_hover = false"> 
             <i class="fa-solid fa-heart"></i> 
             <span class="none650"> 收藏 </span> 
@@ -345,7 +345,7 @@
 
     <footer>
       <div class="footerContact">
-        <div class="container">
+        <div class="footerContainer">
           <div class="w33">
             <p>智聯微網</p>
             <p>台中市西屯區市政路386號四樓三</p>          
@@ -360,7 +360,7 @@
       </div>
 
       <div class="copyright">
-        <div class="container">
+        <div class="footerContainer">
           <p>Copyright &copy; 2023 - All Rights Reserved - UNIQ Micronet . </p>
         </div>
       </div>

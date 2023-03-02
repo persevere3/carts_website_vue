@@ -702,11 +702,7 @@ export default {
               }
             }
 
-            if(pathname.indexOf('shopping') < 0){
-              window.history.replaceState({}, document.title, "/order.html");
-            } else {
-              window.history.replaceState({}, document.title, "/shoppingOrder.html");
-            }
+            window.history.replaceState({}, document.title, vm.getShoppingPathname('order'));
           }
 
           // user
@@ -715,11 +711,7 @@ export default {
               vm.urlPush('/');
             }
             if(vm.user_account){
-              if(pathname.indexOf('shopping') < 0){
-                vm.urlPush('/user_info.html');
-              } else {
-                vm.urlPush('/shoppingInfo.html');
-              }
+              vm.urlPush(vm.getShoppingPathname('info'));
             }
 
             if( vm.site.TermsNotices && location.search.split('?term=')[1]){
@@ -730,11 +722,7 @@ export default {
             vm.LineToken = location.href.split('code=')[1] && 
                           location.href.split('code=')[1].split('&')[0];       
             if(vm.LineToken){
-              if(pathname.indexOf('shopping') < 0){
-                window.history.replaceState({}, document.title, "/user.html");
-              } else {
-                window.history.replaceState({}, document.title, "/shoppingUser.html");
-              }
+              window.history.replaceState({}, document.title, vm.getShoppingPathname('user'));
               vm.getLineProfile();
             }
           }
@@ -763,17 +751,9 @@ export default {
                 vm.getMemberOrder()
               }
 
-              if(pathname.indexOf('shopping') < 0){
-                window.history.replaceState({}, document.title, "/user_info.html");
-              } else {
-                window.history.replaceState({}, document.title, "/shoppingInfo.html");
-              }
+              window.history.replaceState({}, document.title, vm.getShoppingPathname('info'));
             } else {
-              if(pathname.indexOf('shopping') < 0){
-                vm.urlPush('/user.html');
-              } else {
-                vm.urlPush('/shoppingUser.html');
-              }
+              vm.urlPush(vm.getShoppingPathname('user'));
             }
           }
 
@@ -1935,11 +1915,7 @@ export default {
             })
             localStorage.setItem(`${vm.site.Name}@${vm.user_account}@carts`, JSON.stringify(vm.carts));
 
-            if(location.pathname.indexOf('shopping') < 0){
-              vm.urlPush('/user_info.html');
-            } else {
-              vm.urlPush('/shoppingInfo.html');
-            }
+            vm.urlPush(vm.getShoppingPathname('info'));
           }
           else {
             vm.user_message = JSON.parse(xhr.response).msg
@@ -1964,11 +1940,7 @@ export default {
       localStorage.removeItem('user_account');
       this.user_account = '';
       this.getCarts();
-      if(location.pathname.indexOf('shopping') < 0){
-        this.urlPush('/user.html');
-      } else {
-        this.urlPush('/shoppingUser.html');
-      }
+      this.urlPush(this.getShoppingPathname('user'));
     },
 
     // forget password
@@ -2422,7 +2394,7 @@ export default {
     // https://demo.uniqcarttest.tk/?code=cYECgbvDcN1egeR6UyPk&state=login
     LineLogin() {
       let client_id = '1657797715';
-      let redirect_uri = `${this.protocol}//${this.api}/user.html`;
+      let redirect_uri = `${vm.protocol}//${vm.api}${vm.getShoppingPathname('user')}`;
       
       let link = 'https://access.line.me/oauth2/v2.1/authorize?';
       link += 'response_type=code';
@@ -2564,6 +2536,35 @@ export default {
         localStorage.setItem(`${this.site.Name}@carts`, JSON.stringify(this.carts));
       }
     },
+
+    getShoppingPathname(page) {
+      let shoppingHost = 'store.uniqm.com'
+      
+      let host = location.host;
+
+      let pageIndex = shoppingHost == host ? 1 : 0;
+
+      let pageObj = {
+        index: {
+          0: '/',
+          1: '/'
+        },
+        order: {
+          0: '/order.html',
+          1: '/shoppingOrder.html'
+        },
+        user: {
+          0: '/user.html',
+          1: '/shoppingUser.html'
+        },
+        info: {
+          0: '/user_info.html',
+          1: '/shoppingInfo.html'
+        },
+      }
+
+      return pageObj[page][pageIndex];
+    }
   },
   created(){
     let vm = this;
@@ -2615,4 +2616,4 @@ export default {
     //   fjs.parentNode.insertBefore(js, fjs);
     // }(document, 'script', 'facebook-jssdk'));
   }
-} 
+}
