@@ -99,7 +99,7 @@
       </div>
       <div class="menu">
         <ul>
-          <li><a @click="urlPush(getShoppingPathname('index'))"> <i class="fa-solid fa-house"></i> <span class="none650"> 首頁 </span> </a></li>
+          <li @click="urlPush(getShoppingPathname('index'))"><i class="fa-solid fa-house"></i> <span class="none650"> 首頁 </span></li>
           <li @click.stop="is_favorite_hover = !is_favorite_hover; is_carts_hover = false"> 
             <i class="fa-solid fa-heart"></i> 
             <span class="none650"> 收藏 </span> 

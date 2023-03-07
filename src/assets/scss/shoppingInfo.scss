@@ -40,7 +40,7 @@ $primary_color: #202d40;
     justify-content: center;
     align-items: center;
 
-    font-size: 20px;
+    font-size: var(--font-l);
     color: $primary_color;
     opacity: 0.5;
     transition: .3s;
@@ -54,7 +54,7 @@ $primary_color: #202d40;
 
   .message{
     padding: 0px 10px;
-    font-size: 14px;
+    font-size: var(--font-m);
 
     &.error{
       color: #dc3545;
@@ -83,7 +83,7 @@ input{
   padding: 0px 30px 0 10px;
   height: 40px;
   line-height: 40px;
-  font-size: 16px;
+  font-size: var(--font-m);
   border-radius: 3px;
   border: none;
   outline: none;
@@ -111,7 +111,7 @@ input{
   height: 40px;
   line-height: 40px;
   padding: 0px 20px;
-  font-size: 16px;
+  font-size: var(--font-m);
   border-radius: 3px;
   background-color: $primary_color;
   color: #fff;
@@ -148,7 +148,7 @@ input{
       height: 50px;
       line-height: 50px;
       text-align: center;
-      font-size: 16px;
+      font-size: var(--font-m);
       background-color: #eee; 
       color: #888;
       border-right: 1px solid #ddd;
@@ -169,7 +169,7 @@ input{
       height: 40px;
       line-height: 40px;
       padding-left: 10px;
-      font-size: 16px;
+      font-size: var(--font-m);
       color: #333;
       display: flex;
       align-items: center;
@@ -946,11 +946,11 @@ input{
         padding: 0;
         margin-top: 5px;
         margin-right: 5px;
-        font-size: 16px;
+        font-size: var(--font-m);
       }
 
       .copy{
-        font-size: 20px;
+        font-size: var(--font-l);
         color: $primary_color;
         display: flex;
         align-items: center;

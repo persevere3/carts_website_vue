@@ -16,7 +16,7 @@ $primary_color: #202d40;
       height: 60px;
       line-height: 60px;
       text-align: center;
-      font-size: 16px;
+      font-size: var(--font-m);
       background-color: #eee; 
       color: #888;
       border-right: 1px solid #ddd;
@@ -40,7 +40,7 @@ $primary_color: #202d40;
         margin-bottom: 21px;
         border: 1px solid #ddd;
         color: #333;
-        font-size: 16px;
+        font-size: var(--font-m);
         outline: none;
         cursor: pointer;
       }
@@ -55,7 +55,7 @@ $primary_color: #202d40;
           line-height: 40px;
           padding: 0px 30px 0 10px;
           margin-bottom: 5px;
-          font-size: 16px;
+          font-size: var(--font-m);
           border-radius: 3px;
           border: 1px solid #ddd;
           transition: box-shadow .3s;
@@ -90,7 +90,7 @@ $primary_color: #202d40;
         }
         .message{
           padding: 0px 10px;
-          font-size: 14px;
+          font-size: var(--font-m);
 
           &.error{
             color: #dc3545;
@@ -174,7 +174,7 @@ $primary_color: #202d40;
         display: flex;
         align-items: center;
         margin-bottom: 15px;
-        font-size: 16px;
+        font-size: var(--font-m);
 
         .checkbox{
           width: 20px;
@@ -228,7 +228,7 @@ $primary_color: #202d40;
         height: 40px;
         line-height: 40px;
         text-align: center;
-        font-size: 16px;
+        font-size: var(--font-m);
         border-radius: 3px;
         background-color: $primary_color;
         color: #fff;
@@ -258,7 +258,7 @@ $primary_color: #202d40;
       height: 40px;
       margin-left: 2px;
       border-radius: 3px;
-      font-size: 16px;
+      font-size: var(--font-m);
       color: #fff;
       display: flex;
       justify-content: center;
