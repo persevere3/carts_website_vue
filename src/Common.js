@@ -2538,11 +2538,11 @@ export default {
     },
 
     getShoppingPathname(page) {
-      let shoppingHost = 'store.uniqm.com'
+      let shoppingHost = 'uniqm.com'
       
       let host = location.host;
 
-      let pageIndex = shoppingHost == host ? 1 : 0;
+      let pageIndex = host.indexOf(shoppingHost) > -1 ? 1 : 0;
 
       let pageObj = {
         index: {

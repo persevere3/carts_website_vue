@@ -157,9 +157,9 @@
             <p>04-22520766</p>
           </div>
           <div class="w33">
-            <p>聯繫我們</p>
-            <span class="faicon"><i class="fa-brands fa-facebook-f"></i></span>
-            <span class="faicon"><i class="fa fa-envelope"></i></span>
+            <div style="text-align:center; margin-bottom: 5px;"> 聯繫我們 </div>
+            <img src="../../assets/img/qr-line.png" style="width: 60px;" alt="">
+            <!-- <span class="faicon"><i class="fa-brands fa-facebook-f"></i></span> -->
           </div>
         </div>
       </div>
