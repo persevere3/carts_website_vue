@@ -59,6 +59,13 @@ a {
   text-decoration: none;
 }
 
+.ECPay_form_container{
+  position: absolute;
+  top: 0;
+  opacity: 0;
+  z-index: -1;
+}
+
 // ==================================================
 $primary_color: #202d40;
 
