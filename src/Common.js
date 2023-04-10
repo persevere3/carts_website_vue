@@ -1092,10 +1092,6 @@ export default {
         return
       }
 
-      if(location.pathname.indexOf('shopping') > -1) {
-        return
-      }
-
       // 
       let script_arr = [];
 
