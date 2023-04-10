@@ -158,7 +158,7 @@
           </div>
           <div class="w33">
             <div style="text-align:center; margin-bottom: 5px;"> 聯繫我們 </div>
-            <img src="../../assets/img/qr-line.png" style="width: 60px;" alt="">
+            <a href="https://line.me/ti/p/@uniqm" target="_blank"> <img src="/image/qr-line.png" alt=""> </a>
             <!-- <span class="faicon"><i class="fa-brands fa-facebook-f"></i></span> -->
           </div>
         </div>
