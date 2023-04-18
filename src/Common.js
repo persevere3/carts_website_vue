@@ -173,6 +173,19 @@ export default {
         is_error: false,
         message: '',
       },
+      r_phone2: {
+        value: '',
+        rules: {
+          required: {
+            message: '此項目為必填'
+          },
+          cellphone: {
+            message: '手機格式錯誤'
+          }
+        },
+        is_error: false,
+        message: '',
+      },
       r_verify_code: {
         value: '',
         rules: {
@@ -340,6 +353,8 @@ export default {
 
       // user_info
       user_account: '',
+
+      user_info: {},
 
       user_info_nav_active: 'info',
 
@@ -708,7 +723,7 @@ export default {
           // user
           if (pathname === '/user.html' || pathname === '/shoppingUser.html') {
             if(!(vm.site.MemberFuction * 1)){
-              vm.urlPush('/');
+              vm.urlPush(getShoppingPathname('index'));
             }
             if(vm.user_account){
               vm.urlPush(vm.getShoppingPathname('info'));
@@ -730,11 +745,17 @@ export default {
           // user_info
           if (pathname === '/user_info.html' || pathname === '/shoppingInfo.html') {
             // 沒有開啟會員功能
-            if(!(vm.site.MemberFuction * 1)){
-              vm.urlPush('/');
+            if(!(vm.site.MemberFuction * 1)) {
+              vm.urlPush(getShoppingPathname('index'));
             }
+
+            if(location.search.indexOf('account') > -1) {
+              vm.user_account = location.search.split('account=')[1]
+              localStorage.setItem('user_account', vm.user_account)
+            }
+
             //
-            if(vm.user_account){
+            if(vm.user_account) {
               await vm.getUser_info();
 
               let RtnMsg = location.href.split('RtnMsg=')[1] && 
@@ -1087,7 +1108,7 @@ export default {
         }
       }
     },
-    appendScript(text, tag){
+    appendScript(text, tag) {
       if(!text){
         return
       }
@@ -2077,7 +2098,7 @@ export default {
     },
 
     // user_info
-    getUser_info(){
+    getUser_info() {
       let vm = this;
 
       return new Promise((resolve, reject) => {
@@ -2089,21 +2110,22 @@ export default {
         xhr.withCredentials = true;
         xhr.open('POST', `${vm.protocol}//${vm.api}/interface/WebMember/GetMemberInfo`, true);
         xhr.send(formData);
-        xhr.onreadystatechange = function(){
-          if (this.readyState == 4 && this.status == 200) {  
-            if(JSON.parse(xhr.response).status){
-              let data = JSON.parse(xhr.response).datas[0][0];
+        xhr.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            if(JSON.parse(xhr.response).status) {
+              vm.user_info = JSON.parse(xhr.response).datas[0][0];
 
-              vm.r_account.value = data.Phone
-              vm.r_name.value = data.Name
-              vm.r_mail.value = data.Email
-              vm.r_birthday.value = new Date(data.Birthday)
-              vm.sex = data.Gender == 1 ? 'male' : 'female' 
-              vm.recommend_code = data.Promocode
-              vm.total_bonus = data.Wallet * 1
+              vm.r_name.value = vm.user_info.Name
+              vm.r_mail.value = vm.user_info.Email
+              vm.r_birthday.value = vm.user_info.Birthday ? new Date(vm.user_info.Birthday) : ''
+              vm.sex = vm.user_info.Gender == 1 ? 'male' : 'female' 
+              vm.r_phone2.value = vm.user_info.Phone2
+              vm.recommend_code = vm.user_info.Promocode
+              vm.r_recommender.value = vm.user_info.Recommender
+              vm.total_bonus = vm.user_info.Wallet * 1
 
               let result_arr = [];
-              let address_arr = data.Adress.split('_#_');
+              let address_arr = vm.user_info.Adress.split('_#_');
               address_arr.length = address_arr.length - 1;
               for(let address of address_arr){
                 let item = address.split('_ _');
@@ -2172,7 +2194,12 @@ export default {
         }
       }
 
-      if (!this.verify(this.r_name, this.r_mail, this.r_birthday, ...arr)) {
+      if(this.store.NotificationSystem == 1 || this.store.NotificationSystem == 2) {
+        if (!this.verify(this.verify_code)) {
+          return
+        }
+      }
+      if (!this.verify(this.r_name, this.r_mail, this.r_birthday, this.r_phone2, ...arr)) {
         return
       }
 
@@ -2180,7 +2207,12 @@ export default {
 
       let formData = new FormData();
       formData.append("storeid", this.site.Name);
+      formData.append("recommender", this.r_recommender.value);
       formData.append("phone", this.user_account);
+      formData.append("phone2", this.r_phone2.value);
+      if(vm.store.NotificationSystem == 1 || vm.store.NotificationSystem == 2) {
+        formData.append("validate", this.verify_code.value);
+      }
       formData.append("name", this.r_name.value);
       let b = this.r_birthday.value;
       let birthday = `${b.getFullYear()}/${b.getMonth() + 1 < 10  ? '0' : '' }${b.getMonth() + 1}/${b.getDate() < 10  ? '0' : '' }${b.getDate()}`
@@ -2389,8 +2421,9 @@ export default {
     // Line
     // https://demo.uniqcarttest.tk/?code=cYECgbvDcN1egeR6UyPk&state=login
     LineLogin() {
+      let vm = this
       let client_id = '1657797715';
-      let redirect_uri = `${vm.protocol}//${vm.api}${vm.getShoppingPathname('user')}`;
+      let redirect_uri = `${location.origin}${vm.getShoppingPathname('user')}`;
       
       let link = 'https://access.line.me/oauth2/v2.1/authorize?';
       link += 'response_type=code';

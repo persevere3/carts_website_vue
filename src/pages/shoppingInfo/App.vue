@@ -157,9 +157,15 @@
                 <i class="error_icon fas fa-exclamation-circle"></i> {{ r_mail.message }}
               </div>
             </div>
-            <div class="input_container" :class="{ error: r_birthday.is_error }">
+            <div class="input_container" :class="{ error: r_birthday.is_error }" v-if="!!user_info.Birthday">
               <div class="title"> 生日 </div>
-              <input type="text" readonly v-model.trim="birthday" @input="birthday = $event.target.value">
+              <input type="text" readonly v-model.trim="birthday" @input="birthday.value = $event.target.value">
+            </div>
+            <div class="input_container" :class="{ error: r_birthday.is_error }" v-else>
+              <div class="title"> 生日 </div>
+              <date-picker placeholder="* 請輸入生日" format="YYYY/MM/DD" v-model="r_birthday.value"
+                @close="verify(r_birthday)" @clear="verify(r_birthday)">
+              </date-picker>
             </div>
             <div class="radio_container">
               <div class="title"> 性別 </div>
@@ -177,10 +183,23 @@
           </div>
 
           <div class="right">
-            <div class="input_container" :class="{ error: r_account.is_error }">
-              <div class="title"> 手機 </div>
-              <input type="number" readonly v-model.trim="r_account.value" @input="r_account.value = $event.target.value">
+            <div class="input_container" v-if="!user_info.Recommender">
+              <div class="title border"> 推薦人代碼 </div>
+              <input type='text' v-model='r_recommender.value'>
             </div>
+
+            <div class="input_container" :class="{ error: r_phone2.is_error }">
+              <div class="title"> 手機 </div>
+              <input type="number" :readonly="!!user_info.Phone2" v-model.trim="r_phone2.value" @input="!!user_info.Phone2 ? r_phone2.value = $event.target.value : verify(r_phone2)">
+            </div>
+            <template v-if="!user_info.Phone2 && (store.NotificationSystem == 1 || store.NotificationSystem == 2)">
+              <div class="input_container" :class="{ error: r_verify_code.is_error }">
+                <div class="title"> 手機驗證碼 </div>
+                <input type="text" placeholder="* 請輸入手機驗證碼" v-model.trim="r_verify_code.value" @blur="verify(r_verify_code)"> 
+              </div>
+              <div class="button" style="margin-bottom: 20px;" @click="send_verify_code"> 獲取驗證碼 <span v-if="second > 0"> ( {{second}}s ) </span> </div>
+            </template>
+
             <div class="password_container">
               <div class="title"> 密碼 </div>
               <div class="button" @click="is_payModal = true; payModal_message = 'template3'"> 修改密碼 </div>
