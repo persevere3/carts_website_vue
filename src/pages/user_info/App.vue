@@ -75,14 +75,14 @@
             </div>
 
             <div class="right">
-              <div class="input_container" v-if="!user_info.Recommender">
+              <div class="input_container">
                 <div class="title border"> 推薦人代碼 </div>
-                <input type='text' v-model='r_recommender.value'>
+                <input type='text' placeholder="請輸入推薦人代碼" :readonly="!!user_info.Recommender" v-model='r_recommender.value' @input="!!user_info.Recommender ? r_recommender.value = $event.target.value : ''">
               </div>
 
               <div class="input_container" :class="{ error: r_phone2.is_error }">
                 <div class="title"> 手機 </div>
-                <input type="number" :readonly="!!user_info.Phone2" v-model.trim="r_phone2.value" @input="!!user_info.Phone2 ? r_phone2.value = $event.target.value : verify(r_phone2)">
+                <input type="number" placeholder="* 請輸入手機" :readonly="!!user_info.Phone2" v-model.trim="r_phone2.value" @input="!!user_info.Phone2 ? r_phone2.value = $event.target.value : verify(r_phone2)">
               </div>
               <template v-if="!user_info.Phone2 && (store.NotificationSystem == 1 || store.NotificationSystem == 2)">
                 <div class="input_container" :class="{ error: r_verify_code.is_error }">

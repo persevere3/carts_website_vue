@@ -2421,17 +2421,19 @@ export default {
     // Line
     // https://demo.uniqcarttest.tk/?code=cYECgbvDcN1egeR6UyPk&state=login
     LineLogin() {
-      let vm = this
-      let client_id = '1657797715';
-      let redirect_uri = `${location.origin}${vm.getShoppingPathname('user')}`;
+      // let vm = this
+      // let client_id = '1657797715';
+      // let redirect_uri = `${location.origin}${vm.getShoppingPathname('user')}`;
       
-      let link = 'https://access.line.me/oauth2/v2.1/authorize?';
-      link += 'response_type=code';
-      link += '&client_id=' + client_id;
-      link += '&redirect_uri=' + redirect_uri;
-      link += '&state=login';
-      link += '&scope=openid%20profile';
-      window.location.href = link;
+      // let link = 'https://access.line.me/oauth2/v2.1/authorize?';
+      // link += 'response_type=code';
+      // link += '&client_id=' + client_id;
+      // link += '&redirect_uri=' + redirect_uri;
+      // link += '&state=login';
+      // link += '&scope=openid%20profile';
+      // window.location.href = link;
+
+      this.urlPush(`${location.origin}/interface/webmember/LineLoginAuthorize?storeid=${this.site.Name}`)
     },
 
     getLineProfile() {

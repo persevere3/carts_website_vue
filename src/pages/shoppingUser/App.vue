@@ -323,6 +323,11 @@
           </template>
         </div>
       </form>
+
+      <div class="third_login">
+        <div v-if="false" class="button" style="background-color: #3B5998;" > <i class="fa-brands fa-facebook"></i> 使用Facebook登入 </div>
+        <div class="button" style="background-color: #00c300;" @click="LineLogin"> <i class="fa-brands fa-line"></i> 使用Line登入 </div>
+      </div>
     </div>
 
     <div class="user_modal_container" v-if="is_userModal">
