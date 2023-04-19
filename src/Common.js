@@ -694,9 +694,14 @@ export default {
 
             let RtnMsg = location.href.split('RtnMsg=')[1] && 
             location.href.split('RtnMsg=')[1].split('&')[0];
-            if(RtnMsg){
+            if(RtnMsg) {
               vm.payModal_message = '付款成功';
               vm.is_payModal = true;
+            }
+
+            if(location.search.indexOf('account') > -1) {
+              vm.user_account = location.search.split('account=')[1]
+              localStorage.setItem('user_account', vm.user_account)
             }
 
             if(vm.user_account) {
@@ -782,6 +787,11 @@ export default {
           if (pathname === '/shopping.html') {
             vm.getCategories()
             vm.getProducts()
+
+            if(location.search.indexOf('account') > -1) {
+              vm.user_account = location.search.split('account=')[1]
+              localStorage.setItem('user_account', vm.user_account)
+            }
           }
         }
         else if(this.status == 500){
@@ -2446,7 +2456,7 @@ export default {
       // link += '&scope=openid%20profile';
       // window.location.href = link;
 
-      this.urlPush(`${location.origin}/interface/webmember/LineLoginAuthorize?storeid=${this.site.Name}`)
+      this.urlPush(`${location.origin}/interface/webmember/LineLoginAuthorize?storeid=${this.site.Name}&site=${this.site.Site}`)
     },
 
     getLineProfile() {

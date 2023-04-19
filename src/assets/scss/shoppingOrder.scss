@@ -93,6 +93,14 @@ input{
       }
     }
   }
+  @include m{
+    .info{  
+      input{
+        width: 100%;
+        margin-bottom: 15px;
+      }
+    }
+  }
 
   .filter {
     .button_row {
