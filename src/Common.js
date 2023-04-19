@@ -1051,6 +1051,19 @@ export default {
 
           // GA
           let GAText = vm.store.GA;
+
+          if(GAText.indexOf('GTM-') > -1) {
+            let GTMID = GAText.split('GTM-')[1].split('\')')[0]
+  
+            let noscript = document.createElement('noscript');
+            noscript.setAttribute('src', `https://www.googletagmanager.com/ns.html?id=GTM-${GTMID}`);
+            noscript.setAttribute('height', '0');
+            noscript.setAttribute('width', '0');
+            noscript.setAttribute('style', 'display:none; visibility:hidden');
+  
+            document.querySelector('body').insertBefore(noscript, document.querySelector('body div'));
+          }
+
           vm.appendScript(GAText, 'head');
         }
       }
