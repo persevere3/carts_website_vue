@@ -1,5 +1,6 @@
 import Swiper from './assets/js/swiper.js'
 import Common from './components/Common.vue'
+import Cookie from './components/Cookie.vue'
 
 import DatePicker from 'vue2-datepicker';
 import 'vue2-datepicker/index.css';
@@ -7,6 +8,7 @@ import 'vue2-datepicker/index.css';
 export default {
   components: {
     Common,
+    Cookie,
     DatePicker
   },
   data(){
@@ -706,7 +708,7 @@ export default {
 
             if(vm.user_account) {
               await vm.getUser_info();
-              vm.order_phone = vm.user_account;
+              vm.order_phone = vm.r_phone2.value;
               vm.order_mail = vm.r_mail.value;
               vm.getOrder();
             } else {

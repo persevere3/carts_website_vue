@@ -369,6 +369,7 @@
           <p>Copyright &copy; 2023 - All Rights Reserved - UNIQ Micronet . </p>
         </div>
       </div>
+      <Cookie />
     </footer>
   </div>
 </template>
