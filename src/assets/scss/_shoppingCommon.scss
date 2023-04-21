@@ -268,14 +268,13 @@ header {
 footer {
   font-size: var(--font-m);
   color: #d3d3d3;
-  position: relative;
 
   .cookie {
     width: 90%;
     left: 50%;
     transform: translateX(-50%);
     bottom: 10px;
-    position: absolute;
+    position: fixed;
     padding: 20px;
     background-color: #f5f5f5;
     color: #888;
