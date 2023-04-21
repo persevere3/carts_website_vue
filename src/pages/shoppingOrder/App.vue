@@ -333,6 +333,9 @@
             <p>智聯微網</p>
             <p>台中市西屯區市政路386號四樓三</p>          
             <p>04-22520766</p>
+
+            <a href="./privacy.html"> 隱私權政策 </a>
+            <a href="./member-benefits.html"> 會員權益聲明 </a>
           </div>
           <div class="w33">
             <div style="text-align:center; margin-bottom: 5px;"> 聯繫我們 </div>

@@ -280,6 +280,8 @@ footer {
     color: #888;
     font-weight: bold;
     border-radius: 10px;
+    box-shadow: 0 0 3px 1px #888;
+    z-index: 1000;
   }
   .cookie .close{
     width: 20px;
@@ -322,6 +324,17 @@ footer {
   .footerContact .w33 p{
     margin-bottom: 1.666667vw;
   }
+  footer .footerContact .w33 a{
+    margin-bottom: 1.666667vw;
+    font-size: var(--font-m);
+    color: #d3d3d3;
+    text-decoration: underline;
+    display: block;
+  }
+  footer .footerContact .w33 a:hover{
+    color: #fff;
+  }
+
   .footerContact .w33 a img{
     width: 60px;
   }
