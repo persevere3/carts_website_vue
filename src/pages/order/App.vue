@@ -1,7 +1,7 @@
 <template>
   <div class="orders" @click="select_active = false">
    <Common 
-      :json_site="JSON.stringify(site)" 
+      :json_site="JSON.stringify(site)"
       :json_all="JSON.stringify(all)"
       :json_store="JSON.stringify(store)"
       :json_footer_community="JSON.stringify(footer_community)"
@@ -15,10 +15,10 @@
         <div class="box" v-if="!user_account">
           <div class="info">
             <label> 訂單查詢 </label>
-            <input type="text" placeholder="購買人手機號碼" v-model="order_phone" @keyup.enter="getOrder">
-            <input type="text" placeholder="購買人電子信箱" v-model="order_mail" @keyup.enter="getOrder">
+            <input type="text" placeholder="購買人手機號碼" v-model="order_phone" @keyup.enter="user_account ? getMemberOrder() : getOrder()">
+            <input type="text" placeholder="購買人電子信箱" v-model="order_mail" @keyup.enter="user_account ? getMemberOrder() : getOrder()">
             <div class="button_row">
-              <div class="button" @click="getOrder"> 搜尋 </div>
+              <div class="button" @click="user_account ? getMemberOrder() : getOrder()"> 搜尋 </div>
             </div>
           </div>
         </div>
@@ -47,7 +47,7 @@
             </div>
 
             <div class="button_row">
-              <div class="button" @click="getOrder('', true)"> 篩選 </div>
+              <div class="button" @click="user_account ? getMemberOrder('', true) : getOrder('', true)"> 篩選 </div>
             </div>
           </div>
         </div>
@@ -165,9 +165,9 @@
           <div class="page_container">
             <div class="page">
               <ul>
-                <li :class="{'disabled' : order_page_index < 2}" @click="order_page_index > 1 ? order_page_index-- : ''; getOrder('page')"> <i class="fas fa-caret-left"></i> </li>
-                <li v-show="order_page_index > Math.floor(5/2) && order_page_index < order_page_number - Math.floor(5/2) ? item >= order_page_index - Math.floor(5/2) && item <= order_page_index + Math.floor(5/2) : order_page_index <= 5  ? item <= 5 : item > order_page_number - 5" :class="{'active' : order_page_index === item}" v-for="item in order_page_number" :key="item" @click="order_page_index = item; getOrder('page')"> {{item}} </li>
-                <li :class="{'disabled' : order_page_index > order_page_number - 1}" @click="order_page_index < order_page_number ? order_page_index++ : ''; getOrder('page');"> <i class="fas fa-caret-right"></i> </li>
+                <li :class="{'disabled' : order_page_index < 2}" @click="order_page_index > 1 ? order_page_index-- : ''; user_account ? getMemberOrder('page', true) : getOrder('page', true)"> <i class="fas fa-caret-left"></i> </li>
+                <li v-show="order_page_index > Math.floor(5/2) && order_page_index < order_page_number - Math.floor(5/2) ? item >= order_page_index - Math.floor(5/2) && item <= order_page_index + Math.floor(5/2) : order_page_index <= 5  ? item <= 5 : item > order_page_number - 5" :class="{'active' : order_page_index === item}" v-for="item in order_page_number" :key="item" @click="order_page_index = item; user_account ? getMemberOrder('page', true) : getOrder('page', true)"> {{item}} </li>
+                <li :class="{'disabled' : order_page_index > order_page_number - 1}" @click="order_page_index < order_page_number ? order_page_index++ : ''; user_account ? getMemberOrder('page', true) : getOrder('page', true);"> <i class="fas fa-caret-right"></i> </li>
               </ul>
             </div>
             <div class="total"> {{ order_page_index }} / {{ order_page_number }} </div>
@@ -175,11 +175,13 @@
               <div class="value"> {{order_page_size}} </div>
               <i class="fas fa-caret-down"></i>
               <ul :class="{'active' : select_active}">
-                <li :class="{'active' : order_page_size === item * 10}" v-for="item in 5" :key="item" @click="order_page_size = item * 10; getOrder()"> {{item * 10}} </li>
+                <li :class="{'active' : order_page_size === item * 10}" v-for="item in 5" :key="item" @click="order_page_size = item * 10; user_account ? getMemberOrder('', true) : getOrder('', true)"> {{item * 10}} </li>
               </ul>
             </div>
           </div>
         </div>
+
+        <div class="box" v-if="noOrder" style="text-align: center;"> 查無訂單資料 </div>
       </div>
 
       <div class="payModal_container" v-if="is_payModal">

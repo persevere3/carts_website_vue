@@ -93,22 +93,22 @@
 
     <header>
       <div class="logo" v-if="store">
-        <a @click="urlPush(getShoppingPathname('index'))">
+        <a @click="urlPush(getPathname('index'))">
           <img :src="store.Logo" alt="">
         </a>
       </div>
       <div class="menu">
         <ul>
-          <li @click="urlPush(getShoppingPathname('index'))"><i class="fa-solid fa-house"></i> <span class="none650"> 首頁 </span></li>
+          <li @click="urlPush(getPathname('index'))"><i class="fa-solid fa-house"></i> <span class="none650"> 首頁 </span></li>
           <li @click.stop="is_favorite_hover = !is_favorite_hover; is_carts_hover = false"> 
             <i class="fa-solid fa-heart"></i> 
             <span class="none650"> 收藏 </span> 
           </li>
-          <li @click.stop="carts.length ? is_carts_hover = !is_carts_hover : urlPush('/cart', true); is_favorite_hover = false"> 
+          <li @click.stop="carts.length ? is_carts_hover = !is_carts_hover : pushTo_cart(); is_favorite_hover = false"> 
             <i class="fa-solid fa-cart-shopping"></i> 
             <span class="none650"> 購物車 </span> 
           </li>
-          <li @click="user_account ? urlPush(`/shoppingOrder.html?phone=${user_account}`) : urlPush('/shoppingOrder.html')">
+          <li @click="urlPush('/shoppingOrder.html')">
             <i class="fas fa-clipboard-list"></i>
             <span class="none650"> 訂單 </span>
           </li>
@@ -121,13 +121,13 @@
     </header>
 
     <div class="main">
-      <div class="box" v-if="!user_account">
+      <div class="box" v-if="!user_account"> 
         <div class="info">
           <label> 訂單查詢 </label>
-          <input type="text" placeholder="購買人手機號碼" v-model="order_phone" @keyup.enter="getOrder">
-          <input type="text" placeholder="購買人電子信箱" v-model="order_mail" @keyup.enter="getOrder">
+          <input type="text" placeholder="購買人手機號碼" v-model="order_phone" @keyup.enter="user_account ? getMemberOrder() : getOrder()">
+          <input type="text" placeholder="購買人電子信箱" v-model="order_mail" @keyup.enter="user_account ? getMemberOrder() : getOrder()">
           <div class="button_row">
-            <div class="button" @click="getOrder"> 搜尋 </div>
+            <div class="button" @click="user_account ? getMemberOrder() : getOrder()"> 搜尋 </div>
           </div>
         </div>
       </div>
@@ -156,7 +156,7 @@
           </div>
 
           <div class="button_row">
-            <div class="button" @click="getOrder('', true)"> 篩選 </div>
+            <div class="button" @click="user_account ? getMemberOrder('', true) : getOrder('', true)"> 篩選 </div>
           </div>
         </div>
       </div>
@@ -274,9 +274,9 @@
         <div class="page_container">
           <div class="page">
             <ul>
-              <li :class="{'disabled' : order_page_index < 2}" @click="order_page_index > 1 ? order_page_index-- : ''; getOrder('page')"> <i class="fas fa-caret-left"></i> </li>
-              <li v-show="order_page_index > Math.floor(5/2) && order_page_index < order_page_number - Math.floor(5/2) ? item >= order_page_index - Math.floor(5/2) && item <= order_page_index + Math.floor(5/2) : order_page_index <= 5  ? item <= 5 : item > order_page_number - 5" :class="{'active' : order_page_index === item}" v-for="item in order_page_number" :key="item" @click="order_page_index = item; getOrder('page')"> {{item}} </li>
-              <li :class="{'disabled' : order_page_index > order_page_number - 1}" @click="order_page_index < order_page_number ? order_page_index++ : ''; getOrder('page');"> <i class="fas fa-caret-right"></i> </li>
+              <li :class="{'disabled' : order_page_index < 2}" @click="order_page_index > 1 ? order_page_index-- : ''; user_account ? getMemberOrder('page', true) : getOrder('page', true)"> <i class="fas fa-caret-left"></i> </li>
+              <li v-show="order_page_index > Math.floor(5/2) && order_page_index < order_page_number - Math.floor(5/2) ? item >= order_page_index - Math.floor(5/2) && item <= order_page_index + Math.floor(5/2) : order_page_index <= 5  ? item <= 5 : item > order_page_number - 5" :class="{'active' : order_page_index === item}" v-for="item in order_page_number" :key="item" @click="order_page_index = item; user_account ? getMemberOrder('page', true) : getOrder('page', true)"> {{item}} </li>
+              <li :class="{'disabled' : order_page_index > order_page_number - 1}" @click="order_page_index < order_page_number ? order_page_index++ : ''; user_account ? getMemberOrder('page', true) : getOrder('page', true);"> <i class="fas fa-caret-right"></i> </li>
             </ul>
           </div>
           <div class="total"> {{ order_page_index }} / {{ order_page_number }} </div>
@@ -284,11 +284,13 @@
             <div class="value"> {{order_page_size}} </div>
             <i class="fas fa-caret-down"></i>
             <ul :class="{'active' : select_active}">
-              <li :class="{'active' : order_page_size === item * 10}" v-for="item in 5" :key="item" @click="order_page_size = item * 10; getOrder()"> {{item * 10}} </li>
+              <li :class="{'active' : order_page_size === item * 10}" v-for="item in 5" :key="item" @click="order_page_size = item * 10; user_account ? getMemberOrder('', true) : getOrder('', true)"> {{item * 10}} </li>
             </ul>
           </div>
         </div>
       </div>
+
+      <div class="box" v-if="noOrder" style="text-align: center;"> 查無訂單資料 </div>
     </div>
 
     <div class="payModal_container" v-if="is_payModal">
@@ -330,12 +332,13 @@
       <div class="footerContact">
         <div class="footerContainer">
           <div class="w33">
-            <p>智聯微網</p>
+            <p>智聯微網 統編: 42872739 </p>
             <p>台中市西屯區市政路386號四樓三</p>          
             <p>04-22520766</p>
 
             <a href="./privacy.html"> 隱私權政策 </a>
             <a href="./member-benefits.html"> 會員權益聲明 </a>
+            <a href="./return.html"> 退換貨說明 </a>
           </div>
           <div class="w33">
             <div style="text-align:center; margin-bottom: 5px;"> 聯繫我們 </div>

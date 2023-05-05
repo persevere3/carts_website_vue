@@ -468,7 +468,7 @@ input{
             }
             .td{
               padding: 5px 10px;
-              min-height: 45px;
+              min-height: 30px;
               display: flex;
               justify-content: center;
               align-items: center;
@@ -630,6 +630,11 @@ input{
   
               border: 1px solid #333;
               border-right: none;
+
+              display: flex;
+              justify-content: center;
+              align-items: center;
+
               &:first-child{
                 border-radius: 5px 0 0 5px;
               }
@@ -651,7 +656,6 @@ input{
   
               i{
                 font-size: 24px;
-                margin-bottom: 5px;
               }
             }
           }

@@ -93,22 +93,22 @@
 
     <header>
       <div class="logo" v-if="store">
-        <a @click="urlPush(getShoppingPathname('index'))">
+        <a @click="urlPush(getPathname('index'))">
           <img :src="store.Logo" alt="">
         </a>
       </div>
       <div class="menu">
         <ul>
-          <li @click="urlPush(getShoppingPathname('index'))"><i class="fa-solid fa-house"></i> <span class="none650"> 首頁 </span></li>
+          <li @click="urlPush(getPathname('index'))"><i class="fa-solid fa-house"></i> <span class="none650"> 首頁 </span></li>
           <li @click.stop="is_favorite_hover = !is_favorite_hover; is_carts_hover = false"> 
-            <i class="fa-solid fa-heart"></i> 
+            <i class="fa-solid fa-heart"></i>
             <span class="none650"> 收藏 </span> 
           </li>
-          <li @click.stop="carts.length ? is_carts_hover = !is_carts_hover : urlPush('/cart', true); is_favorite_hover = false"> 
+          <li @click.stop="carts.length ? is_carts_hover = !is_carts_hover : pushTo_cart(); is_favorite_hover = false"> 
             <i class="fa-solid fa-cart-shopping"></i> 
             <span class="none650"> 購物車 </span> 
           </li>
-          <li @click="user_account ? urlPush(`/shoppingOrder.html?phone=${user_account}`) : urlPush('/shoppingOrder.html')">
+          <li @click="urlPush('/shoppingOrder.html')">
             <i class="fas fa-clipboard-list"></i>
             <span class="none650"> 訂單 </span>
           </li>
@@ -152,12 +152,13 @@
       <div class="footerContact">
         <div class="footerContainer">
           <div class="w33">
-            <p>智聯微網</p>
+            <p>智聯微網 統編: 42872739 </p>
             <p>台中市西屯區市政路386號四樓三</p>          
             <p>04-22520766</p>
 
             <a href="./privacy.html"> 隱私權政策 </a>
             <a href="./member-benefits.html"> 會員權益聲明 </a>
+            <a href="./return.html"> 退換貨說明 </a>
           </div>
           <div class="w33">
             <div style="text-align:center; margin-bottom: 5px;"> 聯繫我們 </div>

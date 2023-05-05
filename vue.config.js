@@ -1,7 +1,9 @@
-let isUniqm = true
+// uniqm.com, uniqm.net
+let webVersion = 'uniqm.com'
+
 module.exports = {
-  publicPath: process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'uniqm' ? './' : '/',
-  pages: !isUniqm
+  publicPath: process.env.NODE_ENV === 'production' ? './' : '/',
+  pages: webVersion === 'common'
     ? {
       index : {
         entry: 'src/pages/index/main.js', // page 的入口

@@ -93,22 +93,22 @@
 
     <header>
       <div class="logo" v-if="store">
-        <a @click="urlPush(getShoppingPathname('index'))">
+        <a @click="urlPush(getPathname('index'))">
           <img :src="store.Logo" alt="">
         </a>
       </div>
       <div class="menu">
         <ul>
-          <li @click="urlPush(getShoppingPathname('index'))"><i class="fa-solid fa-house"></i> <span class="none650"> 首頁 </span> </li>
+          <li @click="urlPush(getPathname('index'))"><i class="fa-solid fa-house"></i> <span class="none650"> 首頁 </span> </li>
           <li @click.stop="is_favorite_hover = !is_favorite_hover; is_carts_hover = false"> 
             <i class="fa-solid fa-heart"></i> 
             <span class="none650"> 收藏 </span> 
           </li>
-          <li @click.stop="carts.length ? is_carts_hover = !is_carts_hover : urlPush('/cart', true); is_favorite_hover = false"> 
+          <li @click.stop="carts.length ? is_carts_hover = !is_carts_hover : pushTo_cart(); is_favorite_hover = false"> 
             <i class="fa-solid fa-cart-shopping"></i> 
             <span class="none650"> 購物車 </span> 
           </li>
-          <li @click="user_account ? urlPush(`/shoppingOrder.html?phone=${user_account}`) : urlPush('/shoppingOrder.html')">
+          <li @click="urlPush('/shoppingOrder.html')">
             <i class="fas fa-clipboard-list"></i>
             <span class="none650"> 訂單 </span>
           </li>
@@ -122,6 +122,9 @@
 
     <div class="main" :class="user_info_nav_active" v-if="user_account">
       <div class="logout_container button_row">
+        <!-- <div class="button" v-if="user_info && user_info.Registermethod == 2" @click="deleteAccount_test" style="margin-right: 5px;"> 刪除Line帳號(測試用) </div>
+        <div class="button" v-if="user_info && user_info.Registermethod <= 1 && user_info.ConnectLine" @click="unbindLine_test" style="margin-right: 5px;"> 解除Line綁定(測試用) </div> -->
+        <div class="button" v-if="user_info && user_info.Registermethod <= 1 && !user_info.ConnectLine" @click="bindLine" style="margin-right: 5px;"> 綁定Line帳號 </div>
         <div class="button" @click="post_logout"> 登出 </div>
       </div>
 
@@ -152,7 +155,7 @@
             </div>
             <div class="input_container" :class="{ error: r_mail.is_error }">
               <div class="title"> 電子信箱 </div>
-              <input type="text" readonly placeholder="* 請輸入電子信箱" v-model.trim="r_mail.value" @input="r_mail.value = $event.target.value">
+              <input type="text" :readonly="!!user_info.Email" placeholder="* 請輸入電子信箱" v-model.trim="r_mail.value" @input="r_mail.value = $event.target.value">
               <div class="error message">
                 <i class="error_icon fas fa-exclamation-circle"></i> {{ r_mail.message }}
               </div>
@@ -185,7 +188,7 @@
           <div class="right">
             <div class="input_container">
               <div class="title border"> 推薦人代碼 </div>
-              <input type='text' placeholder="請輸入推薦人代碼" :readonly="!!user_info.Recommender" v-model='r_recommender.value' @input="!!user_info.Recommender ? r_recommender.value = $event.target.value : ''">
+              <input type='text' readonly v-model="r_recommender.value">
             </div>
 
             <div class="input_container" :class="{ error: r_phone2.is_error }">
@@ -200,7 +203,7 @@
               <div class="button" style="margin-bottom: 20px;" @click="send_verify_code"> 獲取驗證碼 <span v-if="second > 0"> ( {{second}}s ) </span> </div>
             </template>
 
-            <div class="password_container">
+            <div class="password_container" v-if="user_info.Registermethod != 2">
               <div class="title"> 密碼 </div>
               <div class="button" @click="is_payModal = true; payModal_message = 'template3'"> 修改密碼 </div>
             </div>
@@ -461,14 +464,14 @@
             <div class="page">
               <ul>
                 <li :class="{'disabled' : order_page_index < 2}"
-                  @click="order_page_index > 1 ? order_page_index-- : ''; getMemberOrder('page')"> <i
+                  @click="order_page_index > 1 ? order_page_index-- : ''; getMemberOrder('page', true)"> <i
                     class="fas fa-caret-left"></i> </li>
                 <li
                   v-show="order_page_index > Math.floor(5/2) && order_page_index < order_page_number - Math.floor(5/2) ? item >= order_page_index - Math.floor(5/2) && item <= order_page_index + Math.floor(5/2) : order_page_index <= 5  ? item <= 5 : item > order_page_number - 5"
                   :class="{'active' : order_page_index === item}" v-for="item in order_page_number" :key="item"
-                  @click="order_page_index = item; getMemberOrder('page')"> {{item}} </li>
+                  @click="order_page_index = item; getMemberOrder('page', true)"> {{item}} </li>
                 <li :class="{'disabled' : order_page_index > order_page_number - 1}"
-                  @click="order_page_index < order_page_number ? order_page_index++ : ''; getMemberOrder('page');"> <i
+                  @click="order_page_index < order_page_number ? order_page_index++ : ''; getMemberOrder('page', true);"> <i
                     class="fas fa-caret-right"></i> </li>
               </ul>
             </div>
@@ -478,7 +481,7 @@
               <i class="fas fa-caret-down"></i>
               <ul :class="{'active' : select_active}">
                 <li :class="{'active' : order_page_size === item * 10}" v-for="item in 5" :key="item"
-                  @click="order_page_size = item * 10; getMemberOrder()"> {{item * 10}} </li>
+                  @click="order_page_size = item * 10; getMemberOrder('', true)"> {{item * 10}} </li>
               </ul>
             </div>
           </div>
@@ -568,12 +571,13 @@
       <div class="footerContact">
         <div class="footerContainer">
           <div class="w33">
-            <p>智聯微網</p>
+            <p>智聯微網 統編: 42872739 </p>
             <p>台中市西屯區市政路386號四樓三</p>          
             <p>04-22520766</p>
 
             <a href="./privacy.html"> 隱私權政策 </a>
             <a href="./member-benefits.html"> 會員權益聲明 </a>
+            <a href="./return.html"> 退換貨說明 </a>
           </div>
           <div class="w33">
             <div style="text-align:center; margin-bottom: 5px;"> 聯繫我們 </div>

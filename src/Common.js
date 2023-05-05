@@ -347,6 +347,7 @@ export default {
       f_confirm_password_type: 'password',
 
       is_userModal: false,
+      is_LineRegister: false,
       is_userMessage: false,
       user_message: '',
 
@@ -450,6 +451,11 @@ export default {
 
       is_favorite_hover: false,
       is_carts_hover: false,
+
+      noOrder: false, 
+
+      // 
+      webVersion: 'uniqm.com',
     }
   },
   computed:{
@@ -694,46 +700,61 @@ export default {
           // order
           if (pathname === '/order.html' || pathname === '/shoppingOrder.html') {
 
-            let RtnMsg = location.href.split('RtnMsg=')[1] && 
+            let RtnMsg = location.href.split('RtnMsg=')[1] &&
             location.href.split('RtnMsg=')[1].split('&')[0];
             if(RtnMsg) {
               vm.payModal_message = '付款成功';
               vm.is_payModal = true;
             }
 
-            if(location.search.indexOf('account') > -1) {
-              vm.user_account = location.search.split('account=')[1]
+            // Line 登入
+            let account = location.search.split('account=')[1] && 
+            location.search.split('account=')[1].split('&')[0];
+            if(account) {
+              vm.user_account = account
               localStorage.setItem('user_account', vm.user_account)
+            }
+
+            // Line 綁定
+            let result = location.search.split('result=')[1] && 
+            location.search.split('result=')[1].split('&')[0];
+            if(result) {
+              result = JSON.parse(decodeURI(result))
+              if(!result.status) alert(result.msg)
+              else {
+                vm.user_account = result.account
+                localStorage.setItem('user_account', vm.user_account)
+              }
             }
 
             if(vm.user_account) {
               await vm.getUser_info();
-              vm.order_phone = vm.r_phone2.value;
-              vm.order_mail = vm.r_mail.value;
-              vm.getOrder();
+              vm.order_phone = vm.user_info.Phone;
+              vm.order_mail = vm.user_info.Email;
+              vm.getMemberOrder();
             } else {
               let phone = location.href.split('phone=')[1] && 
               location.href.split('phone=')[1].split('&')[0];
               let mail = location.href.split('mail=')[1] && 
               location.href.split('mail=')[1].split('&')[0];
 
-              if(phone && mail){
+              if(phone && mail) {
                 vm.order_phone = phone;
                 vm.order_mail = mail;
                 vm.getOrder();
               }
             }
 
-            window.history.replaceState({}, document.title, vm.getShoppingPathname('order'));
+            window.history.replaceState({}, document.title, vm.getPathname('order'));
           }
 
           // user
           if (pathname === '/user.html' || pathname === '/shoppingUser.html') {
             if(!(vm.site.MemberFuction * 1)){
-              vm.urlPush(getShoppingPathname('index'));
+              vm.urlPush(vm.getPathname('index'));
             }
             if(vm.user_account){
-              vm.urlPush(vm.getShoppingPathname('info'));
+              vm.urlPush(vm.getPathname('info'));
             }
 
             if( vm.site.TermsNotices && location.search.split('?term=')[1]){
@@ -744,7 +765,7 @@ export default {
             vm.LineToken = location.href.split('code=')[1] && 
                           location.href.split('code=')[1].split('&')[0];       
             if(vm.LineToken){
-              window.history.replaceState({}, document.title, vm.getShoppingPathname('user'));
+              window.history.replaceState({}, document.title, vm.getPathname('user'));
               vm.getLineProfile();
             }
           }
@@ -753,12 +774,27 @@ export default {
           if (pathname === '/user_info.html' || pathname === '/shoppingInfo.html') {
             // 沒有開啟會員功能
             if(!(vm.site.MemberFuction * 1)) {
-              vm.urlPush(getShoppingPathname('index'));
+              vm.urlPush(vm.getPathname('index'));
             }
 
-            if(location.search.indexOf('account') > -1) {
-              vm.user_account = location.search.split('account=')[1]
+            // Line 登入
+            let account = location.search.split('account=')[1] && 
+            location.search.split('account=')[1].split('&')[0];
+            if(account) {
+              vm.user_account = account
               localStorage.setItem('user_account', vm.user_account)
+            }
+
+            // Line 綁定
+            let result = location.search.split('result=')[1] && 
+            location.search.split('result=')[1].split('&')[0];
+            if(result) {
+              result = JSON.parse(decodeURI(result))
+              if(!result.status) alert(result.msg)
+              else {
+                vm.user_account = result.account
+                localStorage.setItem('user_account', vm.user_account)
+              }
             }
 
             //
@@ -779,9 +815,9 @@ export default {
                 vm.getMemberOrder()
               }
 
-              window.history.replaceState({}, document.title, vm.getShoppingPathname('info'));
+              window.history.replaceState({}, document.title, vm.getPathname('info'));
             } else {
-              vm.urlPush(vm.getShoppingPathname('user'));
+              vm.urlPush(vm.getPathname('user'));
             }
           }
 
@@ -808,6 +844,7 @@ export default {
     // 
     getCarts() {
       let vm = this;
+      
       if(vm.user_account) {
         vm.carts = JSON.parse(localStorage.getItem(`${vm.site.Name}@${vm.user_account}@carts`)) || [];
       }
@@ -1456,10 +1493,12 @@ export default {
             vm.filter_number = '';
             vm.filter_pay = '0';
             vm.filter_delivery = '0';
+            vm.noOrder = true
             return;
           } else {
             vm.order = orders;
             vm.order_page_number = order_page_number
+            vm.noOrder = false
           }
 
           vm.$nextTick(function(){
@@ -1482,7 +1521,7 @@ export default {
         }
       }
     },
-    getMemberOrder(type, is_filter){
+    getMemberOrder(type, is_filter) {
       return new Promise((resolve)=>{
         let vm = this;
 
@@ -1554,6 +1593,7 @@ export default {
         }
       })
     },
+    // ???
     async searchOrder(number){
       if(!this.order){
         await this.getMemberOrder();
@@ -1657,10 +1697,10 @@ export default {
           vm.is_payModal = true;
 
           let pathname = location.pathname;
-          if (pathname.indexOf('order') > -1 ) {
-            vm.getOrder();
+          if (pathname.indexOf('order') > -1 && !vm.user_account ) {
+            vm.getOrder('page', true);
           } else {
-            vm.getMemberOrder()
+            vm.getMemberOrder('page', true)
           }
 
           vm.$forceUpdate();
@@ -1683,6 +1723,7 @@ export default {
       xhr.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
           vm.payResult = JSON.parse(xhr.response)
+          alert(xhr.response)
           vm.toPay()
         }
       }
@@ -1694,7 +1735,7 @@ export default {
       }
       // ecpay
       else {
-        if(this.api.indexOf('demo') > -1){
+        if(this.api.indexOf('demo') > -1) {
           this.ECPay_form = `<form id="ECPay_form" target="_blank" action="https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5" method="post">`
         } else {
           this.ECPay_form = `<form id="ECPay_form" target="_blank" action="https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5" method="post">`
@@ -1706,10 +1747,14 @@ export default {
         }
         this.ECPay_form += `</form>`;
 
-        this.$nextTick(()=>{
+        setTimeout(function() {
+          // alert(1)
           let ECPay_form = document.querySelector('#ECPay_form');
+          // ECPay_form.parentNode.style.opacity = 1;
+          // ECPay_form.parentNode.style.position = 'static';
           ECPay_form.submit();
-        })
+          // alert(2)
+        }, 1000)
       }
     },
 
@@ -1926,6 +1971,7 @@ export default {
       formData.append("storeid", this.site.Name);
       formData.append("phone", this.l_account.value);
       formData.append("password", this.l_password.value);
+      formData.append("realAccount", this.l_account.value);
 
       let xhr = new XMLHttpRequest();
       xhr.withCredentials = true;
@@ -1937,27 +1983,7 @@ export default {
             localStorage.setItem('user_account', vm.l_account.value);
             vm.user_account = vm.l_account.value;
 
-            let carts = JSON.parse(localStorage.getItem(`${vm.site.Name}@${vm.user_account}@carts`)) || [];
-            let localCarts = JSON.parse(localStorage.getItem(`${vm.site.Name}@carts`)) || [];
-            for(let localIndex in localCarts) {
-              let f = false;
-              for(let cartsIndex in carts) {
-                if(localCarts[localIndex].ID === carts[cartsIndex].ID) {
-                  vm.$set(carts, cartsIndex, localCarts[localIndex])
-                  f = true;
-                }
-              }
-              if(!f) {
-                vm.$set(carts, carts.length, localCarts[localIndex])
-              }
-            }
-            vm.carts = [];
-            carts.forEach((item, index)=>{
-              vm.$set(vm.carts, index, item)
-            })
-            localStorage.setItem(`${vm.site.Name}@${vm.user_account}@carts`, JSON.stringify(vm.carts));
-
-            vm.urlPush(vm.getShoppingPathname('info'));
+            vm.urlPush(vm.getPathname('info'));
           }
           else {
             vm.user_message = JSON.parse(xhr.response).msg
@@ -1965,6 +1991,29 @@ export default {
           }
         }
       }
+    },
+    login_handle_carts() {
+      let vm = this
+      let carts = JSON.parse(localStorage.getItem(`${vm.site.Name}@${vm.user_account}@carts`)) || [];
+      let localCarts = JSON.parse(localStorage.getItem(`${vm.site.Name}@carts`)) || [];
+      for(let localIndex in localCarts) {
+        let f = false;
+        for(let cartsIndex in carts) {
+          if(localCarts[localIndex].ID === carts[cartsIndex].ID) {
+            vm.$set(carts, cartsIndex, localCarts[localIndex])
+            f = true;
+          }
+        }
+        if(!f) {
+          vm.$set(carts, carts.length, localCarts[localIndex])
+        }
+      }
+      vm.carts = [];
+      carts.forEach((item, index)=>{
+        vm.$set(vm.carts, index, item)
+      })
+      console.log(`${vm.site.Name}@${vm.user_account}@carts`, vm.carts)
+      localStorage.setItem(`${vm.site.Name}@${vm.user_account}@carts`, JSON.stringify(vm.carts));
     },
     post_logout(){
       let vm = this;
@@ -1980,9 +2029,7 @@ export default {
     },
     logout(){
       localStorage.removeItem('user_account');
-      this.user_account = '';
-      this.getCarts();
-      this.urlPush(this.getShoppingPathname('user'));
+      this.urlPush(this.getPathname('user'));
     },
 
     // forget password
@@ -2139,6 +2186,8 @@ export default {
           if (this.readyState == 4 && this.status == 200) {
             if(JSON.parse(xhr.response).status) {
               vm.user_info = JSON.parse(xhr.response).datas[0][0];
+
+              vm.login_handle_carts();
 
               vm.r_name.value = vm.user_info.Name
               vm.r_mail.value = vm.user_info.Email
@@ -2445,20 +2494,30 @@ export default {
 
     // Line
     // https://demo.uniqcarttest.tk/?code=cYECgbvDcN1egeR6UyPk&state=login
-    LineLogin() {
-      // let vm = this
-      // let client_id = '1657797715';
-      // let redirect_uri = `${location.origin}${vm.getShoppingPathname('user')}`;
-      
-      // let link = 'https://access.line.me/oauth2/v2.1/authorize?';
-      // link += 'response_type=code';
-      // link += '&client_id=' + client_id;
-      // link += '&redirect_uri=' + redirect_uri;
-      // link += '&state=login';
-      // link += '&scope=openid%20profile';
-      // window.location.href = link;
+    LineLogin(isRegister) {
+      this.urlPush(`${location.origin}/interface/webmember/LineLoginAuthorize?storeid=${this.site.Name}&site=${this.site.Site}${isRegister ? `&recommender=${this.r_recommender.value}&method=Register` : ''}`)
+    },
+    validateRecommenderCode() {
+      let vm = this;
 
-      this.urlPush(`${location.origin}/interface/webmember/LineLoginAuthorize?storeid=${this.site.Name}&site=${this.site.Site}`)
+      if(!vm.r_recommender.value) {
+        vm.LineLogin(true)
+        return
+      }
+      let formData = new FormData();
+      formData.append("storeid", vm.site.Name);
+      formData.append("recommender", vm.r_recommender.value);
+
+      let xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+      xhr.open('POST', `${vm.protocol}//${vm.api}/interface/WebMember/CheckRecommanderCode`, true);
+      xhr.send(formData);
+      xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          alert(JSON.parse(xhr.response).msg)
+          if(JSON.parse(xhr.response).status) vm.LineLogin(true)
+        }
+      }
     },
 
     getLineProfile() {
@@ -2490,19 +2549,14 @@ export default {
     },
     // homePage allProducts, category, search
     pushTo_cart(id){
+      let href = this.webVersion === 'uniqm.net' ? 'https://www.uniqm.net' : '/cart'
       this.site = JSON.parse(localStorage.getItem('site')) || [] ;
-      if(this.site.WebPreview == 2){
-        alert('預覽模式下不開放');
-      }
-      else{
+      if(this.site.WebPreview == 2) alert('預覽模式下不開放')
+      else {
         const vm = this;
 
-        if(id === undefined){
-          vm.urlPush(`/cart?open_carts=true`, true)
-        }
-        else{
-          vm.urlPush(`/cart?id=${id}`, true)
-        }
+        if(id === undefined) vm.urlPush(`${href}?open_carts=true`, true)
+        else vm.urlPush(`${href}?id=${id}`, true)
       }
     },
 
@@ -2593,33 +2647,80 @@ export default {
       }
     },
 
-    getShoppingPathname(page) {
-      let shoppingHost = 'uniqm.com'
-      
-      let host = location.host;
-
-      let pageIndex = host.indexOf(shoppingHost) > -1 ? 1 : 0;
-
+    getPathname(page) {
       let pageObj = {
         index: {
-          0: '/',
-          1: '/'
+          'common': '/',
+          'uniqm.com': '/',
+          'uniqm.net': '/',
         },
         order: {
-          0: '/order.html',
-          1: '/shoppingOrder.html'
+          'common': '/order.html',
+          'uniqm.com': '/shoppingOrder.html',
+          'uniqm.net': '',
         },
         user: {
-          0: '/user.html',
-          1: '/shoppingUser.html'
+          'common': '/user.html',
+          'uniqm.com': '/shoppingUser.html',
+          'uniqm.net': '',
         },
         info: {
-          0: '/user_info.html',
-          1: '/shoppingInfo.html'
+          'common': '/info.html',
+          'uniqm.com': '/shoppingInfo.html',
+          'uniqm.net': '',
         },
       }
 
-      return pageObj[page][pageIndex];
+      return pageObj[page][this.webVersion];
+    },
+
+    //
+    bindLine() {
+      this.urlPush(`${location.origin}/interface/webmember/LineLoginAuthorize?storeid=${this.site.Name}&site=${this.site.Site}&phone=${this.user_account}`)
+    },
+    unbindLine_test() {
+      let vm = this
+
+      let isConfim = confirm('確定解除Line綁定嗎？');
+      if(!isConfim) return
+
+      let formData = new FormData();
+      formData.append("storeid", vm.site.Name);
+      formData.append("phone", vm.user_account);
+
+      let xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+      xhr.open('post',`${vm.protocol}//${vm.api}/interface/webmember/OldMemberDeleteLineIDAccount`, true);
+      xhr.send(formData);
+      xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          if(JSON.parse(xhr.response).status) {
+            vm.getUser_info()
+          }
+        }
+      }
+    },
+    deleteAccount_test() {
+      let vm = this;
+
+      let isConfim = confirm('確定刪除帳號嗎？')
+      if(!isConfim) return
+
+      let formData = new FormData();
+      formData.append("storeid", vm.site.Name);
+      formData.append("phone", vm.user_account);
+
+      let xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+      xhr.open('post',`${vm.protocol}//${vm.api}/interface/WebMember/DeleteLineIDAccount`, true);
+      xhr.send(formData);
+      xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          if(JSON.parse(xhr.response).status) {
+            vm.logout();
+          }
+        }
+      }
     }
   },
   created(){

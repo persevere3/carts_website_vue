@@ -232,9 +232,9 @@
           </div>
         </form>
 
-        <div class="third_login">
+        <div class="third_login" v-if="user_nav_active != 'forget'">
           <div v-if="false" class="button" style="background-color: #3B5998;" > <i class="fa-brands fa-facebook"></i> 使用Facebook登入 </div>
-          <div class="button" style="background-color: #00c300;" @click="LineLogin"> <i class="fa-brands fa-line"></i> 使用Line登入 </div>
+          <div class="button" style="background-color: #00c300;" @click="user_nav_active === 'login' ? LineLogin() : is_LineRegister = true"> <i class="fa-brands fa-line"></i> 使用Line <span v-if="user_nav_active === 'register'">註冊</span> <span v-if="user_nav_active === 'login'">登入</span> </div>
         </div>
       </div>
 
@@ -244,6 +244,21 @@
         </div>
         <div class="user_modal">
           <div class="content" v-html="unescapeHTML(site.TermsNotices)"></div>
+        </div>
+      </div>
+
+      <div class="user_modal_container" v-if="is_LineRegister">
+        <div class="close" @click="is_LineRegister = false;">
+          <i class="fas fa-times"></i>
+        </div>
+        <div class="user_modal">
+          <div class="content">
+            <div class="input_container">
+              <input type="text" placeholder="請輸入推薦代碼" v-model.trim="r_recommender.value">
+              <div class="message"> (註冊後不可做更改，如果沒有推薦人可不填寫。) </div>
+            </div>
+            <div class="button" style="margin-bottom: 20px;" @click="validateRecommenderCode"> Line註冊 </div>
+          </div>
         </div>
       </div>
 

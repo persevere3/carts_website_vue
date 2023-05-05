@@ -65,11 +65,11 @@
               我的最愛
               <i class="fas fa-heart"></i>
             </li>
-            <li @click.stop="carts.length ? is_carts_hover = !is_carts_hover : urlPush('/cart', true); is_favorite_hover = false">
+            <li @click.stop="carts.length ? is_carts_hover = !is_carts_hover : pushTo_cart(); is_favorite_hover = false">
               購物車
               <i class="fa fa-shopping-cart" aria-hidden="true"></i>
             </li>
-            <li @click="user_account ? urlPush(`/order.html?phone=${user_account}`) : urlPush('/order.html')">
+            <li @click="urlPush('/order.html')">
               訂單查詢
               <i class="fas fa-clipboard-list"></i>
             </li>
@@ -109,10 +109,10 @@
             <li @click.stop="is_favorite_hover = !is_favorite_hover; is_carts_hover = false">
               <i class="fas fa-heart"></i>
             </li>
-            <li @click.stop="carts.length ? is_carts_hover = !is_carts_hover : urlPush('/cart', true); is_favorite_hover = false">
+            <li @click.stop="carts.length ? is_carts_hover = !is_carts_hover : pushTo_cart(); is_favorite_hover = false">
               <i class="fa fa-shopping-cart" aria-hidden="true"></i>
             </li>
-            <li @click="user_account ? urlPush(`/order.html?phone=${user_account}`) : urlPush('/order.html')">
+            <li @click="urlPush('/order.html')">
               <i class="fas fa-clipboard-list"></i>
             </li>
             <li v-if="site.MemberFuction * 1" @click="user_account ? urlPush('/user_info.html') : urlPush('/user.html')">
