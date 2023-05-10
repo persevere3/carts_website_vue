@@ -455,7 +455,7 @@ export default {
       noOrder: false, 
 
       // 
-      webVersion: 'uniqm.com',
+      webVersion: 'common',
     }
   },
   computed:{
@@ -1723,41 +1723,43 @@ export default {
       xhr.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
           vm.payResult = JSON.parse(xhr.response)
-          alert(xhr.response)
           vm.toPay()
         }
       }
     },
     toPay(){
+      let vm = this
       // LinePay
       if(this.pay_method == 'LinePay'){
-        this.urlPush(this.payResult.payUrl, true)
+        this.urlPush(this.payResult.payUrl)
       }
       // ecpay
       else {
         if(this.api.indexOf('demo') > -1) {
-          this.ECPay_form = `<form id="ECPay_form" target="_blank" action="https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5" method="post">`
+          // target="_blank"
+          this.ECPay_form = `<form id="ECPay_form" action="https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5" method="post">`
         } else {
-          this.ECPay_form = `<form id="ECPay_form" target="_blank" action="https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5" method="post">`
+          this.ECPay_form = `<form id="ECPay_form" action="https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5" method="post">`
         }
         for(let item in this.payResult){
           if(item === 'success' || item === 'message') continue
           // EncryptType TotalAmount ExpireDate: number，other: text
           this.ECPay_form += `<input type="${item == 'EncryptType' || item == 'TotalAmount' || item == 'ExpireDate' ? 'number' : 'text'}" name="${item}" value="${this.payResult[item]}">`;
         }
-        this.ECPay_form += `</form>`;
+        this.ECPay_form += `
+            <div class="message"> 前往付款頁面 </div>
+            <div class="button_row">
+              <div class="button" onclick="document.querySelector('.ECPay_form_container').style.display = 'none'" > 取消 </div> 
+              <div class="button" onclick="document.querySelector('#ECPay_form').submit(); document.querySelector('.ECPay_form_container').style.display = 'none'" > 確認 </div> 
+            </div>
+          </form>
+        `;
 
-        setTimeout(function() {
-          // alert(1)
-          let ECPay_form = document.querySelector('#ECPay_form');
-          // ECPay_form.parentNode.style.opacity = 1;
-          // ECPay_form.parentNode.style.position = 'static';
-          ECPay_form.submit();
-          // alert(2)
-        }, 1000)
+        this.$nextTick(() => {
+          document.querySelector('.ECPay_form_container').style.display = 'block'
+        })
       }
     },
-
     // user
     required_verify(item) {
       if(!item.hasOwnProperty('value')){

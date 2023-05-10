@@ -243,7 +243,7 @@
                   </template>
                 </div>
                 <div class="state_container" v-else-if="item.PayStatus == 2 && item.PayMethod != 'PayOnDelivery'">
-                  <div class="button"  @click="pay_method = item.PayMethod; rePay(item.FilNo, `${protocol}//${api}/shoppingOrder.html`)"> 前往付款 </div>
+                  <div class="button"  @click="pay_method = item.PayMethod; rePay(item.FilNo, `${protocol}//${api}/shoppingOrder.html`)"> 立即付款 </div>
                 </div>
                 <div class="state_container" v-else>
                   <div> {{ payStatus_arr[item.PayStatus] }} </div>
@@ -326,7 +326,7 @@
       </div>
     </div>
 
-    <div class="ECPay_form_container" v-html="ECPay_form"></div>
+    <div class="ECPay_form_container" v-html="ECPay_form" ></div>
 
     <footer>
       <div class="footerContact">

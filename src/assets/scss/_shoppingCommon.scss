@@ -59,12 +59,54 @@ a {
   text-decoration: none;
 }
 
-.ECPay_form_container{
-  position: absolute;
-  top: 0;
-  opacity: 0;
-  z-index: -1;
+.ECPay_form_container {
+  width: 300px;
+  padding: 20px;
+  position: fixed;
+  top: 150px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 10px;
+  box-shadow: 0 0 3px;
+  background-color: #fff;
+
+  display: none;
+
+  input {
+    display: block;
+    width: 0;
+    height: 0;
+  }
+  .message {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+  .button_row {
+    display: flex;
+    justify-content: center;
+
+    .button {
+      height: 30px;
+      line-height: 30px;
+      margin-right: 10px;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
 }
+// test
+// .ECPay_form_container{
+//   height: 500px;
+//   overflow-y: scroll;
+
+//   input {
+//     width: auto;
+//     height: auto;
+//   }
+// }
 
 // ==================================================
 $primary_color: #202d40;
