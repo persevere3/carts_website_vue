@@ -735,10 +735,10 @@ export default {
             } else {
               let phone = location.href.split('phone=')[1] && 
               location.href.split('phone=')[1].split('&')[0];
-              let mail = location.href.split('mail=')[1] && 
-              location.href.split('mail=')[1].split('&')[0];
+              let email = location.href.split('email=')[1] && 
+              location.href.split('email=')[1].split('&')[0];
 
-              if(phone && mail) {
+              if(phone && email) {
                 vm.order_phone = phone;
                 vm.order_mail = mail;
                 vm.getOrder();
@@ -1722,6 +1722,12 @@ export default {
       xhr.send(formData);
       xhr.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
+          if('status' in JSON.parse(xhr.response)) {
+            alert(JSON.parse(xhr.response).msg)
+            if(vm.user_account) vm.getMemberOrder()
+            else vm.getOrder()
+          }
+          else {
           vm.payResult = JSON.parse(xhr.response)
           vm.toPay()
         }
