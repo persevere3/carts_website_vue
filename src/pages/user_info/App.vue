@@ -13,7 +13,7 @@
     > 
       <div class="main" :class="user_info_nav_active" v-if="user_account">
         <div class="logout_container button_row">
-          <template v-if="webVersion === 'demo'"> 
+          <template v-if="webVersion === 'demo'">
             <div class="button" v-if="user_info && user_info.Registermethod == 2" @click="deleteAccount_test" style="margin-right: 5px;"> 刪除Line帳號(測試用) </div>
             <div class="button" v-if="user_info && user_info.Registermethod <= 1 && user_info.ConnectLine" @click="unbindLine_test" style="margin-right: 5px;"> 解除Line綁定(測試用) </div>
           </template>
@@ -311,7 +311,7 @@
                     <!-- PayStatus == 2 (待付款)，PayMethod == 'ATM'，PayType == 1 (公司) -->
                     <div class="state_container" v-else-if="item.PayStatus == 2 && item.PayMethod == 'ATM' && item.PayType == 1">
                       <template v-if="store.SelfAtmStatus == 0">
-                        <div> ATM帳戶關閉，請聯繫賣家 </div>
+                        <div> ATM帳戶關閉，請聯繫我們 </div>
                       </template>
                       <template v-else>
                         <div class="show_bank">
