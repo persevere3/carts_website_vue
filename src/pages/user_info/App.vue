@@ -13,7 +13,7 @@
     > 
       <div class="main" :class="user_info_nav_active" v-if="user_account">
         <div class="logout_container button_row">
-          <template v-if="webVersion === 'demo'">
+          <template v-show="webVersion === 'demo'">
             <div class="button" v-if="user_info && user_info.Registermethod == 2" @click="deleteAccount_test" style="margin-right: 5px;"> 刪除Line帳號(測試用) </div>
             <div class="button" v-if="user_info && user_info.Registermethod <= 1 && user_info.ConnectLine" @click="unbindLine_test" style="margin-right: 5px;"> 解除Line綁定(測試用) </div>
           </template>
