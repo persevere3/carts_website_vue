@@ -703,7 +703,7 @@ export default {
             let RtnMsg = location.href.split('RtnMsg=')[1] &&
             location.href.split('RtnMsg=')[1].split('&')[0];
             if(RtnMsg) {
-              vm.payModal_message = '付款成功';
+              vm.payModal_message = '已收到您的付款';
               vm.is_payModal = true;
             }
 
@@ -804,7 +804,7 @@ export default {
               let RtnMsg = location.href.split('RtnMsg=')[1] && 
               location.href.split('RtnMsg=')[1].split('&')[0];
               if(RtnMsg){
-                vm.payModal_message = '付款成功';
+                vm.payModal_message = '已收到您的付款';
                 vm.is_payModal = true;
               }
 
@@ -870,7 +870,7 @@ export default {
         xhr.onreadystatechange = function() {
           if (this.readyState == 4 && this.status == 200) {
             if(!JSON.parse(xhr.response).status) {
-              if(JSON.parse(xhr.response).msg == '請先登入會員') {
+              if(JSON.parse(xhr.response).msg.indexOf('登入') > -1) {
                 localStorage.removeItem('user_account');
                 vm.getFavorite()
               }
@@ -919,7 +919,7 @@ export default {
           xhr.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
               if(!JSON.parse(xhr.response).status) {
-                if(JSON.parse(xhr.response).msg == '請先登入會員') {
+                if(JSON.parse(xhr.response).msg.indexOf('登入') > -1) {
                   localStorage.removeItem('user_account');
                 }
               }
@@ -941,7 +941,7 @@ export default {
           xhr.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
               if(!JSON.parse(xhr.response).status) {
-                if(JSON.parse(xhr.response).msg == '請先登入會員') {
+                if(JSON.parse(xhr.response).msg.indexOf('登入') > -1) {
                   localStorage.removeItem('user_account');
                 }
               }
@@ -1488,7 +1488,7 @@ export default {
           let orders = JSON.parse(xhr.response).Orders;
           let order_page_number = Math.ceil(JSON.parse(xhr.response).Count / vm.order_page_size)
           if(order_page_number == 0) {
-            vm.payModal_message = '查無訂單資料';
+            vm.payModal_message = '沒有您查詢的訂單資料';
             vm.is_payModal = true;
             vm.filter_number = '';
             vm.filter_pay = '0';
@@ -1501,7 +1501,7 @@ export default {
             vm.noOrder = false
           }
 
-          vm.$nextTick(function(){
+          vm.$nextTick(function() {
             // let max_height = parseInt( getComputedStyle( document.querySelector('.td.products') )['maxHeight']);
             // let uls = document.querySelectorAll('.td.products ul');
             // uls.forEach(function(item, index){
@@ -1557,7 +1557,7 @@ export default {
 
               vm.order_page_number = Math.ceil(data.Count / vm.order_page_size);
               if(vm.order_page_number == 0){
-                vm.payModal_message = '查無訂單資料';
+                vm.payModal_message = '沒有您查詢的訂單資料';
                 vm.is_payModal = true;
                 vm.order = null;
                 return;
@@ -1628,24 +1628,25 @@ export default {
       xhr.send(formData);
       xhr.onreadystatechange = function(){
         if (this.readyState == 4 && this.status == 200) {
-          if(JSON.parse(xhr.response).status){
+          if(JSON.parse(xhr.response).status) {
             let data = JSON.parse(xhr.response).datas[0]
 
             vm.order_page_number = Math.ceil(data.Count / vm.order_page_size);
             if(vm.order_page_number == 0){
-              vm.payModal_message = '沒有購物金紀錄';
+              vm.payModal_message = '沒有您的購物金紀錄';
               vm.is_payModal = true;
               vm.bonus = null;
               return;
             }
-
-            vm.total_bonus = data.Total;
-            vm.bonus = data.Bonuses;
-            vm.bonus.forEach((item) => {
-              if(item.Type.indexOf('使用點數') > -1){
-                item.FeedBack = -item.FeedBack;
-              }
-            })
+            else {
+              vm.total_bonus = data.Total;
+              vm.bonus = data.Bonuses;
+              vm.bonus.forEach((item) => {
+                if(item.Type.indexOf('使用點數') > -1){
+                  item.FeedBack = -item.FeedBack;
+                }
+              })
+            }
           } else {
             vm.payModal_message = JSON.parse(xhr.response).msg;
             vm.check_logout();
@@ -1690,9 +1691,9 @@ export default {
       xhr.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
           if(JSON.parse(xhr.response).status){
-            vm.payModal_message = '確認付款已送出';
+            vm.payModal_message = '帳號末6碼已送出，確認您的付款中';
           } else {
-            vm.payModal_message = '確認付款失敗';
+            vm.payModal_message = '抱歉，請重新輸入帳號末6碼';
           }
           vm.is_payModal = true;
 
@@ -1728,8 +1729,9 @@ export default {
             else vm.getOrder()
           }
           else {
-          vm.payResult = JSON.parse(xhr.response)
-          vm.toPay()
+            vm.payResult = JSON.parse(xhr.response)
+            vm.toPay()
+          }
         }
       }
     },
@@ -1843,7 +1845,7 @@ export default {
         return true;
       }
     },
-    send_verify_code(){
+    send_verify_code() {
       if(this.second > 0) return
 
       if(this.store.NotificationSystem == 0) {
@@ -1953,9 +1955,6 @@ export default {
       xhr.send(formData);
       xhr.onreadystatechange = function(){
         if (this.readyState == 4 && this.status == 200) {
-          vm.user_message = JSON.parse(xhr.response).msg
-          vm.is_userMessage = true;
-          
           if(JSON.parse(xhr.response).status){
             vm.l_account.value = vm.r_account.value;
             vm.l_password.value = vm.r_password.value;
@@ -1994,7 +1993,7 @@ export default {
             vm.urlPush(vm.getPathname('info'));
           }
           else {
-            vm.user_message = JSON.parse(xhr.response).msg
+            vm.user_message = '請確認您的帳號密碼後重新登入'
             vm.is_userMessage = true;
           }
         }
