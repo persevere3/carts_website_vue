@@ -1,9 +1,9 @@
-// uniqm.com, uniqm.net
-let webVersion = 'common'
+// common, demo, uniqm.com, uniqm.net
+let webVersion = 'uniqm.com'
 
 module.exports = {
   publicPath: process.env.NODE_ENV === 'production' ? './' : '/',
-  pages: webVersion === 'common'
+  pages: webVersion === 'common' || webVersion === 'demo'
     ? {
       index : {
         entry: 'src/pages/index/main.js', // page 的入口

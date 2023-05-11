@@ -455,7 +455,7 @@ export default {
       noOrder: false, 
 
       // 
-      webVersion: 'common',
+      webVersion: 'uniqm.com',
     }
   },
   computed:{
@@ -2653,21 +2653,25 @@ export default {
       let pageObj = {
         index: {
           'common': '/',
+          'demo': '/',
           'uniqm.com': '/',
           'uniqm.net': '/',
         },
         order: {
           'common': '/order.html',
+          'demo': '/order.html',
           'uniqm.com': '/shoppingOrder.html',
           'uniqm.net': '',
         },
         user: {
           'common': '/user.html',
+          'demo': '/user.html',
           'uniqm.com': '/shoppingUser.html',
           'uniqm.net': '',
         },
         info: {
-          'common': '/info.html',
+          'common': '/user_info.html',
+          'demo': '/user_info.html',
           'uniqm.com': '/shoppingInfo.html',
           'uniqm.net': '',
         },
