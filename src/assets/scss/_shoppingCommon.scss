@@ -74,8 +74,8 @@ a {
 
   input {
     display: block;
-    width: 0;
-    height: 0;
+    width: 0 !important;
+    height: 0 !important;
   }
   .message {
     text-align: center;
@@ -103,8 +103,8 @@ a {
 //   overflow-y: scroll;
 
 //   input {
-//     width: auto;
-//     height: auto;
+//     width: auto !important;
+//     height: auto !important;
 //   }
 // }
 
