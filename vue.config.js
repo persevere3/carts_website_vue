@@ -1,5 +1,5 @@
 // common, demo, uniqm.com, uniqm.net
-let webVersion = 'uniqm.com'
+let webVersion = 'demo'
 
 module.exports = {
   publicPath: process.env.NODE_ENV === 'production' ? './' : '/',

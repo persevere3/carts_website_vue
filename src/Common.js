@@ -455,7 +455,7 @@ export default {
       noOrder: false, 
 
       // 
-      webVersion: 'uniqm.com',
+      webVersion: 'demo',
     }
   },
   computed:{
@@ -740,7 +740,7 @@ export default {
 
               if(phone && email) {
                 vm.order_phone = phone;
-                vm.order_mail = mail;
+                vm.order_mail = email;
                 vm.getOrder();
               }
             }
