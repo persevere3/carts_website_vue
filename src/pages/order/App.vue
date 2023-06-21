@@ -110,7 +110,8 @@
                 <div class="td payState">
                   <div class="l_head"> 付款狀態 </div>
                   <!-- 付款方式 -->
-                  <div v-if="item.PayMethod" class="payMethod"> {{payMethod_obj[item.PayMethod]}} </div>
+                  <div v-if="item.PayStatus === '5'" class="payMethod"> {{payMethod_obj['MartPayOnDelivery']}} </div>
+                  <div v-else-if="item.PayMethod" class="payMethod"> {{payMethod_obj[item.PayMethod]}} </div>
                   
                   <!-- 付款狀態 -->
                   <div class="state_container" v-if="item.Delivery == 3 || item.Delivery == 4">

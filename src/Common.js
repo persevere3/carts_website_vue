@@ -72,7 +72,7 @@ export default {
       product_active: '',
 
       payStatus_arr: [
-        '', '付款成功', '尚未付款', '已退款', '待對帳'
+        '', '付款成功', '尚未付款', '已退款', '待對帳', '尚未付款'
       ],
       delivery_arr: [
         '', '已出貨', '準備中', '已退貨', '已取消', '已自取'
@@ -84,6 +84,7 @@ export default {
         'PayBarCode':'超商條碼',
         'PayOnDelivery':'取貨付款',
         'LinePay':'LinePay',
+        'MartPayOnDelivery': '超商取貨付款'
       },
 
       order_page_number: 0,
