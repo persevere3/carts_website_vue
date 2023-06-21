@@ -2207,6 +2207,7 @@ export default {
               vm.total_bonus = vm.user_info.Wallet * 1
 
               let result_arr = [];
+              vm.user_info.Adress = decodeURI(vm.user_info.Adress)
               let address_arr = vm.user_info.Adress.split('_#_');
               address_arr.length = address_arr.length - 1;
               for(let address of address_arr){
