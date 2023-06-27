@@ -145,6 +145,15 @@
                 </div>
                 <div class="delete" @click="delete_address(item.id)"> <i class="fas fa-trash-alt"></i> </div>
               </div>
+
+              <div class="input_container">
+                <div class="title border"> 手機條碼載具 </div>
+                <input type='text' v-model='phone_barCode'>
+              </div>
+              <div class="input_container">
+                <div class="title border"> 自然人憑證載具 </div>
+                <input type='text' v-model='natural_barCode'>
+              </div>
             </div>
 
             <div class="button_row">
@@ -224,7 +233,7 @@
                   <label> 付款狀態 </label>
                   <select v-model="filter_pay">
                     <option value="0"> === 付款狀態 === </option>
-                    <option :value="index" v-for="(item, index) in payStatus_arr" :key="index" v-show="index != 0"> {{ item }} </option>
+                    <option :value="index" v-for="(item, index) in payStatus_arr" :key="index" v-show="index != 0 && index != 5"> {{ item }} </option>
                   </select>
                 </div>
 
@@ -302,8 +311,17 @@
                   <div class="td payState">
                     <div class="l_head"> 付款狀態 </div>
                     <!-- 付款方式 -->
-                    <div v-if="item.PayStatus === '5'" class="payMethod"> {{payMethod_obj['MartPayOnDelivery']}} </div>
-                    <div v-else-if="item.PayMethod" class="payMethod"> {{payMethod_obj[item.PayMethod]}} </div>
+                    <template v-if="item.Mart" > 
+                      <div v-if="item.Mart.indexOf('Delivery') < 0" class="payMethod">
+                        <div> {{ payMethod_obj['MartOnDelivery'] }} </div>
+                        <div> {{ payMethod_obj[item.PayMethod] }} </div>
+                      </div>
+                      <div v-else class="payMethod"> {{payMethod_obj['MartPayOnDelivery']}} </div>
+                    </template>
+                    <template v-else>
+                      <div class="payMethod"> {{ payMethod_obj[item.PayMethod] }} </div>
+                    </template>
+
 
                     <!-- 付款狀態 -->
                     <div class="state_container" v-if="item.Delivery == 3 || item.Delivery == 4">
@@ -336,7 +354,10 @@
                   </div>
                   <div class="td transportState">
                     <div class="l_head"> 運送狀態 </div>
-                    {{delivery_arr[item.Delivery]}}
+                    <div class="text">  
+                      <span> {{delivery_arr[item.Delivery]}} </span>
+                      <span class="search" v-if="item.Mart" @click="activeOrder = item"> 查詢 </span>
+                    </div>
                     <template v-if="item.CancelTime && (item.Delivery == 3 || item.Delivery == 4)">
                       <div> {{ item.CancelTime.split(' ')[0] }} </div>
                       <div> {{ item.CancelTime.split(' ')[1] }} </div>
@@ -353,6 +374,21 @@
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div class="martDeliveryModal" v-if="activeOrder">
+              <div class='number_container'>
+                <div class="number_title"> 包裹查詢號碼 </div>
+                <input type='text' id='number_input' readonly v-model='activeOrder.FilNo'>
+                <div class='copy' @click="copy(activeOrder.FilNo, 'number_input')"> 
+                  <i class='fas fa-copy'></i>
+                </div>
+              </div>
+              
+              <div class="message"> iv.	包裹已配達買家取件門市 – 台醫門市 </div>
+              <div class="time"> 12.12.12 12.12.12 </div>
+
+              <div class="button close" @click="activeOrder = null"> 確認 </div>
             </div>
 
             <div class="page_container">

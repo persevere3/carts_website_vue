@@ -82,10 +82,13 @@ export default {
         'ATM':'ATM',
         'PayCode':'超商代碼',
         'PayBarCode':'超商條碼',
-        'PayOnDelivery':'取貨付款',
+        'PayOnDelivery':'宅配取貨付款',
         'LinePay':'LinePay',
-        'MartPayOnDelivery': '超商取貨付款'
+        'MartPayOnDelivery': '超商取貨付款',
+        'MartOnDelivery': '超商取貨不付款'
       },
+
+      activeOrder: null,
 
       order_page_number: 0,
       order_page_index: 1,
@@ -251,6 +254,9 @@ export default {
       r_password_type: 'password',
       r_confirm_password_type: 'password',
       r_is_agree: false,
+
+      phone_barCode: '',
+      natural_barCode: '',
 
       l_account: {
         value: '',
@@ -2206,6 +2212,9 @@ export default {
               vm.r_recommender.value = vm.user_info.Recommender
               vm.total_bonus = vm.user_info.Wallet * 1
 
+              vm.phone_barCode = vm.user_info.PhoneCode
+              vm.natural_barCode = vm.user_info.NatureCode
+
               let result_arr = [];
               vm.user_info.Adress = decodeURI(vm.user_info.Adress)
               let address_arr = vm.user_info.Adress.split('_#_');
@@ -2307,6 +2316,9 @@ export default {
         address_str += `${item.id}_ _${item.city}_ _${item.district}_ _${item.detail}_#_`
       }
       formData.append("address", address_str);
+
+      formData.append("savePhoneCode", this.phone_barCode ? this.phone_barCode : '');
+      formData.append("saveNatureCode", this.natural_barCode ? this.natural_barCode : '');
 
       let xhr = new XMLHttpRequest();
       xhr.withCredentials = true;
