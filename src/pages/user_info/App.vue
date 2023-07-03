@@ -356,7 +356,7 @@
                     <div class="l_head"> 運送狀態 </div>
                     <div class="text">  
                       <span> {{delivery_arr[item.Delivery]}} </span>
-                      <span class="search" v-if="item.Mart" @click="activeOrder = item"> 查詢 </span>
+                      <span class="search" v-if="item.Mart && item.Delivery === '1'" @click="searchMartDelivery(item)"> 查詢 </span>
                     </div>
                     <template v-if="item.CancelTime && (item.Delivery == 3 || item.Delivery == 4)">
                       <div> {{ item.CancelTime.split(' ')[0] }} </div>
@@ -378,15 +378,15 @@
 
             <div class="martDeliveryModal" v-if="activeOrder">
               <div class='number_container'>
-                <div class="number_title"> 包裹查詢號碼 </div>
-                <input type='text' id='number_input' readonly v-model='activeOrder.FilNo'>
-                <div class='copy' @click="copy(activeOrder.FilNo, 'number_input')"> 
+                <div class="number_title"> {{ martObj[activeOrder.Mart.replace('C2C', '').replace('Delivery', '')] }} 包裹查詢號碼 </div>
+                <input type='text' id='number_input' readonly v-model='activeOrder.deliveryNumber'>
+                <div class='copy' @click="copy(activeOrder.deliveryNumber, 'number_input')"> 
                   <i class='fas fa-copy'></i>
                 </div>
               </div>
               
-              <div class="message"> iv.	包裹已配達買家取件門市 – 台醫門市 </div>
-              <div class="time"> 12.12.12 12.12.12 </div>
+              <div class="message"> {{ activeOrder.deliveryMsg }} </div>
+              <div class="time">  </div>
 
               <div class="button close" @click="activeOrder = null"> 確認 </div>
             </div>

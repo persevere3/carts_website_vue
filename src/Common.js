@@ -88,6 +88,13 @@ export default {
         'MartOnDelivery': '超商取貨不付款'
       },
 
+      martObj: {
+        'UNIMART': '7-11',
+        'FAMI': '全家',
+        'HILIFE': '萊爾富',
+        'OKMART': 'OK超商'
+      },
+
       activeOrder: null,
 
       order_page_number: 0,
@@ -2744,6 +2751,38 @@ export default {
           if(JSON.parse(xhr.response).status) {
             vm.logout();
           }
+        }
+      }
+    },
+
+    //
+    searchMartDelivery(item) {
+      let vm = this;
+
+      let MerchantTradeNo = item.FilNo
+      let LogisticsSubType = item.Mart.replace('Delivery', '')
+      let formData = new FormData();
+      formData.append("Site", vm.site.Site);
+      formData.append("Store", vm.site.Name);
+
+      formData.append("MerchantTradeNo", MerchantTradeNo);
+      formData.append("LogisticsSubType", LogisticsSubType);
+
+      let xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+      xhr.open('post',`${vm.protocol}//${vm.api}/interface/store/QueryLogisticsInfo`, true);
+      xhr.send(formData);
+      xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          // let deliveryMsg = JSON.parse(xhr.response)
+          let martName = decodeURI(item.Address).split(' - ')[1]
+          console.log(martName)
+          let deliveryMsg = xhr.response.split('|')[0]
+          let deliveryNumber = xhr.response.split('|')[1]
+          if(deliveryMsg.indexOf('已配達') > -1) deliveryMsg += ` - ${martName}`
+          item.deliveryMsg = deliveryMsg
+          item.deliveryNumber = deliveryNumber
+          vm.activeOrder = item
         }
       }
     }

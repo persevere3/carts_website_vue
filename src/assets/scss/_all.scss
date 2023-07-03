@@ -313,7 +313,6 @@ $primary_color: #4db38e;
 }
 
 .martDeliveryModal {
-  max-width: 95%;
   padding: 20px 40px;
   position: fixed;
   top: 50%;
@@ -343,7 +342,8 @@ $primary_color: #4db38e;
   }
 
   input {
-    width: 150px;
+    width: 130px !important;
+    padding: 0 10px !important;
     height: 35px;
     line-height: 35px;
     font-size: 16px;
