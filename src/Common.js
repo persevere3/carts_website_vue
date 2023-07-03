@@ -130,6 +130,12 @@ export default {
           required: {
             message: '此項目為必填'
           },
+          name: {
+            message: '此項目請輸入全中文或全英文'
+          },
+          nameLength: {
+            message: '此項目中文長度最長為5，英文長度最長為10'
+          },
         },
         is_error: false,
         message: '',
@@ -1807,6 +1813,44 @@ export default {
           item.message = '';
           return true;
         }
+      }
+    },
+    name_verify(item) {
+      let regExp = /^[\u4e00-\u9fa5]+$|^[a-zA-Z]+$/
+      if(!regExp.test(item.value)) {
+        item.is_error = true;
+        item.message = item.rules.name.message;
+        return false;
+      }
+      else {
+        item.is_error = false;
+        item.message = '';
+        return true;
+      }
+    },
+    nameLength_verify(item) {
+      let chineseRegExp = /^[\u4e00-\u9fa5]+$/
+      let englishRegExp = /^[a-zA-Z]+$/
+      let is_error = false
+      if(chineseRegExp.test(item.value)) {
+        if(item.value.length > 5) {
+          is_error = true
+        }
+      } else if(englishRegExp.test(item.value)) {
+        if(item.value.length > 10) {
+          is_error = true
+        }
+      }
+
+      if(is_error) {
+        item.is_error = true;
+        item.message = item.rules.nameLength.message;
+        return false;
+      }
+      else {
+        item.is_error = false;
+        item.message = '';
+        return true;
       }
     },
     cellphone_verify(item) {
