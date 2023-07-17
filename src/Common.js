@@ -74,8 +74,8 @@ export default {
       payStatus_arr: [
         '', '付款成功', '尚未付款', '已退款', '待對帳', '尚未付款'
       ],
-      delivery_arr: [
-        '', '已出貨', '準備中', '已退貨', '已取消', '已自取'
+      delivery_arr: [     
+        '', '已出貨', '準備中', '已退貨', '已取消', '已自取', '已送達', '已取貨'
       ],
       payMethod_obj: {
         'CreditCard':'信用卡',
@@ -90,6 +90,7 @@ export default {
 
       martObj: {
         'UNIMART': '7-11',
+        'UNIMARTFREEZE': '7-11 冷凍',
         'FAMI': '全家',
         'HILIFE': '萊爾富',
         'OKMART': 'OK超商'
@@ -131,10 +132,10 @@ export default {
             message: '此項目為必填'
           },
           name: {
-            message: '此項目請輸入全中文或全英文'
+            message: '請輸入全中文或全英文'
           },
           nameLength: {
-            message: '此項目中文長度最長為5，英文長度最長為10'
+            message: '中文長度請介於2~5，英文長度請介於4~10'
           },
         },
         is_error: false,
@@ -792,6 +793,10 @@ export default {
 
           // user_info
           if (pathname === '/user_info.html' || pathname === '/shoppingInfo.html') {
+            // 
+            delete vm.r_mail.rules['required']
+            delete vm.r_phone2.rules['required']
+
             // 沒有開啟會員功能
             if(!(vm.site.MemberFuction * 1)) {
               vm.urlPush(vm.getPathname('index'));
@@ -1763,8 +1768,7 @@ export default {
       }
       // ecpay
       else {
-        if(this.api.indexOf('demo') > -1) {
-          // target="_blank"
+        if(this.webVersion === 'demo') {
           this.ECPay_form = `<form id="ECPay_form" action="https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5" method="post">`
         } else {
           this.ECPay_form = `<form id="ECPay_form" action="https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5" method="post">`
@@ -1833,11 +1837,11 @@ export default {
       let englishRegExp = /^[a-zA-Z]+$/
       let is_error = false
       if(chineseRegExp.test(item.value)) {
-        if(item.value.length > 5) {
+        if(item.value.length > 5 || item.value.length < 2) {
           is_error = true
         }
       } else if(englishRegExp.test(item.value)) {
-        if(item.value.length > 10) {
+        if(item.value.length > 10 || item.value.length < 4) {
           is_error = true
         }
       }
@@ -1855,7 +1859,7 @@ export default {
     },
     cellphone_verify(item) {
       let rep = /^(09)[0-9]{8}$/;
-      if (!rep.test(item.value)) {
+      if (item.value && !rep.test(item.value)) {
         item.is_error = true;
         item.message = item.rules.cellphone.message;
         return false;
@@ -1880,7 +1884,7 @@ export default {
     },
     mail_verify(item) {
       let rep = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
-      if (!rep.test(item.value)) {
+      if (item.value && !rep.test(item.value)) {
         item.is_error = true;
         item.message = item.rules.mail.message;
         return false;
@@ -2251,6 +2255,9 @@ export default {
           if (this.readyState == 4 && this.status == 200) {
             if(JSON.parse(xhr.response).status) {
               vm.user_info = JSON.parse(xhr.response).datas[0][0];
+              vm.user_info.ThreeLinkCode = vm.user_info.ThreeLinkCode || ''
+              vm.user_info.invoice_title = vm.user_info.ThreeLinkCode.split('|')[0] || ''
+              vm.user_info.invoice_uniNumber = vm.user_info.ThreeLinkCode.split('|')[1] || ''
 
               vm.login_handle_carts();
 
@@ -2327,25 +2334,26 @@ export default {
       }
     },
     edit_info() {
-      let arr = this.delivery_address
-      for(let i = arr.length - 1; i > 0; i --) {
+      let address_arr = this.delivery_address
+      for(let i = address_arr.length - 1; i > 0; i --) {
         for( let j = 0; j < i; j++) {
-          if(arr[j].city == arr[i].city && arr[j].district == arr[i].district && arr[j].detail == arr[i].detail){
-            arr.splice(i, 1);
+          if(address_arr[j].city == address_arr[i].city && address_arr[j].district == address_arr[i].district && address_arr[j].detail == address_arr[i].detail){
+            address_arr.splice(i, 1);
             break;
           }
         }
       }
 
-      if(this.store.NotificationSystem == 1 || this.store.NotificationSystem == 2) {
-        if (!this.verify(this.verify_code)) {
-          return
-        }
-      }
-      if (!this.verify(this.r_name, this.r_mail, this.r_birthday, this.r_phone2, ...arr)) {
-        return
-      }
+      // 手機驗證
+      // if(this.store.NotificationSystem == 1 || this.store.NotificationSystem == 2) {
+      //   if (!this.verify(this.verify_code)) {
+      //     return
+      //   }
+      // }
 
+      if (!this.verify(this.r_name, this.r_birthday, ...address_arr)) return
+      if(!this.verify(this.r_mail, this.r_phone2)) return
+         
       let vm = this;
 
       let formData = new FormData();
@@ -2363,13 +2371,15 @@ export default {
       formData.append("gender", this.sex == 'male' ? 1 : 0 );
       formData.append("email", this.r_mail.value);
       let address_str = '';
-      for(let item of arr){
+      for(let item of address_arr){
         address_str += `${item.id}_ _${item.city}_ _${item.district}_ _${item.detail}_#_`
       }
       formData.append("address", address_str);
 
       formData.append("savePhoneCode", this.phone_barCode ? this.phone_barCode : '');
       formData.append("saveNatureCode", this.natural_barCode ? this.natural_barCode : '');
+
+      formData.append("threeLinkCode", `${this.user_info.invoice_title}|${this.user_info.invoice_uniNumber}`);
 
       let xhr = new XMLHttpRequest();
       xhr.withCredentials = true;
@@ -2565,7 +2575,6 @@ export default {
     // },
 
     // Line
-    // https://demo.uniqcarttest.tk/?code=cYECgbvDcN1egeR6UyPk&state=login
     LineLogin(isRegister) {
       this.urlPush(`${location.origin}/interface/webmember/LineLoginAuthorize?storeid=${this.site.Name}&site=${this.site.Site}${isRegister ? `&recommender=${this.r_recommender.value}&method=Register` : ''}`)
     },
@@ -2752,7 +2761,7 @@ export default {
 
     //
     bindLine() {
-      this.urlPush(`${location.origin}/interface/webmember/LineLoginAuthorize?storeid=${this.site.Name}&site=${this.site.Site}&phone=${this.user_account}`)
+      this.urlPush(`${location.origin}/interface/webmember/LineLoginAuthorize?storeid=${this.site.Name}&site=${this.site.Site}&phone=${this.user_account}&method=LineRegister`)
     },
     unbindLine_test() {
       let vm = this
@@ -2825,7 +2834,7 @@ export default {
           let deliveryNumber = xhr.response.split('|')[1]
           if(deliveryMsg.indexOf('已配達') > -1) deliveryMsg += ` - ${martName}`
           item.deliveryMsg = deliveryMsg
-          item.deliveryNumber = deliveryNumber
+          if(deliveryNumber) item.deliveryNumber = deliveryNumber
           vm.activeOrder = item
         }
       }

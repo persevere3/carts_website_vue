@@ -122,7 +122,7 @@
 
     <div class="main" :class="user_info_nav_active" v-if="user_account">
       <div class="logout_container button_row">
-        <template v-if="webVersion === 'demo' && false"> 
+        <template v-if="webVersion === 'demo'"> 
           <div class="button" v-if="user_info && user_info.Registermethod == 2" @click="deleteAccount_test" style="margin-right: 5px;"> 刪除Line帳號(測試用) </div>
           <div class="button" v-if="user_info && user_info.Registermethod <= 1 && user_info.ConnectLine" @click="unbindLine_test" style="margin-right: 5px;"> 解除Line綁定(測試用) </div>
         </template>
@@ -155,13 +155,20 @@
                 <i class="error_icon fas fa-exclamation-circle"></i> {{ r_name.message }}
               </div>
             </div>
+
             <div class="input_container" :class="{ error: r_mail.is_error }">
               <div class="title"> 電子信箱 </div>
-              <input type="text" :readonly="!!user_info.Email" placeholder="* 請輸入電子信箱" v-model.trim="r_mail.value" @input="r_mail.value = $event.target.value">
+              <input type="text" placeholder="請輸入電子信箱"
+                :readonly="!!user_info.Email"
+                v-model.trim="r_mail.value"
+                @blur="verify(r_mail)"
+              >
               <div class="error message">
-                <i class="error_icon fas fa-exclamation-circle"></i> {{ r_mail.message }}
+                <i class="error_icon fas fa-exclamation-circle"></i> 
+                {{ r_mail.message }}
               </div>
             </div>
+
             <div class="input_container" :class="{ error: r_birthday.is_error }" v-if="!!user_info.Birthday">
               <div class="title"> 生日 </div>
               <input type="text" readonly v-model.trim="birthday" @input="birthday.value = $event.target.value">
@@ -195,15 +202,32 @@
 
             <div class="input_container" :class="{ error: r_phone2.is_error }">
               <div class="title"> 手機 </div>
-              <input type="number" placeholder="* 請輸入手機" :readonly="!!user_info.Phone2" v-model.trim="r_phone2.value" @input="!!user_info.Phone2 ? r_phone2.value = $event.target.value : verify(r_phone2)">
+              <input type="number" placeholder="請輸入手機" 
+                :readonly="!!user_info.Phone2" 
+                v-model.trim="r_phone2.value"
+                @blur="verify(r_phone2)"
+              >
+              <div class="error message">
+                <i class="error_icon fas fa-exclamation-circle"></i> 
+                {{ r_phone2.message }}
+              </div>
             </div>
-            <template v-if="!user_info.Phone2 && (store.NotificationSystem == 1 || store.NotificationSystem == 2)">
+            <!-- 手機驗證碼 -->
+            <!-- <template v-if="!user_info.Phone2">
               <div class="input_container" :class="{ error: r_verify_code.is_error }">
                 <div class="title"> 手機驗證碼 </div>
-                <input type="text" placeholder="* 請輸入手機驗證碼" v-model.trim="r_verify_code.value" @blur="verify(r_verify_code)"> 
+                <input type="text" placeholder="* 請輸入手機驗證碼" 
+                  v-model.trim="r_verify_code.value" 
+                  @blur="verify(r_verify_code)"
+                >
               </div>
-              <div class="button" style="margin-bottom: 20px;" @click="send_verify_code"> 獲取驗證碼 <span v-if="second > 0"> ( {{second}}s ) </span> </div>
-            </template>
+              <div class="button" style="margin-bottom: 20px;" 
+                @click="send_verify_code"
+              >
+                獲取驗證碼 
+                <span v-if="second > 0"> ( {{second}}s ) </span> 
+              </div>
+            </template> -->
 
             <div class="password_container" v-if="user_info.Registermethod != 2">
               <div class="title"> 密碼 </div>
@@ -261,6 +285,15 @@
             <div class="input_container">
               <div class="title border"> 自然人憑證載具 </div>
               <input type='text' v-model='natural_barCode'>
+            </div>
+
+            <div class="input_container">
+              <div class="title border"> 公司抬頭 </div>
+              <input type='text' v-model='user_info.invoice_title'>
+            </div>
+            <div class="input_container">
+              <div class="title border"> 統一編號 </div>
+              <input type='text' v-model='user_info.invoice_uniNumber'>
             </div>
           </div>
 
@@ -463,7 +496,7 @@
                   <div class="l_head"> 運送狀態 </div>
                   <div class="text">  
                     <span> {{delivery_arr[item.Delivery]}} </span>
-                    <span class="search" v-if="item.Mart && item.Delivery === '1'" @click="searchMartDelivery(item)"> 查詢 </span>
+                    <span class="search" v-if="item.Mart && (item.Delivery === '1' || item.Delivery === '6')" @click="searchMartDelivery(item)"> 查詢 </span>
                   </div>
                   <template v-if="item.CancelTime && (item.Delivery == 3 || item.Delivery == 4)">
                     <div> {{ item.CancelTime.split(' ')[0] }} </div>
@@ -484,7 +517,7 @@
           </div>
 
           <div class="martDeliveryModal" v-if="activeOrder">
-            <div class='number_container'>
+            <div class='number_container' v-if="activeOrder.deliveryNumber">
               <div class="number_title"> {{ martObj[activeOrder.Mart.replace('C2C', '').replace('Delivery', '')] }} 包裹查詢號碼 </div>
               <input type='text' id='number_input' readonly v-model='activeOrder.deliveryNumber'>
               <div class='copy' @click="copy(activeOrder.deliveryNumber, 'number_input')"> 

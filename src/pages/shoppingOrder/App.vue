@@ -263,7 +263,7 @@
                 <div class="l_head"> 運送狀態 </div>
                 <div class="text">  
                   <span> {{delivery_arr[item.Delivery]}} </span>
-                  <span class="search" v-if="item.Mart && item.Delivery === '1'" @click="searchMartDelivery(item)"> 查詢 </span>
+                  <span class="search" v-if="item.Mart && (item.Delivery === '1' || item.Delivery === '6')" @click="searchMartDelivery(item)"> 查詢 </span>
                 </div>
                 <template v-if="item.CancelTime && (item.Delivery == 3 || item.Delivery == 4)">
                   <div> {{ item.CancelTime.split(' ')[0] }} </div>
@@ -284,7 +284,7 @@
         </div>
 
         <div class="martDeliveryModal" v-if="activeOrder">
-          <div class='number_container'>
+          <div class='number_container' v-if="activeOrder.deliveryNumber">
             <div class="number_title"> {{ martObj[activeOrder.Mart.replace('C2C', '').replace('Delivery', '')] }} 包裹查詢號碼 </div>
             <input type='text' id='number_input' readonly v-model='activeOrder.deliveryNumber'>
             <div class='copy' @click="copy(activeOrder.deliveryNumber, 'number_input')"> 
