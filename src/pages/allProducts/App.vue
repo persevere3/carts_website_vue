@@ -48,8 +48,15 @@
                   </div>
                   <div class="info">
                     <div class="name"> {{item2.Name}} </div>
-                    <div class="discount_price"> NT${{numberThousands(item2.NowPrice)}} </div>
-                    <div class="origin_price" v-if="parseInt(item2.Price) > -1"> NT${{numberThousands(item2.Price)}} </div>
+                    <!-- 多價格 -->
+                    <template v-if="item2.PriceType === 'onePrice'">
+                      <div class="discount_price"> NT${{numberThousands(item2.NowPrice)}} </div>
+                      <div class="origin_price" v-if="parseInt(item2.Price) > -1"> NT${{numberThousands(item2.Price)}} </div>
+                    </template>
+                    <!-- <template v-else>
+                      <div class="discount_price"> NT${{ item2.nowPriceRange }} </div>
+                      <div class="origin_price" v-if="item2.priceRange"> NT${{ item2.priceRange }} </div>
+                    </template> -->
                   </div>
                   <div class="l_addTo_cart_btn">
                     <i class="fa fa-shopping-cart" aria-hidden="true"></i>

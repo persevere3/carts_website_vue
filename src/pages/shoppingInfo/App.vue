@@ -11,7 +11,10 @@
                 <div class="name"> {{ item.Name }}({{spec.Name}}) </div>
               </div>
               <div class="price_and_delete">
-                <div class="price"> NT${{numberThousands(item.NowPrice)}} x {{spec.buyQty}}  </div>
+                <!-- 多價格 -->
+                <div class="price" v-if="item.PriceType === 'onePrice'"> NT${{numberThousands(item.NowPrice)}} x {{spec.buyQty}}  </div>
+                <!-- <div class="price" v-else> NT${{numberThousands(spec.ItemNowPrice)}} x {{spec.buyQty}}  </div> -->
+
                 <div class="delete" @click.stop="delete_carts_item(item.ID, spec.ID)">
                   <i class="fas fa-trash-alt"></i>
                 </div>
@@ -42,7 +45,10 @@
                     <div class="name"> 加價購 {{ item2.Name }}({{spec2.Name}}) </div>
                   </div>
                   <div class="price_and_delete">
-                    <div class="price"> NT${{numberThousands(item2.Price)}} x {{spec2.buyQty}}  </div>
+                    <!-- 多價格 -->
+                    <div class="price" v-if="item2.PriceType === 'onePrice'"> NT${{numberThousands(item2.Price)}} x {{spec2.buyQty}}  </div>
+                    <!-- <div class="price" v-else> NT${{numberThousands(spec2.ItemPrice)}} x {{spec2.buyQty}}  </div> -->
+
                     <!-- <div class="delete" @click.stop="spec2.buyQty = 0">
                       <i class="fas fa-trash-alt"></i>
                     </div> -->
@@ -81,7 +87,10 @@
               <div class="name"> {{ item.Name }} </div>
             </div>
             <div class="price_and_delete">
-              <div class="price"> NT${{numberThousands(item.NowPrice)}} </div>
+              <!-- 多價格 -->
+              <div class="price" v-if="item.PriceType === 'onePrice'"> NT${{numberThousands(item.NowPrice)}} </div>
+              <!-- <div class="price" v-else> NT${{ item.nowPriceRange }} </div> -->
+
               <div class="delete" @click.stop="toggleFavorite(item.ID)">
                 <i class="fas fa-trash-alt"></i>
               </div>
@@ -424,9 +433,18 @@
                   :class="{active : product_active == item.FilNo, expandable : item.expandable }"
                   @click="product_active == item.FilNo ? product_active = '' : product_active = item.FilNo">
                   <ul>
+                    
                     <li v-for="(item2, index) in item.Items" :key="index" v-show="product_active == item.FilNo || index < 4">
                       {{item2.ProductType == 2 ? '加價購' : ''}} {{item2.Name}}{{item2.Spec ? `(${item2.Spec})` : ''}}
+                      
+                      <!-- 多價格 ??? -->
                       NT${{numberThousands(item2.Price)}} x {{item2.Amount}}
+                      <!-- <template v-if="item2.PriceType === 'onePrice'">  
+                        NT${{numberThousands(item2.Price)}} x {{item2.Amount}}
+                      </template>
+                      <template v-else> 
+                        NT${{numberThousands(item2.Price)}} x {{item2.Amount}}
+                      </template> -->
                     </li>
                   </ul>
                   <template v-if="item.expandable">

@@ -84,7 +84,16 @@
                 <div class="td products" :class="{active : product_active == item.FilNo, expandable : item.expandable }" @click="product_active == item.FilNo ? product_active = '' : product_active = item.FilNo">
                   <ul>
                     <li v-for="(item2, index) in item.Items" :key="index" v-show="product_active == item.FilNo || index < 4">
-                      {{item2.ProductType == 2 ? '加價購' : ''}} {{item2.Name}}{{item2.Spec ? `(${item2.Spec})` : ''}} NT${{numberThousands(item2.Price)}} x {{item2.Amount}}
+                      {{item2.ProductType == 2 ? '加價購' : ''}} {{item2.Name}}{{item2.Spec ? `(${item2.Spec})` : ''}} 
+                      
+                      <!-- 多價格 ??? -->
+                      NT${{numberThousands(item2.Price)}} x {{item2.Amount}}
+                      <!-- <template v-if="item2.PriceType === 'onePrice'">  
+                        NT${{numberThousands(item2.Price)}} x {{item2.Amount}}
+                      </template>
+                      <template v-else> 
+                        NT${{numberThousands(item2.Price)}} x {{item2.Amount}}
+                      </template> -->
                     </li>
                   </ul>
                   <template v-if="item.expandable">
