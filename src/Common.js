@@ -1010,6 +1010,7 @@ export default {
           // }
 
           vm.all = JSON.parse(xhr.response);
+          vm.multiPriceHandler(vm.all.data);
           vm.totalpage_num = Math.ceil(vm.all.data.length / vm.perpage_num);
           
           // webcategory, websubcategory => navbar
@@ -1089,6 +1090,16 @@ export default {
         }
       }
     },
+
+    multiPriceHandler(data) {
+      data.forEach(item => {
+        if(item.PriceType === 'multiPrice') {
+          item.priceRange = `${this.numberThousands(item.MinPrice)} - ${this.numberThousands(item.MaxPrice)}`
+          item.nowPriceRange = `${this.numberThousands(item.NowMinPrice)} - ${this.numberThousands(item.NowMaxPrice)}`
+        }
+      })
+    },
+
     getStore(){
       let vm = this;
 
@@ -1362,6 +1373,8 @@ export default {
           let data = vm.category_product.Data[0];
           let category = vm.category_product.Category;
           let product = vm.category_product.Product;
+
+          vm.multiPriceHandler(vm.category_product.Product)
           
           // category => sort[i]
           for (let i = 0; i < category.length; i++) {
@@ -1458,6 +1471,7 @@ export default {
           }
 
           vm.search = JSON.parse(xhr.response).data;
+          vm.multiPriceHandler(vm.search);
           vm.perpage_num =  6;
           vm.search_totalpage_num = Math.ceil(vm.search.length / vm.perpage_num);
           vm.product_page_active = 1;
@@ -2679,6 +2693,7 @@ export default {
           }
 
           vm.products = JSON.parse(xhr.response).data;
+          vm.multiPriceHandler(vm.products)
         }
       }
     },
