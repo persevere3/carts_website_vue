@@ -1094,8 +1094,18 @@ export default {
     multiPriceHandler(data) {
       data.forEach(item => {
         if(item.PriceType === 'multiPrice') {
-          item.priceRange = `${this.numberThousands(item.MinPrice)} - ${this.numberThousands(item.MaxPrice)}`
-          item.nowPriceRange = `${this.numberThousands(item.NowMinPrice)} - ${this.numberThousands(item.NowMaxPrice)}`
+          // 建議售價
+          // 所有規格都有填建議售價
+          if(item.MinPrice > 0 && item.MaxPrice > 0) {        
+            // 建議售價都一樣
+            if(item.MinPrice === item.MaxPrice) item.priceRange = this.numberThousands(item.MinPrice)
+            else item.priceRange = `${this.numberThousands(item.MinPrice)} - ${this.numberThousands(item.MaxPrice)}`
+          }
+
+          // 售價
+          // 售價都一樣
+          if(item.NowMinPrice === item.NowMaxPrice) item.nowPriceRange = this.numberThousands(item.NowMinPrice)
+          else item.nowPriceRange = `${this.numberThousands(item.NowMinPrice)} - ${this.numberThousands(item.NowMaxPrice)}`
         }
       })
     },
