@@ -2463,11 +2463,31 @@ export default {
     
     // homePage
     pagePush(page){
-      if(page > this.totalpage_num || page < 1){
+      let totalpage_num = location.pathname.indexOf('search') > -1 ? this.search_totalpage_num : this.totalpage_num
+
+      if(page > totalpage_num || page < 1 || page == this.product_page_active) {
         return;
       }
       this.product_page_active = page;
       this.$forceUpdate();
+    },
+
+    //
+    is_show_page(item, totalpage_num) {
+      let showpage_num = 5
+
+      if(totalpage_num < showpage_num + 1) {
+        return item < totalpage_num + 1
+      }
+      else if(this.product_page_active < (showpage_num / 2)) {
+        return item < showpage_num + 1
+      }
+      else if(this.product_page_active > totalpage_num - (showpage_num / 2)) {
+        return item > (totalpage_num - 5) 
+      }
+      else {
+        return item >= (this.product_page_active - 2) && item <= (this.product_page_active + 2)
+      }
     },
     
     // allProducts, category, rich, contact(map)

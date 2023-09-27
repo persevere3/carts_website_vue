@@ -81,12 +81,33 @@
           </div>
           <div class="product_page">
             <ul>
-              <li @click="pagePush(product_page_active - 1)" :class="{opacity0: product_page_active < 2}"> <i class="fa fa-angle-double-left" aria-hidden="true"></i> </li>
-              <li v-for="item in totalpage_num" :class="{li_active: product_page_active === item}" 
-                  @click="pagePush(item)">
+              <li :class="{opacity0: product_page_active == 1}" 
+                  @click="pagePush(1)"
+              >
+                <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+              </li>
+              <li :class="{opacity0: product_page_active < 2}" 
+                  @click="pagePush(product_page_active - 1)"
+              >
+                <i class="fa-solid fa-chevron-left"></i>
+              </li>
+              <li v-for="item in totalpage_num"
+                  v-show="is_show_page(item, totalpage_num)"
+                  :class="{li_active: product_page_active === item}" 
+                  @click="pagePush(item)"
+              >
                 {{item}}
               </li>
-              <li @click="pagePush(product_page_active + 1)" :class="{opacity0: product_page_active > totalpage_num - 1}"> <i class="fa fa-angle-double-right" aria-hidden="true"></i> </li>
+              <li :class="{opacity0: product_page_active > totalpage_num - 1}" 
+                  @click="pagePush(product_page_active + 1)" 
+              > 
+                <i class="fa-solid fa-chevron-right"></i> 
+              </li>
+              <li :class="{opacity0: product_page_active == totalpage_num}" 
+                  @click="pagePush(totalpage_num)" 
+              > 
+                <i class="fa fa-angle-double-right" aria-hidden="true"></i> 
+              </li>
             </ul>
           </div>
         </div>
