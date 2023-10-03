@@ -57,7 +57,7 @@
                     <template v-else>
                       <div class="discount_price"> NT${{ item2.nowPriceRange }} </div>
                       <div class="origin_price" v-if="item2.priceRange"> NT${{ item2.priceRange }} </div>
-                      <div class="origin_price" v-else style="opacity: 0;"> NT${{numberThousands(item2.priceRange)}} </div>
+                      <div class="origin_price" v-else style="opacity: 0;"> NT${{ item2.priceRange }} </div>
                     </template>
                   </div>
                   <div class="l_addTo_cart_btn">
