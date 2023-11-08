@@ -156,7 +156,7 @@
 
     <div class="carts_container" :class="{hover : is_carts_hover}" v-if="carts.length">
       <ul class="carts_items">
-        <template v-for="item in carts" :key="item.ID">
+        <template v-for="item in carts">
           <!-- 有規格 -->
           <template v-if="item.specArr">
             <li v-for="spec in item.specArr " :key="spec.ID" v-show="spec.buyQty != 0 || spec.buyQty === ''" @click.stop="pushTo_cart(item.ID)">
@@ -234,7 +234,7 @@
 
     <div class="favorite_container" :class="{hover : is_favorite_hover}" v-if="Object.keys(favorite).length">
       <ul class="favorite_items">
-        <template v-for="item in favorite" :key="item.ID">
+        <template v-for="item in favorite">
           <li @click.stop="pushTo_cart(item.ID)">
             <div class="img_and_name">
               <div class="img" :style="{backgroundImage: `url(${item.Img1})`}"></div>

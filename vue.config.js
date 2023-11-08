@@ -1,95 +1,31 @@
-// common, demo, uniqm.com, uniqm.net
-let webVersion = 'demo'
+const VueSSRServerPlugin = require("vue-server-renderer/server-plugin")
+const VueSSRClientPlugin = require("vue-server-renderer/client-plugin")
+
+//环境变量，决定入口是客户端还是服务端
+const TARGRT_NODE = process.env.WEBPACK_TARGET === "node"
+const target = TARGRT_NODE ? "server" : "client"
 
 module.exports = {
-  publicPath: process.env.NODE_ENV === 'production' ? './' : '/',
-  pages: webVersion === 'common' || webVersion === 'demo'
-    ? {
-      index : {
-        entry: 'src/pages/index/main.js', // page 的入口
-        template: 'src/pages/index/index.html', // 模板来源
-        filename: 'index.html', 
-        chunks: ['chunk-vendors', 'chunk-common', 'index']
+  css: {
+    extract: false
+  },
+  outputDir: "./dist/" + target,
+  configureWebpack: () => ({
+      //将 entry 指向应用程序的 server entry 文件
+      entry: `./src/entry-${target}.js`,
+      //对 bundle renderer 提供 source map 支持
+      devtool: "source-map",
+      //这允许 webpack 以 Node 适用方式(Node-appropriate fashion)处理动态导入(dynamic import)
+      //并且还会在编译 Vue 组件时，告知 `vue-loader` 输送面向服务器代码(server-oriented code)
+      target: TARGRT_NODE ? "node" : "web",
+      node: TARGRT_NODE ? undefined : false,
+      output: {
+          //此处告知 server bundle 使用 Node 风格导出模块(Node-style exports)
+          libraryTarget: TARGRT_NODE ? "commonjs2" : undefined
       },
-      allProducts : {
-        entry: 'src/pages/allProducts/main.js',
-        template: 'src/pages/allProducts/index.html',
-        filename: 'allProducts.html', 
-        chunks: ['chunk-vendors', 'chunk-common', 'allProducts']
-      },
-      category : {
-        entry: 'src/pages/category/main.js',
-        template: 'src/pages/category/index.html',
-        filename: 'category.html', 
-        chunks: ['chunk-vendors', 'chunk-common', 'category']
-      },
-      rich : {
-        entry: 'src/pages/rich/main.js',
-        template: 'src/pages/rich/index.html',
-        filename: 'rich.html', 
-        chunks: ['chunk-vendors', 'chunk-common', 'rich']
-      },
-      contact : {
-        entry: 'src/pages/contact/main.js',
-        template: 'src/pages/contact/index.html',
-        filename: 'contact.html', 
-        chunks: ['chunk-vendors', 'chunk-common', 'contact']
-      },
-      search : {
-        entry: 'src/pages/search/main.js',
-        template: 'src/pages/search/index.html',
-        filename: 'search.html', 
-        chunks: ['chunk-vendors', 'chunk-common', 'search']
-      },
-      order : {
-        entry: 'src/pages/order/main.js',
-        template: 'src/pages/order/index.html',
-        filename: 'order.html', 
-        chunks: ['chunk-vendors', 'chunk-common', 'order']
-      },
-      user : {
-        entry: 'src/pages/user/main.js',
-        template: 'src/pages/user/index.html',
-        filename: 'user.html', 
-        chunks: ['chunk-vendors', 'chunk-common', 'user']
-      },
-      user_info : {
-        entry: 'src/pages/user_info/main.js',
-        template: 'src/pages/user_info/index.html',
-        filename: 'user_info.html', 
-        chunks: ['chunk-vendors', 'chunk-common', 'user_info']
-      },
-      error : {
-        entry: 'src/pages/error/main.js',
-        template: 'src/pages/error/index.html',
-        filename: 'error.html', 
-        chunks: ['chunk-vendors', 'chunk-common', 'error']
-      },
-    }
-    : {
-      shopping : {
-        entry: 'src/pages/shopping/main.js',
-        template: 'src/pages/shopping/index.html',
-        filename: 'shopping.html', 
-        chunks: ['chunk-vendors', 'chunk-common', 'shopping']
-      },
-      shoppingUser : {
-        entry: 'src/pages/shoppingUser/main.js',
-        template: 'src/pages/shoppingUser/index.html',
-        filename: 'shoppingUser.html', 
-        chunks: ['chunk-vendors', 'chunk-common', 'shoppingUser']
-      },
-      shoppingInfo : {
-        entry: 'src/pages/shoppingInfo/main.js',
-        template: 'src/pages/shoppingInfo/index.html',
-        filename: 'shoppingInfo.html', 
-        chunks: ['chunk-vendors', 'chunk-common', 'shoppingInfo']
-      },
-      shoppingOrder : {
-        entry: 'src/pages/shoppingOrder/main.js',
-        template: 'src/pages/shoppingOrder/index.html',
-        filename: 'shoppingOrder.html', 
-        chunks: ['chunk-vendors', 'chunk-common', 'shoppingOrder']
-      },
-    },
+      optimization: { splitChunks: TARGRT_NODE ? false : undefined },
+      //将服务器的整个输出构建为单个 JOSN 文件的插件
+      //服务端默认文件名为 vue-ssr-server-bundle.json
+      plugins: [TARGRT_NODE ? new VueSSRServerPlugin() : new VueSSRClientPlugin()]
+  })
 }

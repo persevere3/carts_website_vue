@@ -1,4 +1,10 @@
-import Swiper from './assets/js/swiper.js'
+import Swiper from 'swiper';
+import 'swiper/swiper.scss'
+
+import SwiperCore, { Pagination } from 'swiper/core';
+import 'swiper/components/pagination/pagination.scss';
+SwiperCore.use([Pagination])
+
 import Common from './components/Common.vue'
 import Cookie from './components/Cookie.vue'
 
