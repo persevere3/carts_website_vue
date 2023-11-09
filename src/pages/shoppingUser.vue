@@ -12,7 +12,7 @@
               </div>
               <div class="price_and_delete">
                 <!-- 多價格 carts_container 主商品 小計 -->
-                <div class="price" v-if="item.PriceType === 'onePrice'"> NT${{numberThousands(item.NowPrice)}} x {{spec.buyQty}}  </div>
+                <div class="price" v-if="item.priceType === 'onePrice'"> NT${{numberThousands(item.NowPrice)}} x {{spec.buyQty}}  </div>
                 <div class="price" v-else> NT${{numberThousands(spec.ItemNowPrice)}} x {{spec.buyQty}}  </div>
 
                 
@@ -47,7 +47,7 @@
                   </div>
                   <div class="price_and_delete">
                     <!-- 多價格 carts_container 加價購 小計 -->
-                    <div class="price" v-if="item2.PriceType === 'onePrice'"> NT${{numberThousands(item2.Price)}} x {{spec2.buyQty}}  </div>
+                    <div class="price" v-if="item2.priceType === 'onePrice'"> NT${{numberThousands(item2.Price)}} x {{spec2.buyQty}}  </div>
                     <div class="price" v-else> NT${{numberThousands(spec2.ItemNowPrice)}} x {{spec2.buyQty}}  </div>
                     
                     <!-- <div class="delete" @click.stop="spec2.buyQty = 0">
@@ -89,7 +89,7 @@
             </div>
             <div class="price_and_delete">
               <!-- 多價格 favorite_container 主商品 單價 -->
-              <div class="price" v-if="item.PriceType === 'onePrice'"> NT${{numberThousands(item.NowPrice)}} </div>
+              <div class="price" v-if="item.priceType === 'onePrice'"> NT${{numberThousands(item.NowPrice)}} </div>
               <div class="price" v-else> NT${{ item.nowPriceRange }} </div>
               
               <div class="delete" @click.stop="toggleFavorite(item.ID)">

@@ -1099,7 +1099,11 @@ export default {
 
     multiPriceHandler(data) {
       data.forEach(item => {
-        if(item.PriceType === 'multiPrice') {
+        item.PriceType ? item.priceType = item.PriceType : ''
+      })
+
+      data.forEach(item => {
+        if(item.priceType === 'multiPrice') {
           // 建議售價
           // 所有規格都有填建議售價
           if(item.MinPrice > 0 && item.MaxPrice > 0) {        

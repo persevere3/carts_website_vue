@@ -166,7 +166,7 @@
               </div>
               <div class="price_and_delete">
                 <!-- 多價格 carts_container 主商品 小計 -->
-                <div class="price" v-if="item.PriceType === 'onePrice'"> NT${{numberThousands(item.NowPrice)}} x {{spec.buyQty}}  </div>
+                <div class="price" v-if="item.priceType === 'onePrice'"> NT${{numberThousands(item.NowPrice)}} x {{spec.buyQty}}  </div>
                 <div class="price" v-else> NT${{numberThousands(spec.ItemNowPrice)}} x {{spec.buyQty}}  </div>
 
                 <div class="delete" @click.stop="delete_carts_item(item.ID, spec.ID)">
@@ -200,7 +200,7 @@
                   </div>
                   <div class="price_and_delete">
                     <!-- 多價格 carts_container 加價購 小計 -->
-                    <div class="price" v-if="item2.PriceType === 'onePrice'"> NT${{numberThousands(item2.Price)}} x {{spec2.buyQty}}  </div>
+                    <div class="price" v-if="item2.priceType === 'onePrice'"> NT${{numberThousands(item2.Price)}} x {{spec2.buyQty}}  </div>
                     <div class="price" v-else> NT${{numberThousands(spec2.ItemNowPrice)}} x {{spec2.buyQty}}  </div>
 
                     <!-- <div class="delete" @click.stop="spec2.buyQty = 0">
@@ -210,7 +210,7 @@
                 </li>
               </template>
               <!-- 沒有規格 -->
-              <li v-if="!item2.specArr" @click.stop="pushTo_cart(item.ID)">
+              <li v-if="!item2.specArr" v-show="item2.Qty != 0 || item2.Qty === ''" @click.stop="pushTo_cart(item.ID)">
                 <div class="img_and_name">
                   <div class="img" :style="{backgroundImage: `url(${item2.Img})`}"></div>
                   <div class="name"> 加價購 {{ item2.Name }} </div>
@@ -242,7 +242,7 @@
             </div>
             <div class="price_and_delete">
               <!-- 多價格 favorite_container 主商品 單價 -->
-              <div class="price" v-if="item.PriceType === 'onePrice'"> NT${{numberThousands(item.NowPrice)}} </div>
+              <div class="price" v-if="item.priceType === 'onePrice'"> NT${{numberThousands(item.NowPrice)}} </div>
               <div class="price" v-else> NT${{ item.nowPriceRange }} </div>
 
               <div class="delete" @click.stop="toggleFavorite(item.ID)">

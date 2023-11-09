@@ -49,7 +49,7 @@
                   <div class="info">
                     <div class="name"> {{item2.Name}} </div>
                     <!-- 多價格 products 主商品 單價 -->
-                    <template v-if="item2.PriceType === 'onePrice'">
+                    <template v-if="item2.priceType === 'onePrice'">
                       <div class="discount_price"> NT${{numberThousands(item2.NowPrice)}} </div>
                       <div class="origin_price" v-if="parseInt(item2.Price) > -1"> NT${{numberThousands(item2.Price)}} </div>
                       <div class="origin_price" v-else style="opacity: 0;"> NT${{numberThousands(item2.Price)}} </div>
