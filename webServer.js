@@ -1,42 +1,66 @@
 ﻿//nodejs服务器
 const express = require("express")
 const app = express()
-
 const fs = require("fs")
-let https = require("https")
- 
+const axios = require('axios');
 const { createBundleRenderer } = require("vue-server-renderer")
 
-//
+// 
 function getSeo(req) {
     return new Promise((resolve, reject) => {
-        // let url = `${req.protocol}://${req.get('host')}/interface/web/getStore`
-        // console.log(url)
-	    https.get('https://majoyreesa.com/interface/web/getStore', res => {
-            res.setEncoding("utf8")
-            let body = ''
+        let protocol = req.protocol
+        let host = req.get('host')
+        let query = req.query
+        console.log('protocol:', protocol)
+        console.log('host:', host)
+        console.log('query:', query)
         
-            //接收資料
-            res.on("data", data => {
-                body += data;
-            });
-            //接收完畢
-            res.on("end", () => {
-                body = JSON.parse(body)
-                resolve(body.data[0].Name)
-            });
+        let getSeoUrl = `${protocol}://${host}/interface/web/GetTitle`
+        console.log('getSeo url:', getSeoUrl)
+
+        let id = query['id'] ? query['id'] : 0
+        let webid = query['store'] ? query['store'] : 0
+        let pagetype = 1
+        if(req.url.indexOf('cart') > -1) pagetype = 0
+        else if (req.url === '/' || req.url.indexOf('/?') > -1 || req.url.indexOf('index') > -1)  pagetype = 1
+        else if (req.url.indexOf('allProducts') > -1 || req.url.indexOf('category') > -1)  pagetype = 3
+        else if (req.url.indexOf('contact') > -1 )  pagetype = 5
+        else if (req.url.indexOf('rich') > -1 ) {
+        if(query['cid'] == 0) pagetype = 3
+            else if(query['cid'] == 1 || query['cid'] == 2) pagetype = 4
+            else if(query['cid'] == 3) pagetype = 2
+        }
+        let params = `webid=${webid}&id=${id}&pagetype=${pagetype}&WebPreview=1`
+        console.log('params:', params)
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        };
+        
+        axios.post(getSeoUrl, params, config).then(function (response) {
+            console.log('response.data:', response.data);
+            let title = response.data.data[0] ? response.data.data[0].title : null
+            resolve(title)
+        })
+        .catch(function (error) {
+            console.log(error);
         });
     })
 }
 
 // 中间件处理静态文件请求
-	app.use(express.static("./dist/client", {index: false})) // ???
+app.use(express.static("./dist/client", {index: false})) // ???
+
+// 
+app.enable('trust proxy')
 
 //
 app.get("*", async (req, res) => {
     try {
         console.log('====================================================================================================')
-        console.log(req.url)
+        console.log('req url:', req.url)
 
         let title = await getSeo(req)
 
