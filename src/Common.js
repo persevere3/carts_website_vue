@@ -1116,8 +1116,55 @@ export default {
       })
     },
 
-    getStore(){
+    getSeo() {
+      const vm = this;
+      return new Promise((resolve) => {
+        // search
+        let search = location.search.substring(1)
+        let searchObj = {
+          id: '0',
+          store: '0'
+        }
+        if(search) {
+          let searchArr = search.split('&')
+          for(let item of searchArr) {
+            searchObj[item.split('=')[0]] = item.split('=')[1]
+          }
+        }
+
+        // pagetype
+        let pagetype = 1
+        if(location.pathname.indexOf('cart') > -1) pagetype = 0
+        else if (location.pathname === '/' || location.pathname.indexOf('index') > -1)  pagetype = 1
+        else if (location.pathname.indexOf('allProducts') > -1 || location.pathname.indexOf('category') > -1)  pagetype = 3
+        else if (location.pathname.indexOf('contact') > -1 )  pagetype = 5
+        else if (location.pathname.indexOf('rich') > -1 ) {
+          if(searchObj['cid'] == 0) pagetype = 3
+          else if(searchObj['cid'] == 1 || searchObj['cid'] == 2) pagetype = 4
+          else if(searchObj['cid'] == 3) pagetype = 2
+        }
+
+        const url = `${vm.protocol}//${vm.api}/interface/web/GetTitle`;
+        let o = `id=${searchObj['id']}&pagetype=${pagetype}&webid=${searchObj['store']}&WebPreview=${this.site.WebPreview}`;
+
+        let xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+        xhr.open('post', url, true);
+        xhr.send(o);
+        xhr.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            let data = JSON.parse(xhr.response).data
+            data[0] ? document.title = data[0].title : ''
+            resolve()
+          }
+          resolve()
+        }
+      })  
+    },
+    async getStore(){
       let vm = this;
+
+      await vm.getSeo()
 
       let site_webPreview = (JSON.parse(localStorage.getItem('site')).WebPreview || '') ;
 
@@ -1143,11 +1190,12 @@ export default {
           vm.footer_community = JSON.parse(xhr.response).footer[0] || {};
 
           let title = vm.store.Name;
+
           if(vm.site.WebPreview == 1){
-            document.title = title;
+            document.title.trim() ? '' : document.title = title
           }
           else if(vm.site.WebPreview == 2){
-            document.title = title + ' (預覽模式)';
+            document.title.trim() ? document.title += ' (預覽模式)' : document.title = title
           }
 
           // GA
