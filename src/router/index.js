@@ -1,5 +1,5 @@
 // common, demo, uniqm.com, uniqm.net
-let webVersion = 'common'
+let webVersion = 'demo'
 
 import Vue from 'vue'
 import Router from 'vue-router'
