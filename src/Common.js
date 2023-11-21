@@ -1149,12 +1149,17 @@ export default {
         }
 
         const url = `${vm.protocol}//${vm.api}/interface/web/GetTitle`;
-        let o = `id=${searchObj['id']}&pagetype=${pagetype}&webid=${searchObj['store']}&WebPreview=${this.site.WebPreview}`;
+
+        let formData = new FormData();
+        formData.append("id", searchObj['id']);
+        formData.append("pagetype", pagetype);
+        formData.append("webid", this.site.Name);
+        formData.append("WebPreview", this.site.WebPreview);
 
         let xhr = new XMLHttpRequest();
         xhr.withCredentials = true;
         xhr.open('post', url, true);
-        xhr.send(o);
+        xhr.send(formData);
         xhr.onreadystatechange = function() {
           if (this.readyState == 4 && this.status == 200) {
             let data = JSON.parse(xhr.response).data
